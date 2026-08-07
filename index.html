@@ -490,11 +490,19 @@ const FUNDS=[
 /* months elapsed in the year, including the partial current month */
 const monthsElapsed=()=>MO+DATE/MONTHS[NOWKEY].dim;
 const alloc=f=>f.annual/12;
-const fundSpent=f=>Object.values(f.months).reduce((a,b)=>a+b,0);
+const fundSpent=f=>Object.values(f.months||{}).reduce((a,b)=>a+b,0);
+const fundDeposited=f=>Object.values(f.deposits||{}).reduce((a,b)=>a+b,0);
+/* what is actually sitting in the pocket right now */
+const fundPocket=f=>fundDeposited(f)-fundSpent(f);
+/* what should be in it if you had funded it every month */
+const fundTargetBal=f=>Math.max(0,alloc(f)*monthsElapsed()-fundSpent(f));
+/* positive = ahead of plan, negative = behind on deposits */
+const fundGap=f=>fundDeposited(f)-alloc(f)*monthsElapsed();
 const fundAccrued=f=>alloc(f)*monthsElapsed();
-const fundBalance=f=>fundAccrued(f)-fundSpent(f);
-const fundThisMonth=f=>f.months[CUR]||0;
+const fundThisMonth=f=>(f.months||{})[CUR]||0;
+const fundDepThisMonth=f=>(f.deposits||{})[CUR]||0;
 const allocTotal=()=>FUNDS.reduce((a,f)=>a+alloc(f),0);
+const depositedThisMonth=()=>FUNDS.reduce((a,f)=>a+fundDepThisMonth(f),0);
 
 let PROFILE={name:'',salary:0,setup:false};
 const INCOME_CATS=[
@@ -582,7 +590,7 @@ const L=o=>AR?o.ar:o.en;
 const Mo=()=>MONTHS[CUR];
 const spent=()=>Mo().spend.reduce((a,b)=>a+b,0);
 const income=()=>PROFILE.salary+(Mo().extra||0);
-const netLeft=()=>income()-spent()-allocTotal()-loansMonthly();
+const netLeft=()=>income()-spent()-depositedThisMonth()-loansMonthly();
 const budg=()=>CATS.reduce((a,c)=>a+c.b,0);
 const isNow=()=>CUR===NOWKEY;
 function dayLabel(d){
@@ -634,8 +642,13 @@ function homeView(){
     <div class="yrow"><span class="col"><span class="nm">${AR?'المصروف اليومي':'Day-to-day'}</span></span>
       <span class="val">−${mn(s)}</span></div>
     <div class="yrow"><span class="col"><span class="nm">${AR?'تحويل المخصصات':'Set aside'}</span>
-      <span class="sub">${AR?'للمصاريف السنوية':'toward annual costs'}</span></span>
-      <span class="val">−${mn(allocTotal())}</span></div>
+      <span class="sub">${AR?`أودعت ${mn(depositedThisMonth())} من ${mn(allocTotal())} المخطط`
+        :`${mn(depositedThisMonth())} deposited of ${mn(allocTotal())} planned`}</span></span>
+      <span class="val">−${mn(depositedThisMonth())}</span></div>
+    ${depositedThisMonth()<allocTotal()-1?`<div class="yrow"><span class="col">
+      <span class="nm" style="color:var(--amber)">${AR?'لم يُحوَّل بعد':'Not yet set aside'}</span>
+      <span class="sub">${AR?'يظهر كأنه متبقٍ لكنه مخصص':'shows as left over but is already spoken for'}</span></span>
+      <span class="val" style="color:var(--amber)">${mn(allocTotal()-depositedThisMonth())}</span></div>`:''}
     ${loansMonthly()>0?`<div class="yrow"><span class="col"><span class="nm">${AR?'أقساط القروض':'Loan payments'}</span></span>
       <span class="val">−${mn(loansMonthly())}</span></div>`:''}
     <div class="yrow total"><span class="col"><span class="nm">${AR?'المتبقي':'Left over'}</span></span>
@@ -820,36 +833,46 @@ function fundsView(){
       <span style="position:absolute;top:-3px;bottom:-3px;inset-inline-start:${pace*100}%;width:2px;background:#FFC98A"></span></div>
     <div class="hstats" style="margin-top:14px">
       <div><div class="k">${AR?'يومي':'Day-to-day'}</div><div class="v">${mn(dSpent)}</div></div>
-      <div><div class="k">${AR?'مخصصات':'Funds'}</div><div class="v">${mn(fSpent)}</div></div>
+      <div><div class="k">${AR?'في الجيوب':'In pockets'}</div>
+        <div class="v">${mn(FUNDS.reduce((a,f)=>a+fundPocket(f),0))}</div></div>
       <div><div class="k">${AR?'مضى من السنة':'Year gone'}</div><div class="v">${Math.round(pace*100)}%</div></div>
     </div></div>
 
   <div class="card"><div class="chead">
-    <h3>${AR?'المخصصات السنوية':'Annual funds'}</h3>
+    <h3>${AR?'الجيوب السنوية':'Annual pockets'}</h3>
     <button class="more" id="addFund">${AR?'إضافة':'Add'}</button></div>
-    <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:-4px 0 14px">${AR
-      ?`العلامة الرأسية توضح ما تم تجميعه بعد ${me.toFixed(1)} شهراً — تجاوز الشريط لها يعني أنك دفعت قبل أن تجمع.`
-      :`The vertical mark is what has accrued after ${me.toFixed(1)} months — a bar past it means you paid before you saved.`}</p>
+    <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:-4px 0 12px">${AR
+      ?'أودع المبلغ الشهري في كل جيب. الشريط يوضح ما أودعته فعلاً، والعلامة الرأسية أين يجب أن تكون الآن.'
+      :'Deposit the monthly amount into each pocket. The bar is what you have actually put in; the vertical mark is where it should be by now.'}</p>
     ${FUNDS.length?FUNDS.map((f,i)=>{
-      const sp=fundSpent(f),ac=fundAccrued(f),bal=ac-sp;
-      const p=Math.min(100,sp/f.annual*100), t=Math.min(100,ac/f.annual*100);
-      const short=bal<0, cc=short?'#D0453A':f.c;
-      const msg=short?(AR?'مسحوب مقدماً '+mn(-bal):mn(-bal)+' ahead of savings')
-                     :(AR?'متوفر '+mn(bal):mn(bal)+' set aside');
-      return `<button class="brow" data-fund="${i}"><div class="btop">
-        <span class="tic" style="width:32px;height:32px;border-radius:10px;background:${cc}1F;color:${cc}">${svg(f.ic)}</span>
-        <span class="nm">${L(f)}<span style="display:block;font-size:10.5px;color:var(--muted);font-weight:500;margin-top:2px">
-          ${mn(f.annual/12)}/${AR?'شهر':'mo'}</span></span>
-        <span class="sp">${mn(sp)} <b>/ ${mn(f.annual)}</b></span></div>
-        <div class="btr"><i style="width:${p}%;background:${cc}"></i>
+      const dep=fundDeposited(f),paid=fundSpent(f),bal=fundPocket(f),gap=fundGap(f);
+      const behind=gap<-1, cc=behind?'#D08A1E':f.c;
+      const p=Math.min(100,dep/f.annual*100), t=Math.min(100,alloc(f)*monthsElapsed()/f.annual*100);
+      const funded=fundDepThisMonth(f)>0;
+      return `<div class="brow" style="cursor:default"><div class="btop">
+        <button data-fund="${i}" style="display:flex;align-items:center;gap:10px;flex:1;background:none;border:none;
+          font-family:var(--f);text-align:start;padding:0;color:inherit">
+          <span class="tic" style="width:32px;height:32px;border-radius:10px;background:${cc}1F;color:${cc}">${svg(f.ic)}</span>
+          <span class="nm" style="flex:1">${L(f)}<span style="display:block;font-size:10.5px;color:var(--muted);font-weight:500;margin-top:2px">
+            ${mn(alloc(f))}/${AR?'شهر':'mo'} · ${AR?'الهدف':'target'} ${mn(f.annual)}</span></span></button>
+        <button class="tinybtn ${funded?'del':''}" data-dep="${i}" style="padding:8px 13px;font-size:11.5px;border-radius:10px;
+          ${funded?'background:var(--tealLite);color:var(--teal)':''}">${
+          funded?(AR?'تم ✓':'Funded ✓'):(AR?'إيداع':'Deposit')}</button></div>
+        <div class="btr" style="margin-top:9px"><i style="width:${p}%;background:${cc}"></i>
           <span class="tick" style="inset-inline-start:${t}%"></span></div>
-        <div class="bfoot"><span>${AR?'تم تجميع':'accrued'} ${mn(ac)}</span>
-          <span class="r ${short?'o':''}">${msg}</span></div></button>`}).join('')
+        <div class="bfoot"><span>${AR?'في الجيب':'in pocket'} <b style="color:var(--ink)">${mn(bal)}</b>${
+          paid>0?` · ${AR?'دُفع':'paid'} ${mn(paid)}`:''}</span>
+          <span class="r ${behind?'a':''}">${behind?(AR?'متأخر '+mn(-gap):mn(-gap)+' behind')
+            :(AR?'متقدم '+mn(gap):mn(gap)+' ahead')}</span></div></div>`}).join('')
     :`<p style="font-size:12px;color:var(--muted);padding:14px 0;text-align:center">${
-      AR?'لا توجد مخصصات بعد':'No funds yet'}</p>`}
-    <div class="yrow total"><span class="col"><span class="nm">${AR?'الإجمالي السنوي':'Annual total'}</span>
-      <span class="sub">${mn(fAnnual/12)}/${AR?'شهر':'mo'}</span></span>
-      <span class="val">${mn(fAnnual)}</span></div>
+      AR?'لا توجد جيوب بعد':'No pockets yet'}</p>`}
+    ${FUNDS.length?`<div class="yrow total"><span class="col">
+      <span class="nm">${AR?'إجمالي الجيوب':'Total in pockets'}</span>
+      <span class="sub">${mn(allocTotal())}/${AR?'شهر':'mo'} · ${AR?'الهدف':'target'} ${mn(fAnnual)}</span></span>
+      <span class="val">${mn(FUNDS.reduce((a,f)=>a+fundPocket(f),0))}</span></div>
+      ${depositedThisMonth()<allocTotal()-1?`<button class="primary" id="fundAll" style="margin-top:14px">
+        ${AR?`إيداع ${mn(allocTotal()-depositedThisMonth())} في كل الجيوب`
+          :`Fund all pockets · ${mn(allocTotal()-depositedThisMonth())}`}</button>`:''}`:''}
   </div>
 
   <div class="card"><div class="chead">
@@ -890,6 +913,13 @@ function fundsView(){
       :`At your current day-to-day rate of ${mn(dSpent/me)} a month, plus the annual funds, you finish ${YR} at ${mn(projected)}.`}</p>
   </div>`;
   document.getElementById('addFund').onclick=()=>fundForm(-1);
+  document.querySelectorAll('[data-dep]').forEach(b=>b.onclick=e=>{
+    e.stopPropagation();depositSheet(+b.dataset.dep)});
+  const fa=document.getElementById('fundAll');
+  if(fa)fa.onclick=()=>{
+    FUNDS.forEach(f=>{const short=alloc(f)-fundDepThisMonth(f);
+      if(short>0){f.deposits=f.deposits||{};f.deposits[NOWKEY]=(f.deposits[NOWKEY]||0)+short}});
+    save();reflow();toast(AR?'تم تمويل كل الجيوب':'All pockets funded');};
 }
 
 /* ---------- settings ---------- */
@@ -1204,6 +1234,57 @@ const freqLabel=l=>{
 };
 
 
+function depositSheet(i){
+  const f=FUNDS[i],suggested=Math.max(0,alloc(f)-fundDepThisMonth(f))||alloc(f);
+  openSheet(`<div class="shead"><span class="tic" style="width:44px;height:44px;border-radius:14px;background:${f.c}1F;color:${f.c}">${svg(f.ic)}</span>
+    <span class="nm"><span class="t">${AR?'إيداع في '+L(f):'Deposit into '+L(f)}</span>
+    <span class="s">${AR?'في الجيب الآن':'In pocket now'} ${mn(fundPocket(f))}</span></span></div>
+  <div class="nform" style="padding:0">
+    <input id="dAmt" type="number" inputmode="numeric" value="${Math.round(suggested)}"
+      style="font-size:26px;font-weight:700;text-align:center">
+    <div style="display:flex;gap:7px;margin-top:12px;flex-wrap:wrap">
+      <button class="cpill" data-dq="${Math.round(alloc(f))}">${AR?'الشهري':'Monthly'} ${mn(alloc(f))}</button>
+      ${fundGap(f)<-1?`<button class="cpill" data-dq="${Math.round(-fundGap(f))}">${
+        AR?'تعويض المتأخر':'Catch up'} ${mn(-fundGap(f))}</button>`:''}
+    </div>
+    <button class="primary" id="dSave" style="margin-top:18px">${AR?'إيداع':'Deposit'}</button>
+    <button class="primary" id="pOpen" style="background:var(--tealLite);color:var(--teal);margin-top:9px">
+      ${AR?'تسجيل دفعة من الجيب':'Record a payment out'}</button>
+  </div>`);
+  document.querySelectorAll('[data-dq]').forEach(b=>b.onclick=()=>{
+    document.getElementById('dAmt').value=b.dataset.dq});
+  document.getElementById('dSave').onclick=()=>{
+    const v=parseFloat(document.getElementById('dAmt').value)||0;
+    if(v<=0){toast(AR?'أدخل مبلغاً':'Enter an amount');return}
+    f.deposits=f.deposits||{};f.deposits[NOWKEY]=(f.deposits[NOWKEY]||0)+v;
+    save();closeSheet();reflow();toast((AR?'أُودع ':'Deposited ')+mn(v)+' · '+L(f));};
+  document.getElementById('pOpen').onclick=()=>paymentSheet(i);
+}
+function paymentSheet(i){
+  const f=FUNDS[i],bal=fundPocket(f);
+  openSheet(`<div class="shead"><span class="tic" style="width:44px;height:44px;border-radius:14px;background:${f.c}1F;color:${f.c}">${svg(f.ic)}</span>
+    <span class="nm"><span class="t">${AR?'دفعة من '+L(f):'Payment from '+L(f)}</span>
+    <span class="s">${AR?'الرصيد':'Balance'} ${mn(bal)}</span></span></div>
+  <div class="nform" style="padding:0">
+    <input id="pAmt" type="number" inputmode="numeric" placeholder="0"
+      style="font-size:26px;font-weight:700;text-align:center">
+    <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin-top:12px;text-align:center" id="pWarn"></p>
+    <button class="primary" id="pSave" style="margin-top:14px">${AR?'تسجيل الدفعة':'Record payment'}</button>
+  </div>`);
+  const inp=document.getElementById('pAmt'),w=document.getElementById('pWarn');
+  inp.oninput=()=>{const v=parseFloat(inp.value)||0;
+    w.textContent=v>bal?(AR?`يتجاوز الرصيد بـ ${mn(v-bal)} — سيظهر الجيب بالسالب.`
+      :`${mn(v-bal)} more than the pocket holds — it will show a shortfall.`)
+      :(v?(AR?`يتبقى ${mn(bal-v)} في الجيب`:`${mn(bal-v)} left in the pocket`):'');
+    w.style.color=v>bal?'var(--red)':'var(--muted)'};
+  inp.focus();
+  document.getElementById('pSave').onclick=()=>{
+    const v=parseFloat(inp.value)||0;
+    if(v<=0){toast(AR?'أدخل مبلغاً':'Enter an amount');return}
+    f.months=f.months||{};f.months[NOWKEY]=(f.months[NOWKEY]||0)+v;
+    save();closeSheet();reflow();toast((AR?'سُجّلت دفعة ':'Payment of ')+mn(v)+' · '+L(f));};
+}
+
 function fundForm(i){
   const isNew=i<0;
   const f=isNew?{en:'',ar:'',annual:0,c:PALETTE[FUNDS.length%PALETTE.length],ic:'tag',months:{}}
@@ -1475,35 +1556,46 @@ function txSheet(i){
   document.getElementById('txEdit').onclick=()=>{editingTx=null;closeSheet();openAdd(t,i)};
 }
 function fundSheet(i){
-  const f=FUNDS[i],sp=fundSpent(f),ac=fundAccrued(f),bal=ac-sp,short=bal<0;
-  const cc=short?'#D0453A':f.c;
-  const rows=Object.entries(f.months).sort((a,b)=>b[0].localeCompare(a[0]));
+  const f=FUNDS[i],dep=fundDeposited(f),paid=fundSpent(f),bal=fundPocket(f),gap=fundGap(f);
+  const behind=gap<-1, cc=behind?'#D08A1E':f.c;
+  const deps=Object.entries(f.deposits||{}).sort((a,b)=>b[0].localeCompare(a[0]));
+  const pays=Object.entries(f.months||{}).sort((a,b)=>b[0].localeCompare(a[0]));
   openSheet(`<div class="shead"><span class="tic" style="width:44px;height:44px;border-radius:14px;background:${cc}1F;color:${cc}">${svg(f.ic)}</span>
     <span class="nm"><span class="t">${L(f)}</span>
-    <span class="s">${mn(alloc(f))}/${AR?'شهر':'mo'} · ${mn(f.annual)}/${AR?'سنة':'yr'}</span></span></div>
-    <div class="yrow"><span class="col"><span class="nm">${AR?'تم تجميعه':'Accrued so far'}</span>
-      <span class="sub">${mn(alloc(f))} × ${monthsElapsed().toFixed(1)} ${AR?'شهر':'months'}</span></span>
-      <span class="val">${mn(ac)}</span></div>
-    <div class="yrow"><span class="col"><span class="nm">${AR?'المدفوع':'Paid out'}</span></span>
-      <span class="val">${mn(sp)}</span></div>
-    <div class="yrow total"><span class="col"><span class="nm">${short?(AR?'مسحوب مقدماً':'Drawn ahead'):(AR?'الرصيد المتوفر':'Balance available')}</span></span>
-      <span class="val" style="color:${short?'var(--red)':'var(--teal)'}">${short?'−':''}${mn(Math.abs(bal))}</span></div>
-    <p style="font-size:11.5px;color:var(--muted);line-height:1.65;margin-top:14px">${
-      short?(AR?'دفعت قبل أن يكتمل التجميع. سيتعادل الرصيد تلقائياً مع مرور الأشهر القادمة.'
-              :'You paid before the fund had accrued. It evens out on its own over the coming months.')
-           :(AR?'هذا المبلغ متراكم وجاهز لتغطية الدفعة القادمة.'
-              :'This much has built up and is ready for the next bill.')}</p>
-    ${rows.length?`<div class="chead" style="margin:20px 0 4px"><h3>${AR?'الدفعات':'Payments'}</h3></div>
-      ${rows.map(([k,v])=>`<div class="yrow"><span class="col"><span class="nm">${
-        AR?MONTHS[k].ar:MONTHS[k].en}</span></span><span class="val">${mn(v)}</span></div>`).join('')}`
-    :`<p style="font-size:12px;color:var(--muted);padding:16px 0;text-align:center">${
-      AR?'لا توجد دفعات هذه السنة بعد':'No payments this year yet'}</p>`}
+    <span class="s">${mn(alloc(f))}/${AR?'شهر':'mo'} · ${AR?'الهدف السنوي':'yearly target'} ${mn(f.annual)}</span></span></div>
+
+    <div style="text-align:center;padding:6px 0 16px">
+      <div style="font-size:34px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums">${mn(bal)}</div>
+      <div style="font-size:11.5px;color:var(--muted);margin-top:2px">${AR?'في الجيب الآن':'in the pocket now'}</div></div>
+
+    <div class="yrow"><span class="col"><span class="nm">${AR?'إجمالي الإيداعات':'Deposited'}</span></span>
+      <span class="val" style="color:var(--teal)">+${mn(dep)}</span></div>
+    <div class="yrow"><span class="col"><span class="nm">${AR?'إجمالي المدفوع':'Paid out'}</span></span>
+      <span class="val">−${mn(paid)}</span></div>
+    <div class="yrow total"><span class="col"><span class="nm">${behind?(AR?'متأخر عن الخطة':'Behind plan'):(AR?'متقدم على الخطة':'Ahead of plan')}</span>
+      <span class="sub">${AR?`كان يجب إيداع ${mn(alloc(f)*monthsElapsed())} بعد ${monthsElapsed().toFixed(1)} شهراً`
+        :`${mn(alloc(f)*monthsElapsed())} should be in after ${monthsElapsed().toFixed(1)} months`}</span></span>
+      <span class="val" style="color:${behind?'var(--amber)':'var(--teal)'}">${behind?'−':'+'}${mn(Math.abs(gap))}</span></div>
+
+    <div class="sbtns"><button class="sbtn edit" id="fDep">${AR?'إيداع':'Deposit'}</button>
+      <button class="sbtn" id="fPay" style="background:#F1F3F5;color:var(--ink)">${AR?'دفعة':'Payment'}</button></div>
+
+    ${(deps.length||pays.length)?`<div class="chead" style="margin:22px 0 4px"><h3>${AR?'الحركة':'Activity'}</h3></div>
+      ${[...deps.map(([k,v])=>({k,v,d:1})),...pays.map(([k,v])=>({k,v,d:0}))]
+        .sort((a,b)=>b.k.localeCompare(a.k)).map(r=>`<div class="yrow">
+        <span class="col"><span class="nm">${r.d?(AR?'إيداع':'Deposit'):(AR?'دفعة':'Payment')}</span>
+        <span class="sub">${MONTHS[r.k]?(AR?MONTHS[r.k].ar:MONTHS[r.k].en):r.k}</span></span>
+        <span class="val" style="color:${r.d?'var(--teal)':'var(--ink)'}">${r.d?'+':'−'}${mn(r.v)}</span></div>`).join('')}`:''}
+
     <div class="sbtns"><button class="sbtn edit" id="fundEdit">${AR?'تعديل':'Edit'}</button>
       <button class="sbtn del" id="fundDel">${AR?'حذف':'Delete'}</button></div>`);
+  document.getElementById('fDep').onclick=()=>{closeSheet();setTimeout(()=>depositSheet(i),260)};
+  document.getElementById('fPay').onclick=()=>{closeSheet();setTimeout(()=>paymentSheet(i),260)};
   document.getElementById('fundDel').onclick=()=>{FUNDS.splice(i,1);save();closeSheet();reflow();
     toast(AR?'تم الحذف':'Fund removed')};
   document.getElementById('fundEdit').onclick=()=>{closeSheet();fundForm(i)};
 }
+
 function monthSheet(){
   openSheet(`<div class="shead"><span class="nm"><span class="t">${AR?'اختر الشهر':'Choose month'}</span></span></div>
     ${KEYS.map(k=>{const m=MONTHS[k],t=m.spend.reduce((a,b)=>a+b,0);
@@ -1626,7 +1718,7 @@ function snapshot(){
   return {v:2,ar:AR,cur:CUR,profile:PROFILE,
     cats:CATS.map(c=>({en:c.en,ar:c.ar,b:c.b,c:c.c,ic:c.ic,
       items:c.items.map(i=>({en:i.en,ar:i.ar}))})),
-    funds:FUNDS.map(f=>({en:f.en,ar:f.ar,annual:f.annual,c:f.c,ic:f.ic,months:f.months})),
+    funds:FUNDS.map(f=>({en:f.en,ar:f.ar,annual:f.annual,c:f.c,ic:f.ic,months:f.months,deposits:f.deposits||{}})),
     loans:LOANS,
     months:Object.fromEntries(KEYS.map(k=>[k,MONTHS[k].tx]))};
 }
@@ -1648,7 +1740,7 @@ function load(){
   if(Array.isArray(d.funds)&&d.funds.length&&d.funds[0].c){
     FUNDS.length=0;
     d.funds.forEach(sf=>FUNDS.push({en:sf.en,ar:sf.ar||sf.en,annual:sf.annual,
-      c:sf.c,ic:sf.ic||'tag',months:sf.months||{}}));
+      c:sf.c,ic:sf.ic||'tag',months:sf.months||{},deposits:sf.deposits||{}}));
   } else {
     (d.funds||[]).forEach(sf=>{const f=FUNDS.find(x=>x.en===sf.en);if(!f)return;
       f.annual=sf.annual;f.months=sf.months||{}});
