@@ -295,9 +295,14 @@ button:active{transform:scale(.972)}
 .stepdots{display:flex;gap:6px;justify-content:center;padding:6px 0 14px}
 .stepdots i{width:6px;height:6px;border-radius:99px;background:var(--line)}
 .stepdots i.on{background:var(--teal);width:18px}
-.tinybtn{background:none;border:none;font-family:var(--f);font-size:11.5px;font-weight:600;
- color:var(--muted);cursor:pointer;padding:6px}
-.tinybtn.del{color:var(--red)}
+.tinybtn{background:var(--teal);border:none;font-family:var(--f);font-size:12.5px;font-weight:700;
+ color:#fff;cursor:pointer;padding:12px 20px;border-radius:13px;flex:none;white-space:nowrap}
+.tinybtn:disabled{background:#C7CCD3}
+.tinybtn.del{background:#FBEBEA;color:var(--red);padding:8px 14px;font-size:11.5px;border-radius:10px}
+.additem{display:flex;gap:8px;align-items:stretch;margin-top:12px}
+.additem input{flex:1;min-width:0;background:var(--bg);border:1.5px solid var(--line);
+ border-radius:13px;padding:12px 14px;font-family:var(--f);font-size:13.5px;color:var(--ink);outline:none}
+.additem input:focus{border-color:var(--teal);background:#fff}
 .nav{position:fixed;bottom:0;width:100%;max-width:430px;background:rgba(255,255,255,.94);
  backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;align-items:center;
  justify-content:space-around;padding:11px 8px calc(14px + env(safe-area-inset-bottom));z-index:30}
@@ -791,32 +796,41 @@ function budView(){
 
 function fundsView(){
   const me=monthsElapsed();
-  const totAnnual=FUNDS.reduce((a,f)=>a+f.annual,0);
-  const totSpent=FUNDS.reduce((a,f)=>a+fundSpent(f),0);
-  const totAccrued=FUNDS.reduce((a,f)=>a+fundAccrued(f),0);
-  const totBal=totAccrued-totSpent;
-  const pct=Math.min(100,totSpent/totAnnual*100), tick=totAccrued/totAnnual*100;
+  const fAnnual=FUNDS.reduce((a,f)=>a+f.annual,0);
+  const fSpent=FUNDS.reduce((a,f)=>a+fundSpent(f),0);
+  const fAccrued=FUNDS.reduce((a,f)=>a+fundAccrued(f),0);
+  const fBal=fAccrued-fSpent;
+  /* day-to-day, expressed annually */
+  const ytd=CATS.map((c,i)=>KEYS.reduce((a,k)=>a+(MONTHS[k].spend[i]||0),0));
+  const dAnnual=CATS.reduce((a,c)=>a+c.b*12,0);
+  const dSpent=ytd.reduce((a,b)=>a+b,0);
+  const dExpected=CATS.reduce((a,c)=>a+c.b*me,0);
+  const grandBudget=dAnnual+fAnnual;
+  const grandSpent=dSpent+fSpent;
+  const pace=me/12;
+  const pct=Math.min(100,grandSpent/grandBudget*100);
+  const projected=Math.round(dSpent/me*12)+fAnnual;
+
   document.getElementById('budWrap').innerHTML=`
   <div class="hero" style="margin-top:16px">
-    <div class="lab">${AR?'المخصصات السنوية':'Annual funds'}</div>
-    <div class="row"><div class="big">${mn(totSpent)}<small>${AR?'من':'of'} ${mn(totAnnual)}</small></div></div>
+    <div class="lab">${AR?`سنة ${YR} — الإنفاق حتى الآن`:`${YR} spending so far`}</div>
+    <div class="row"><div class="big">${mn(grandSpent)}<small>${AR?'من':'of'} ${mn(grandBudget)}</small></div></div>
     <div style="height:7px;background:rgba(255,255,255,.22);border-radius:99px;margin-top:16px;position:relative">
       <i style="display:block;height:100%;width:${pct}%;background:#fff;border-radius:99px"></i>
-      <span style="position:absolute;top:-3px;bottom:-3px;inset-inline-start:${tick}%;width:2px;background:#FFC98A"></span></div>
+      <span style="position:absolute;top:-3px;bottom:-3px;inset-inline-start:${pace*100}%;width:2px;background:#FFC98A"></span></div>
     <div class="hstats" style="margin-top:14px">
-      <div><div class="k">${AR?'تم تجميعه':'Accrued'}</div><div class="v">${mn(totAccrued)}</div></div>
-      <div><div class="k">${AR?'الرصيد':'Balance'}</div>
-        <div class="v ${totBal<0?'warn':''}">${totBal<0?'−':''}${mn(Math.abs(totBal))}</div></div>
-      <div><div class="k">${AR?'شهرياً':'Per month'}</div><div class="v">${mn(allocTotal())}</div></div>
+      <div><div class="k">${AR?'يومي':'Day-to-day'}</div><div class="v">${mn(dSpent)}</div></div>
+      <div><div class="k">${AR?'مخصصات':'Funds'}</div><div class="v">${mn(fSpent)}</div></div>
+      <div><div class="k">${AR?'مضى من السنة':'Year gone'}</div><div class="v">${Math.round(pace*100)}%</div></div>
     </div></div>
 
   <div class="card"><div class="chead">
-    <h3>${AR?'المخصصات':'Funds'}</h3>
-    <button class="more" id="editBudgets">${AR?'ضبط':'Set budgets'}</button></div>
+    <h3>${AR?'المخصصات السنوية':'Annual funds'}</h3>
+    <button class="more" id="addFund">${AR?'إضافة':'Add'}</button></div>
     <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:-4px 0 14px">${AR
-      ?`مضى ${me.toFixed(1)} شهر من السنة. الخط الرأسي يوضح ما تم تجميعه حتى الآن — إن تجاوزه الشريط فقد دفعت قبل أن تجمع.`
-      :`${me.toFixed(1)} months into the year. The vertical mark is what you have accrued — a bar past it means you paid before you saved.`}</p>
-    ${FUNDS.map((f,i)=>{
+      ?`العلامة الرأسية توضح ما تم تجميعه بعد ${me.toFixed(1)} شهراً — تجاوز الشريط لها يعني أنك دفعت قبل أن تجمع.`
+      :`The vertical mark is what has accrued after ${me.toFixed(1)} months — a bar past it means you paid before you saved.`}</p>
+    ${FUNDS.length?FUNDS.map((f,i)=>{
       const sp=fundSpent(f),ac=fundAccrued(f),bal=ac-sp;
       const p=Math.min(100,sp/f.annual*100), t=Math.min(100,ac/f.annual*100);
       const short=bal<0, cc=short?'#D0453A':f.c;
@@ -825,13 +839,57 @@ function fundsView(){
       return `<button class="brow" data-fund="${i}"><div class="btop">
         <span class="tic" style="width:32px;height:32px;border-radius:10px;background:${cc}1F;color:${cc}">${svg(f.ic)}</span>
         <span class="nm">${L(f)}<span style="display:block;font-size:10.5px;color:var(--muted);font-weight:500;margin-top:2px">
-          ${mn(alloc(f))}/${AR?'شهر':'mo'} · ${mn(f.annual)}/${AR?'سنة':'yr'}</span></span>
+          ${mn(f.annual/12)}/${AR?'شهر':'mo'}</span></span>
         <span class="sp">${mn(sp)} <b>/ ${mn(f.annual)}</b></span></div>
         <div class="btr"><i style="width:${p}%;background:${cc}"></i>
           <span class="tick" style="inset-inline-start:${t}%"></span></div>
         <div class="bfoot"><span>${AR?'تم تجميع':'accrued'} ${mn(ac)}</span>
-          <span class="r ${short?'o':''}">${msg}</span></div></button>`}).join('')}
+          <span class="r ${short?'o':''}">${msg}</span></div></button>`}).join('')
+    :`<p style="font-size:12px;color:var(--muted);padding:14px 0;text-align:center">${
+      AR?'لا توجد مخصصات بعد':'No funds yet'}</p>`}
+    <div class="yrow total"><span class="col"><span class="nm">${AR?'الإجمالي السنوي':'Annual total'}</span>
+      <span class="sub">${mn(fAnnual/12)}/${AR?'شهر':'mo'}</span></span>
+      <span class="val">${mn(fAnnual)}</span></div>
+  </div>
+
+  <div class="card"><div class="chead">
+    <h3>${AR?'المصروف اليومي — سنوياً':'Day-to-day, annualised'}</h3>
+    <button class="more" data-gom="1">${AR?'شهري':'Monthly'}</button></div>
+    <p style="font-size:11.5px;color:var(--muted);line-height:1.6;margin:-4px 0 14px">${AR
+      ?'ميزانيتك الشهرية × ١٢. المقارنة مع المتوقع حتى تاريخه، لا مع السنة كاملة.'
+      :'Your monthly budgets × 12. Judged against what you should have spent by now, not the full year.'}</p>
+    ${CATS.map((c,i)=>{
+      const sp=ytd[i], exp=c.b*me, ann=c.b*12;
+      const over=sp>exp*1.02, near=!over&&sp>exp*.9;
+      const cc=over?'#D0453A':near?'#D08A1E':c.c;
+      const p=Math.min(100,sp/ann*100), t=Math.min(100,exp/ann*100);
+      const diff=Math.round(sp-exp);
+      return `<button class="brow" data-cat="${i}"><div class="btop">
+        <span class="tic" style="width:32px;height:32px;border-radius:10px;background:${cc}1F;color:${cc}">${svg(c.ic)}</span>
+        <span class="nm">${L(c)}<span style="display:block;font-size:10.5px;color:var(--muted);font-weight:500;margin-top:2px">
+          ${mn(c.b)}/${AR?'شهر':'mo'}</span></span>
+        <span class="sp">${mn(sp)} <b>/ ${mn(ann)}</b></span></div>
+        <div class="btr"><i style="width:${p}%;background:${cc}"></i>
+          <span class="tick" style="inset-inline-start:${t}%"></span></div>
+        <div class="bfoot"><span>${AR?'المتوقع':'expected'} ${mn(exp)}</span>
+          <span class="r ${over?'o':near?'a':''}">${diff>0?(AR?'زيادة ':'+')+mn(diff):(AR?'توفير ':'−')+mn(-diff)}</span>
+        </div></button>`}).join('')}
+    <div class="yrow total"><span class="col"><span class="nm">${AR?'الإجمالي السنوي':'Annual total'}</span>
+      <span class="sub">${mn(dSpent)} ${AR?'حتى الآن مقابل':'so far vs'} ${mn(dExpected)} ${AR?'متوقع':'expected'}</span></span>
+      <span class="val">${mn(dAnnual)}</span></div>
+  </div>
+
+  <div class="card"><div class="chead"><h3>${AR?'توقع نهاية السنة':'Projected year end'}</h3></div>
+    <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:8px">
+      <span style="font-size:27px;font-weight:700;font-variant-numeric:tabular-nums;
+        color:${projected>grandBudget?'var(--red)':'var(--teal)'}">${mn(projected)}</span>
+      <span style="font-size:12px;font-weight:700;color:${projected>grandBudget?'var(--red)':'var(--teal)'}">
+        ${projected>grandBudget?'+':'−'}${mn(Math.abs(projected-grandBudget))}</span></div>
+    <p style="font-size:11.5px;color:var(--muted);line-height:1.65">${AR
+      ?`بمعدل إنفاقك اليومي الحالي (${mn(dSpent/me)} شهرياً) زائد المخصصات السنوية، ستنهي ${YR} عند ${mn(projected)}.`
+      :`At your current day-to-day rate of ${mn(dSpent/me)} a month, plus the annual funds, you finish ${YR} at ${mn(projected)}.`}</p>
   </div>`;
+  document.getElementById('addFund').onclick=()=>fundForm(-1);
 }
 
 /* ---------- settings ---------- */
@@ -974,14 +1032,18 @@ function drawItemList(){
       <button class="tinybtn del" data-di="${i}">${AR?'حذف':'Remove'}</button></div>`).join('')
     :`<p style="font-size:11.5px;color:var(--muted);padding:10px 0;text-align:center">${
       AR?'لا توجد بنود بعد':'No items yet'}</p>`)
-    +`<div class="erow" style="border:none"><input id="newIt" class="einput" style="width:100%;text-align:start"
+    +`<div class="additem"><input id="newIt" autocomplete="off"
        placeholder="${AR?'اسم البند الجديد':'New item name'}">
-      <button class="tinybtn" id="addIt">${AR?'إضافة':'Add'}</button></div>`;
+      <button class="tinybtn" id="addIt" disabled>${AR?'إضافة':'Add'}</button></div>`;
   document.querySelectorAll('[data-di]').forEach(b=>b.onclick=()=>{
     catEdit.items.splice(+b.dataset.di,1);drawItemList()});
-  document.getElementById('addIt').onclick=()=>{
-    const v=document.getElementById('newIt').value.trim();if(!v)return;
-    catEdit.items.push({en:v,ar:v,w:0});drawItemList()};
+  const inp=document.getElementById('newIt'),btn=document.getElementById('addIt');
+  const addNow=()=>{const v=inp.value.trim();if(!v)return;
+    catEdit.items.push({en:v,ar:v,w:0});drawItemList();
+    setTimeout(()=>document.getElementById('newIt').focus(),0)};
+  inp.oninput=()=>{btn.disabled=!inp.value.trim()};
+  inp.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addNow()}};
+  btn.onclick=addNow;
 }
 
 /* ---------- first-run setup ---------- */
@@ -1140,6 +1202,52 @@ const freqLabel=l=>{
   if(e===12)return AR?`${n} أقساط سنوية`:`${n} yearly`;
   return AR?`${n} أقساط كل ${e} أشهر`:`${n} payments every ${e} months`;
 };
+
+
+function fundForm(i){
+  const isNew=i<0;
+  const f=isNew?{en:'',ar:'',annual:0,c:PALETTE[FUNDS.length%PALETTE.length],ic:'tag',months:{}}
+               :JSON.parse(JSON.stringify(FUNDS[i]));
+  openSheet(`<div class="shead"><span class="nm"><span class="t">${
+    isNew?(AR?'مخصص جديد':'New fund'):(AR?'تعديل المخصص':'Edit fund')}</span>
+    <span class="s">${AR?'مصروف سنوي يُقسَّم على ١٢':'An annual cost, spread over 12 months'}</span></span></div>
+  <div class="nform" style="padding:0">
+    <input id="fEn" placeholder="${AR?'الاسم بالإنجليزية':'Name in English'}" value="${f.en}">
+    <input id="fAr" placeholder="${AR?'الاسم بالعربية':'Name in Arabic'}" value="${f.ar}" style="margin-top:9px">
+    <p class="eyebrow" style="margin:16px 0 6px">${AR?'المبلغ السنوي':'Annual amount'}</p>
+    <input id="fA" type="number" inputmode="numeric" value="${f.annual||''}" placeholder="0"
+      style="font-size:20px;font-weight:700;text-align:center">
+    <p style="font-size:12px;color:var(--teal);font-weight:700;text-align:center;margin-top:10px" id="fPerM"></p>
+    <p class="eyebrow" style="margin:18px 0 8px">${AR?'اللون':'Colour'}</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${PALETTE.map(c=>
+      `<button class="swatch ${c===f.c?'on':''}" data-fc="${c}" style="background:${c}"></button>`).join('')}</div>
+    <p class="eyebrow" style="margin:18px 0 8px">${AR?'الأيقونة':'Icon'}</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${ICONSET.map(k=>
+      `<button class="icpick ${k===f.ic?'on':''}" data-fi="${k}">${svg(k)}</button>`).join('')}</div>
+    <button class="primary" id="fSaveNew" style="margin-top:20px">${AR?'حفظ':'Save'}</button>
+    ${!isNew?`<button class="primary" id="fDel" style="background:#FBEBEA;color:var(--red);margin-top:9px">
+      ${AR?'حذف المخصص':'Delete fund'}</button>`:''}
+  </div>`);
+  const upd=()=>{const v=parseFloat(document.getElementById('fA').value)||0;
+    document.getElementById('fPerM').textContent=v?`= ${mn(v/12)} ${AR?'شهرياً':'per month'}`:''};
+  upd();document.getElementById('fA').oninput=upd;
+  document.querySelectorAll('[data-fc]').forEach(b=>b.onclick=()=>{f.c=b.dataset.fc;
+    document.querySelectorAll('[data-fc]').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
+  document.querySelectorAll('[data-fi]').forEach(b=>b.onclick=()=>{f.ic=b.dataset.fi;
+    document.querySelectorAll('[data-fi]').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
+  document.getElementById('fSaveNew').onclick=()=>{
+    const en=document.getElementById('fEn').value.trim();
+    const ar=document.getElementById('fAr').value.trim();
+    const a=parseFloat(document.getElementById('fA').value)||0;
+    if(!en&&!ar){toast(AR?'أدخل اسماً':'Enter a name');return}
+    if(!a){toast(AR?'أدخل المبلغ':'Enter the amount');return}
+    f.en=en||ar;f.ar=ar||en;f.annual=Math.round(a);
+    if(isNew)FUNDS.push(f); else FUNDS[i]=f;
+    save();closeSheet();reflow();toast(AR?'تم الحفظ':'Saved');};
+  const del=document.getElementById('fDel');
+  if(del)del.onclick=()=>{FUNDS.splice(i,1);save();closeSheet();reflow();
+    toast(AR?'تم حذف المخصص':'Fund removed')};
+}
 
 function loansView(){
   const act=activeLoans();
@@ -1390,25 +1498,11 @@ function fundSheet(i){
         AR?MONTHS[k].ar:MONTHS[k].en}</span></span><span class="val">${mn(v)}</span></div>`).join('')}`
     :`<p style="font-size:12px;color:var(--muted);padding:16px 0;text-align:center">${
       AR?'لا توجد دفعات هذه السنة بعد':'No payments this year yet'}</p>`}
-    <div class="sbtns"><button class="sbtn edit" id="fundEdit">${AR?'تعديل المبلغ السنوي':'Edit annual amount'}</button></div>`);
-  document.getElementById('fundEdit').onclick=()=>{
-    openSheet(`<div class="shead"><span class="nm"><span class="t">${L(f)}</span>
-      <span class="s">${AR?'المبلغ السنوي':'Annual amount'}</span></span></div>
-      <div class="nform" style="padding:0">
-        <input id="fVal" type="number" inputmode="numeric" value="${f.annual}"
-          style="font-size:22px;font-weight:700;text-align:center">
-        <p style="font-size:11.5px;color:var(--muted);margin-top:12px;text-align:center" id="fPer"></p>
-        <button class="primary" id="fSave">${AR?'حفظ':'Save'}</button></div>`);
-    const inp=document.getElementById('fVal'),per=document.getElementById('fPer');
-    const upd=()=>{const v=parseFloat(inp.value)||0;
-      per.textContent=(AR?'= '+mn(v/12)+' شهرياً':'= '+mn(v/12)+' per month')};
-    upd();inp.oninput=upd;inp.focus();inp.select();
-    document.getElementById('fSave').onclick=()=>{
-      const v=parseFloat(inp.value);
-      if(!v||v<=0){toast(AR?'أدخل مبلغاً صحيحاً':'Enter a valid amount');return}
-      f.annual=Math.round(v);save();closeSheet();reflow();
-      toast(L(f)+' · '+mn(v/12)+(AR?' شهرياً':'/mo'));};
-  };
+    <div class="sbtns"><button class="sbtn edit" id="fundEdit">${AR?'تعديل':'Edit'}</button>
+      <button class="sbtn del" id="fundDel">${AR?'حذف':'Delete'}</button></div>`);
+  document.getElementById('fundDel').onclick=()=>{FUNDS.splice(i,1);save();closeSheet();reflow();
+    toast(AR?'تم الحذف':'Fund removed')};
+  document.getElementById('fundEdit').onclick=()=>{closeSheet();fundForm(i)};
 }
 function monthSheet(){
   openSheet(`<div class="shead"><span class="nm"><span class="t">${AR?'اختر الشهر':'Choose month'}</span></span></div>
@@ -1532,7 +1626,7 @@ function snapshot(){
   return {v:2,ar:AR,cur:CUR,profile:PROFILE,
     cats:CATS.map(c=>({en:c.en,ar:c.ar,b:c.b,c:c.c,ic:c.ic,
       items:c.items.map(i=>({en:i.en,ar:i.ar}))})),
-    funds:FUNDS.map(f=>({en:f.en,annual:f.annual,months:f.months})),
+    funds:FUNDS.map(f=>({en:f.en,ar:f.ar,annual:f.annual,c:f.c,ic:f.ic,months:f.months})),
     loans:LOANS,
     months:Object.fromEntries(KEYS.map(k=>[k,MONTHS[k].tx]))};
 }
@@ -1551,8 +1645,14 @@ function load(){
       c.b=sc.b;
       (sc.items||[]).forEach(si=>{if(!c.items.find(x=>x.en===si.en))c.items.push({en:si.en,ar:si.ar,w:0})})});
   }
-  (d.funds||[]).forEach(sf=>{const f=FUNDS.find(x=>x.en===sf.en);if(!f)return;
-    f.annual=sf.annual;f.months=sf.months||{}});
+  if(Array.isArray(d.funds)&&d.funds.length&&d.funds[0].c){
+    FUNDS.length=0;
+    d.funds.forEach(sf=>FUNDS.push({en:sf.en,ar:sf.ar||sf.en,annual:sf.annual,
+      c:sf.c,ic:sf.ic||'tag',months:sf.months||{}}));
+  } else {
+    (d.funds||[]).forEach(sf=>{const f=FUNDS.find(x=>x.en===sf.en);if(!f)return;
+      f.annual=sf.annual;f.months=sf.months||{}});
+  }
   Object.entries(d.months||{}).forEach(([k,tx])=>{if(MONTHS[k]){MONTHS[k].tx=tx||[];recompute(MONTHS[k])}});
   if(Array.isArray(d.loans))LOANS=d.loans;
   if(typeof d.ar==='boolean')AR=d.ar;
@@ -1764,6 +1864,7 @@ document.addEventListener('click',e=>{
   if(e.target.closest('#qmore')){openAdd();return}
   const tx=e.target.closest('[data-tx]');
   if(tx&&isNow()){txSheet(+tx.dataset.tx);return}
+  if(e.target.closest('[data-gom]')){document.querySelector('[data-b="m"]').click();return}
   if(e.target.closest('[data-goy]')){
     document.querySelector('[data-b="y"]').click();return}
   if(e.target.closest('[data-gol]')){document.querySelector('[data-b="l"]').click();return}
