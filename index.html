@@ -286,6 +286,18 @@ button:active{transform:scale(.972)}
  border-top:1px solid var(--line);margin-top:6px}
 .sumline b{font-weight:700;font-variant-numeric:tabular-nums}
 
+
+.swatch{width:30px;height:30px;border-radius:9px;border:2px solid transparent;cursor:pointer;padding:0}
+.swatch.on{border-color:var(--ink)}
+.icpick{width:40px;height:40px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);
+ display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted)}
+.icpick.on{border-color:var(--ink);color:var(--ink)}
+.stepdots{display:flex;gap:6px;justify-content:center;padding:6px 0 14px}
+.stepdots i{width:6px;height:6px;border-radius:99px;background:var(--line)}
+.stepdots i.on{background:var(--teal);width:18px}
+.tinybtn{background:none;border:none;font-family:var(--f);font-size:11.5px;font-weight:600;
+ color:var(--muted);cursor:pointer;padding:6px}
+.tinybtn.del{color:var(--red)}
 .nav{position:fixed;bottom:0;width:100%;max-width:430px;background:rgba(255,255,255,.94);
  backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;align-items:center;
  justify-content:space-around;padding:11px 8px calc(14px + env(safe-area-inset-bottom));z-index:30}
@@ -309,9 +321,10 @@ button:active{transform:scale(.972)}
   <div class="view on" id="v-home"><div class="wrap" id="homeWrap"></div></div>
   <div class="view" id="v-ins"><div class="wrap" id="insWrap"></div></div>
   <div class="view" id="v-bud"><div class="wrap">
-    <div class="seg"><div class="thumb" id="segThumb"></div>
+    <div class="seg seg3"><div class="thumb" id="segThumb"></div>
       <button class="on" data-b="m" data-i="segM">Monthly</button>
-      <button data-b="y" data-i="segY">Annual</button></div>
+      <button data-b="y" data-i="segY">Annual</button>
+      <button data-b="l" data-i="segL">Loans</button></div>
     <div id="budWrap"></div></div></div>
   <div class="view" id="v-set"><div class="wrap" id="setWrap"></div></div>
 
@@ -331,6 +344,10 @@ button:active{transform:scale(.972)}
   <div class="ahead"><span class="t" id="addtitle"></span>
     <button class="xbtn" id="addclose" aria-label="Close">&times;</button></div>
   <div id="addmain">
+    <div style="padding:12px 18px 0"><div class="seg" style="margin:0">
+      <div class="thumb" id="txThumb"></div>
+      <button class="on" data-tt="e" id="ttExp"></button>
+      <button data-tt="i" id="ttInc"></button></div></div>
     <div class="amt-disp"><div class="v zero" id="amtv">0</div><div class="c" id="amtc"></div></div>
     <div class="chips"><button class="chip" id="chipdate"></button><button class="chip" id="chipacc"></button></div>
     <div class="hintbar" id="hint"></div>
@@ -343,6 +360,16 @@ button:active{transform:scale(.972)}
     <button class="primary" id="nisave" disabled></button>
     <p style="font-size:11px;color:var(--muted);margin-top:14px;line-height:1.6" id="nihint"></p>
   </div></div>
+</div>
+<div class="bud-ov" id="catov">
+  <div class="ahead"><span class="t" id="catovtitle"></span>
+    <button class="xbtn" id="catovclose" aria-label="Close">&times;</button></div>
+  <div class="bud-body" id="catovBody"></div>
+</div>
+<div class="bud-ov" id="setupov">
+  <div class="ahead"><span class="t" id="setupTitle"></span>
+    <button class="xbtn" id="setupSkip"></button></div>
+  <div class="bud-body" id="setupBody"></div>
 </div>
 <div class="bud-ov" id="budov">
   <div class="ahead"><span class="t" id="budtitle"></span>
@@ -374,6 +401,7 @@ down:'<path d="M12 3v13"/><path d="M7 11.5 12 16.5l5-5"/><path d="M4 20.5h16"/>'
 date:'<rect x="3.5" y="5" width="17" height="16" rx="3.5"/><path d="M3.5 10h17"/><path d="M8 3v4M16 3v4"/>',
 trash:'<path d="M4 6.5h16"/><path d="M9.5 6.5V4.5h5v2"/><path d="M6 6.5 7 20.5h10L18 6.5"/>',
 plus:'<path d="M12 5v14M5 12h14"/>',
+bank:'<path d="M3 9.5 12 4l9 5.5"/><path d="M5 9.5V19M9.5 9.5V19M14.5 9.5V19M19 9.5V19"/><path d="M2.5 19h19"/>',
 card:'<rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M2.5 10h19"/><path d="M6 15h3"/>',
 wallet:'<path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H18v3"/><rect x="3" y="7.5" width="18" height="12.5" rx="3"/><circle cx="17" cy="14" r="1.2"/>'};
 const svg=(k,cls='ic')=>`<svg class="${cls}" viewBox="0 0 24 24">${IC[k]}</svg>`;
@@ -419,7 +447,8 @@ function animateCharts(){
 function moveThumb(){
   const t=document.getElementById('segThumb');if(!t)return;
   const rtl=document.documentElement.dir==='rtl';
-  const off=BUD==='y'?(rtl?'-100%':'100%'):'0%';
+  const n=BUD==='m'?0:(BUD==='y'?1:2);
+  const off=(rtl?-100*n:100*n)+'%';
   t.style.transform=`translateX(${off})`;
 }
 
@@ -461,6 +490,13 @@ const fundAccrued=f=>alloc(f)*monthsElapsed();
 const fundBalance=f=>fundAccrued(f)-fundSpent(f);
 const fundThisMonth=f=>f.months[CUR]||0;
 const allocTotal=()=>FUNDS.reduce((a,f)=>a+alloc(f),0);
+
+let PROFILE={name:'',salary:0,setup:false};
+const INCOME_CATS=[
+ {en:"Salary",ar:"راتب",c:"#2E8B72",ic:"coin"},
+ {en:"Business",ar:"دخل الأعمال",c:"#3A6E96",ic:"card"},
+ {en:"Rental",ar:"إيجارات",c:"#6E9455",ic:"home"},
+ {en:"Gift / Other",ar:"هدية أو أخرى",c:"#7B7AA6",ic:"plus"}];
 
 const ACCOUNTS=[
  {en:"Cash",ar:"نقداً",ic:"coin",c:"#2E8B72"},
@@ -521,8 +557,11 @@ function genMonth(k){  // sample data only, loaded on request
 function recompute(m){
   m.spend=CATS.map(()=>0);
   m.daily=new Array(m.elapsed).fill(0);
+  m.extra=0;
   m.items=CATS.map(c=>c.items.map(it=>({en:it.en,ar:it.ar,a:0,fresh:it.fresh})));
   m.tx.forEach(t=>{
+    if(t.t==='i'){m.extra+=t.a;return}
+    if(t.ci>=CATS.length)return;
     m.spend[t.ci]+=t.a;
     m.daily[t.day-1]=(m.daily[t.day-1]||0)+t.a;
     const it=m.items[t.ci].find(x=>x.en===t.en);
@@ -537,6 +576,8 @@ const cl=(k,base)=>k==='o'?'#D0453A':k==='a'?'#D08A1E':base;
 const L=o=>AR?o.ar:o.en;
 const Mo=()=>MONTHS[CUR];
 const spent=()=>Mo().spend.reduce((a,b)=>a+b,0);
+const income=()=>PROFILE.salary+(Mo().extra||0);
+const netLeft=()=>income()-spent()-allocTotal()-loansMonthly();
 const budg=()=>CATS.reduce((a,c)=>a+c.b,0);
 const isNow=()=>CUR===NOWKEY;
 function dayLabel(d){
@@ -577,6 +618,24 @@ function homeView(){
     <span class="t">${L(q).split(' ')[0]}</span></button>`).join('')}
     <button class="qbtn" id="qmore"><span class="qic" style="background:#8A92A01F;color:#8A92A0">${svg('dots')}</span>
     <span class="t">${AR?'المزيد':'More'}</span></button></div>
+  ${PROFILE.salary>0||m.extra>0?`<div class="card"><div class="chead">
+    <h3>${AR?'التدفق النقدي':'Cash flow'}</h3>
+    <span class="more" style="color:${netLeft()<0?'var(--red)':'var(--teal)'}">${
+      netLeft()<0?'−':''}${mn(Math.abs(netLeft()))} ${AR?'متبقٍ':'left'}</span></div>
+    <div class="yrow"><span class="col"><span class="nm">${AR?'الدخل':'Income'}</span>
+      <span class="sub">${PROFILE.salary>0?(AR?'راتب ':'Salary ')+mn(PROFILE.salary):''}${
+        m.extra>0?(PROFILE.salary>0?' + ':'')+(AR?'إضافي ':'extra ')+mn(m.extra):''}</span></span>
+      <span class="val" style="color:var(--teal)">+${mn(income())}</span></div>
+    <div class="yrow"><span class="col"><span class="nm">${AR?'المصروف اليومي':'Day-to-day'}</span></span>
+      <span class="val">−${mn(s)}</span></div>
+    <div class="yrow"><span class="col"><span class="nm">${AR?'تحويل المخصصات':'Set aside'}</span>
+      <span class="sub">${AR?'للمصاريف السنوية':'toward annual costs'}</span></span>
+      <span class="val">−${mn(allocTotal())}</span></div>
+    ${loansMonthly()>0?`<div class="yrow"><span class="col"><span class="nm">${AR?'أقساط القروض':'Loan payments'}</span></span>
+      <span class="val">−${mn(loansMonthly())}</span></div>`:''}
+    <div class="yrow total"><span class="col"><span class="nm">${AR?'المتبقي':'Left over'}</span></span>
+      <span class="val" style="color:${netLeft()<0?'var(--red)':'var(--teal)'}">${
+        netLeft()<0?'−':''}${mn(Math.abs(netLeft()))}</span></div></div>`:''}
   <div class="card"><div class="chead"><h3>${AR?'الإنفاق حسب الفئة':'Spending by category'}</h3></div>
     <div class="donut"><div class="dwrap"><svg width="118" height="118" viewBox="0 0 118 118">${donutPath()}</svg>
       <div class="dcen"><span class="v">${mn(b-s)}</span><span class="k">${AR?'متبقٍ':'left'}</span></div></div>
@@ -587,7 +646,13 @@ function homeView(){
     ${m.tx.slice(0,6).map((t,i)=>txRow(t,i)).join('')}</div>`;
 }
 function txRow(t,i){
-  const c=CATS[t.ci];
+  const c=t.t==='i'?INCOME_CATS[t.ii]:CATS[t.ci];
+  if(!c)return '';
+  if(t.t==='i')return `<button class="tx" data-tx="${i}">
+    <span class="tic" style="background:${c.c}1F;color:${c.c}">${svg(c.ic)}</span>
+    <span class="m"><span class="n">${L(t)}</span>
+    <span class="s">${AR?'دخل':'Income'} · ${dayLabel(t.day)}</span></span>
+    <span class="a" style="color:var(--teal)">+${mn(t.a)}</span></button>`;
   return `<button class="tx" data-tx="${i}"><span class="tic" style="background:${c.c}1F;color:${c.c}">${svg(c.ic)}</span>
     <span class="m"><span class="n">${L(t)}</span>
     <span class="s">${L(c)} · ${dayLabel(t.day)}</span></span>
@@ -657,9 +722,10 @@ function insView(){
 /* ---------- budgets ---------- */
 function budView(){
   if(BUD==='y'){fundsView();return}
+  if(BUD==='l'){loansView();return}
   const m=Mo();
-  const catBud=CATS.reduce((a,c)=>a+c.b,0), allocT=allocTotal();
-  const planned=catBud+allocT;
+  const catBud=CATS.reduce((a,c)=>a+c.b,0), allocT=allocTotal(), loanT=loansMonthly();
+  const planned=catBud+allocT+loanT;
   const catSpent=spent();
   const pace=m.elapsed/m.dim;
   const pct=Math.min(100,catSpent/catBud*100);
@@ -669,7 +735,8 @@ function budView(){
     <div class="row"><div class="big">${mn(planned)}<small>QAR</small></div></div>
     <div class="hstats">
       <div><div class="k">${AR?'مصروف يومي':'Day-to-day'}</div><div class="v">${mn(catBud)}</div></div>
-      <div><div class="k">${AR?'مخصصات سنوية':'Fund transfers'}</div><div class="v">${mn(allocT)}</div></div>
+      <div><div class="k">${AR?'مخصصات':'Funds'}</div><div class="v">${mn(allocT)}</div></div>
+      ${loanT>0?`<div><div class="k">${AR?'أقساط':'Loans'}</div><div class="v">${mn(loanT)}</div></div>`:''}
     </div></div>
 
   <div class="card"><div class="chead">
@@ -707,7 +774,19 @@ function budView(){
       </button>`}).join('')}
     <div class="yrow total"><span class="col"><span class="nm">${AR?'إجمالي التحويل':'Total set aside'}</span></span>
       <span class="val">${mn(allocT)}</span></div>
-  </div>`;
+  </div>
+  ${loanT>0?`<div class="card"><div class="chead">
+    <h3>${AR?'أقساط القروض':'Loan payments'}</h3>
+    <button class="more" data-gol="1">${AR?'عرض القروض':'View loans'}</button></div>
+    ${activeLoans().map(l=>`<button class="brow" data-loan="${LOANS.indexOf(l)}"><div class="btop">
+      <span class="tic" style="width:32px;height:32px;border-radius:10px;background:${l.c}1F;color:${l.c}">${svg(l.ic)}</span>
+      <span class="nm">${L(l)}<span style="display:block;font-size:10.5px;color:var(--muted);font-weight:500;margin-top:2px">
+        ${freqLabel(l)}${loanDueNow(l)>0?' · '+(AR?'مستحق الآن':'due now'):''}</span></span>
+      <span class="sp">${mn(loanAccrual(l))}<b> /${AR?'شهر':'mo'}</b></span></div></button>`).join('')}
+    <div class="yrow total"><span class="col"><span class="nm">${AR?'إجمالي التخصيص':'Total set aside'}</span>
+      <span class="sub">${loansDueNow()>0?(AR?`منها ${mn(loansDueNow())} مستحق هذا الشهر`
+        :`${mn(loansDueNow())} of it actually due this month`):(AR?'لا شيء مستحق هذا الشهر':'nothing falls due this month')}</span></span>
+      <span class="val">${mn(loanT)}</span></div></div>`:''}`;
 }
 
 function fundsView(){
@@ -760,7 +839,10 @@ function setView(){
   const nItems=CATS.reduce((a,c)=>a+c.items.length,0);
   const rows=[
     {ic:'globe',c:'#3A6E96',n:AR?'اللغة':'Language',s:AR?'العربية':'English',id:'sLang'},
-    {ic:'tag',c:'#2E8B72',n:AR?'الفئات والبنود':'Categories & items',s:`${CATS.length} ${AR?'فئات':'categories'} · ${nItems} ${AR?'بند':'items'}`},
+    {ic:'tag',c:'#2E8B72',n:AR?'الفئات والبنود':'Categories & items',
+     s:`${CATS.length} ${AR?'فئات':'categories'} · ${nItems} ${AR?'بند':'items'}`,id:'sCats'},
+    {ic:'coin',c:'#2E8B72',n:AR?'الاسم والدخل':'Name & income',
+     s:`${PROFILE.name||(AR?'بدون اسم':'No name')} · ${PROFILE.salary?mn(PROFILE.salary)+'/'+(AR?'شهر':'mo'):(AR?'بدون دخل':'No income')}`,id:'sProfile'},
     {ic:'coin',c:'#C98A3E',n:AR?'العملة':'Currency',s:'QAR — ر.ق'},
     {ic:'lock',c:'#7B7AA6',n:AR?'قفل التطبيق':'App lock',s:AR?'مفعّل':'On'},
     {ic:'card',c:'#9A6685',n:AR?'الميزانيات':'Budgets',
@@ -791,6 +873,8 @@ function setView(){
       ${AR?'مسح كل البيانات':'Clear all data'}</button></div>`;
   const sl=document.getElementById('sLang');if(sl)sl.onclick=()=>{AR=!AR;reflow()};
   const sb=document.getElementById('sBud');if(sb)sb.onclick=openBudgetEditor;
+  const sc=document.getElementById('sCats');if(sc)sc.onclick=openCatManager;
+  const sp=document.getElementById('sProfile');if(sp)sp.onclick=openSetup;
   document.getElementById('expbtn').onclick=()=>{exportData();
     toast(AR?'تم تصدير النسخة':'Backup exported');setTimeout(setView,400)};
   document.getElementById('impbtn').onclick=()=>document.getElementById('impfile').click();
@@ -809,6 +893,433 @@ function setView(){
     document.querySelector('[data-v="v-home"]').classList.add('on');
     document.getElementById('v-home').classList.add('on');
     window.scrollTo(0,0);reflow();toast(AR?'تم المسح':'All data cleared');};
+}
+
+
+/* ---------- categories & items management ---------- */
+const PALETTE=["#2E8B72","#C98A3E","#3A6E96","#7B7AA6","#9A6685","#6E9455","#B07C25","#4E7A80"];
+const ICONSET=["cart","cup","home","car","loop","bag","plane","cap","tool","shield","heart","coin","card","date","tag"];
+let catEdit=null;
+
+function openCatManager(){drawCatManager();document.getElementById('catov').classList.add('on')}
+function drawCatManager(){
+  catEdit=null;
+  document.getElementById('catovtitle').textContent=AR?'الفئات والبنود':'Categories & items';
+  document.getElementById('catovBody').innerHTML=`
+    <div class="card" style="margin-top:6px">
+    ${CATS.map((c,i)=>`<button class="srow" data-ce="${i}">
+      <span class="sic" style="background:${c.c}1F;color:${c.c}">${svg(c.ic)}</span>
+      <span class="m"><span class="n">${L(c)}</span>
+      <span class="s">${c.items.length} ${AR?'بند':'items'} · ${mn(c.b)}/${AR?'شهر':'mo'}</span></span>
+      <span class="ch">${AR?'‹':'›'}</span></button>`).join('')}</div>
+    <button class="primary" id="addCat">${AR?'إضافة فئة':'Add category'}</button>`;
+  document.getElementById('addCat').onclick=()=>editCategory(-1);
+  document.querySelectorAll('[data-ce]').forEach(b=>b.onclick=()=>editCategory(+b.dataset.ce));
+}
+function editCategory(idx){
+  const isNew=idx<0;
+  catEdit=isNew?{en:'',ar:'',b:500,c:PALETTE[CATS.length%PALETTE.length],ic:'tag',items:[]}
+               :JSON.parse(JSON.stringify(CATS[idx]));
+  document.getElementById('catovtitle').textContent=isNew
+    ?(AR?'فئة جديدة':'New category'):(AR?'تعديل الفئة':'Edit category');
+  const used=isNew?0:KEYS.reduce((a,k)=>a+MONTHS[k].tx.filter(t=>t.t!=='i'&&t.ci===idx).length,0);
+  document.getElementById('catovBody').innerHTML=`
+  <div class="nform" style="padding:0">
+    <input id="cEn" placeholder="${AR?'الاسم بالإنجليزية':'Name in English'}" value="${catEdit.en}">
+    <input id="cAr" placeholder="${AR?'الاسم بالعربية':'Name in Arabic'}" value="${catEdit.ar}" style="margin-top:9px">
+    <input id="cB" type="number" inputmode="numeric" placeholder="${AR?'الميزانية الشهرية':'Monthly budget'}"
+      value="${catEdit.b}" style="margin-top:9px">
+    <p class="eyebrow" style="margin:18px 0 8px">${AR?'اللون':'Colour'}</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${PALETTE.map(c=>
+      `<button class="swatch ${c===catEdit.c?'on':''}" data-col="${c}" style="background:${c}"></button>`).join('')}</div>
+    <p class="eyebrow" style="margin:18px 0 8px">${AR?'الأيقونة':'Icon'}</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${ICONSET.map(k=>
+      `<button class="icpick ${k===catEdit.ic?'on':''}" data-ic="${k}">${svg(k)}</button>`).join('')}</div>
+    <p class="eyebrow" style="margin:20px 0 4px">${AR?'البنود':'Items'}</p>
+    <div class="card" style="margin-top:8px" id="itemList"></div>
+    <button class="primary" id="cSave" style="margin-top:18px">${AR?'حفظ':'Save'}</button>
+    ${!isNew?`<button class="primary" id="cDel" style="background:#FBEBEA;color:var(--red);margin-top:9px">
+      ${AR?'حذف الفئة':'Delete category'}</button>
+      ${used?`<p style="font-size:11px;color:var(--muted);margin-top:10px;text-align:center">${
+        AR?`هذه الفئة مستخدمة في ${used} عملية — الحذف سيزيلها أيضاً.`
+          :`Used by ${used} transaction${used>1?'s':''} — deleting removes those too.`}</p>`:''}`:''}
+  </div>`;
+  drawItemList();
+  document.querySelectorAll('[data-col]').forEach(b=>b.onclick=()=>{catEdit.c=b.dataset.col;
+    document.querySelectorAll('[data-col]').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
+  document.querySelectorAll('[data-ic]').forEach(b=>b.onclick=()=>{catEdit.ic=b.dataset.ic;
+    document.querySelectorAll('[data-ic]').forEach(x=>x.classList.remove('on'));b.classList.add('on')});
+  document.getElementById('cSave').onclick=()=>{
+    const en=document.getElementById('cEn').value.trim();
+    const ar=document.getElementById('cAr').value.trim();
+    const b=parseFloat(document.getElementById('cB').value)||0;
+    if(!en&&!ar){toast(AR?'أدخل اسماً':'Enter a name');return}
+    catEdit.en=en||ar; catEdit.ar=ar||en; catEdit.b=Math.round(b);
+    if(isNew)CATS.push(catEdit); else CATS[idx]=catEdit;
+    KEYS.forEach(k=>recompute(MONTHS[k]));save();drawCatManager();reflow();
+    toast(AR?'تم الحفظ':'Saved');};
+  const del=document.getElementById('cDel');
+  if(del)del.onclick=()=>{
+    KEYS.forEach(k=>{const m=MONTHS[k];
+      m.tx=m.tx.filter(t=>t.t==='i'||t.ci!==idx);
+      m.tx.forEach(t=>{if(t.t!=='i'&&t.ci>idx)t.ci--})});
+    CATS.splice(idx,1);
+    KEYS.forEach(k=>recompute(MONTHS[k]));save();drawCatManager();reflow();
+    toast(AR?'تم حذف الفئة':'Category deleted');};
+}
+function drawItemList(){
+  const el=document.getElementById('itemList');if(!el)return;
+  el.innerHTML=(catEdit.items.length?catEdit.items.map((it,i)=>`<div class="erow">
+      <span class="col"><span class="nm">${L(it)}</span></span>
+      <button class="tinybtn del" data-di="${i}">${AR?'حذف':'Remove'}</button></div>`).join('')
+    :`<p style="font-size:11.5px;color:var(--muted);padding:10px 0;text-align:center">${
+      AR?'لا توجد بنود بعد':'No items yet'}</p>`)
+    +`<div class="erow" style="border:none"><input id="newIt" class="einput" style="width:100%;text-align:start"
+       placeholder="${AR?'اسم البند الجديد':'New item name'}">
+      <button class="tinybtn" id="addIt">${AR?'إضافة':'Add'}</button></div>`;
+  document.querySelectorAll('[data-di]').forEach(b=>b.onclick=()=>{
+    catEdit.items.splice(+b.dataset.di,1);drawItemList()});
+  document.getElementById('addIt').onclick=()=>{
+    const v=document.getElementById('newIt').value.trim();if(!v)return;
+    catEdit.items.push({en:v,ar:v,w:0});drawItemList()};
+}
+
+/* ---------- first-run setup ---------- */
+let step=0;
+function openSetup(){step=0;drawSetup();document.getElementById('setupov').classList.add('on')}
+function closeSetup(){document.getElementById('setupov').classList.remove('on');
+  PROFILE.setup=true;save();reflow()}
+function drawSetup(){
+  const steps=4;
+  document.getElementById('setupTitle').textContent=AR?'الإعداد':'Setup';
+  document.getElementById('setupSkip').textContent=AR?'تخطٍ':'Skip';
+  const dots=`<div class="stepdots">${[...Array(steps)].map((_,i)=>
+    `<i class="${i===step?'on':''}"></i>`).join('')}</div>`;
+  let body='';
+  if(step===0)body=`${dots}
+    <h3 style="font-size:19px;font-weight:700;margin-bottom:6px">${AR?'ما اسمك؟':'What should I call you?'}</h3>
+    <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:18px">${
+      AR?'يظهر في أعلى الشاشة الرئيسية فقط.':'Only used for the greeting on your home screen.'}</p>
+    <div class="nform" style="padding:0"><input id="sName" value="${PROFILE.name}"
+      placeholder="${AR?'الاسم':'Name'}"><button class="primary" id="sNext">${AR?'التالي':'Next'}</button></div>`;
+  if(step===1)body=`${dots}
+    <h3 style="font-size:19px;font-weight:700;margin-bottom:6px">${AR?'دخلك الشهري':'Monthly income'}</h3>
+    <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:18px">${
+      AR?'راتبك الثابت. أي دخل إضافي تسجّله لاحقاً من زر الإضافة.'
+        :'Your regular salary. Extra income gets logged later with the add button.'}</p>
+    <div class="nform" style="padding:0"><input id="sSal" type="number" inputmode="numeric"
+      value="${PROFILE.salary||''}" placeholder="0" style="font-size:22px;font-weight:700;text-align:center">
+      <button class="primary" id="sNext">${AR?'التالي':'Next'}</button></div>`;
+  if(step===2){
+    const tot=CATS.reduce((a,c)=>a+c.b,0);
+    body=`${dots}
+    <h3 style="font-size:19px;font-weight:700;margin-bottom:6px">${AR?'الميزانية الشهرية':'Monthly budgets'}</h3>
+    <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:14px">${
+      AR?'حدود إنفاقك اليومي. عدّلها الآن أو لاحقاً.':'Your day-to-day spending limits. Adjust now or later.'}</p>
+    <div class="card" style="margin-top:0">${CATS.map((c,i)=>`<div class="erow">
+      <span class="tic" style="width:32px;height:32px;border-radius:10px;background:${c.c}1F;color:${c.c}">${svg(c.ic)}</span>
+      <span class="col"><span class="nm">${L(c)}</span></span>
+      <input class="einput" type="number" inputmode="numeric" data-sb="${i}" value="${c.b}"></div>`).join('')}
+      <div class="sumline"><span>${AR?'الإجمالي':'Total'}</span><b id="sbTot">${mn(tot)}</b></div></div>
+    <button class="primary" id="sNext">${AR?'التالي':'Next'}</button>`;
+  }
+  if(step===3){
+    const tot=FUNDS.reduce((a,f)=>a+f.annual,0);
+    body=`${dots}
+    <h3 style="font-size:19px;font-weight:700;margin-bottom:6px">${AR?'المصاريف السنوية':'Annual costs'}</h3>
+    <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:14px">${
+      AR?'المبالغ الكبيرة غير الشهرية. يقسمها التطبيق على ١٢ ويتيح تراكمها حتى موعد الدفع.'
+        :'Big non-monthly costs. The app divides each by 12 and lets it build up until the bill lands.'}</p>
+    <div class="card" style="margin-top:0">${FUNDS.map((f,i)=>`<div class="erow">
+      <span class="tic" style="width:32px;height:32px;border-radius:10px;background:${f.c}1F;color:${f.c}">${svg(f.ic)}</span>
+      <span class="col"><span class="nm">${L(f)}</span>
+        <span class="sug none" data-perm="${i}">${mn(f.annual/12)}/${AR?'شهر':'mo'}</span></span>
+      <input class="einput" type="number" inputmode="numeric" data-sf="${i}" value="${f.annual}"></div>`).join('')}
+      <div class="sumline"><span>${AR?'شهرياً':'Per month'}</span><b id="sfTot">${mn(tot/12)}</b></div></div>
+    <button class="primary" id="sNext">${AR?'إنهاء':'Finish'}</button>`;
+  }
+  document.getElementById('setupBody').innerHTML=body;
+  document.querySelectorAll('[data-sb]').forEach(inp=>inp.oninput=()=>{
+    const v=parseFloat(inp.value)||0;CATS[+inp.dataset.sb].b=Math.round(v);
+    document.getElementById('sbTot').textContent=mn(CATS.reduce((a,c)=>a+c.b,0))});
+  document.querySelectorAll('[data-sf]').forEach(inp=>inp.oninput=()=>{
+    const v=parseFloat(inp.value)||0,i=+inp.dataset.sf;FUNDS[i].annual=Math.round(v);
+    document.querySelector(`[data-perm="${i}"]`).textContent=mn(v/12)+'/'+(AR?'شهر':'mo');
+    document.getElementById('sfTot').textContent=mn(FUNDS.reduce((a,f)=>a+f.annual,0)/12)});
+  const nx=document.getElementById('sNext');
+  if(nx)nx.onclick=()=>{
+    if(step===0){const v=document.getElementById('sName').value.trim();
+      if(!v){toast(AR?'أدخل اسمك':'Enter your name');return}PROFILE.name=v}
+    if(step===1)PROFILE.salary=Math.round(parseFloat(document.getElementById('sSal').value)||0);
+    save();
+    if(step<3){step++;drawSetup()} else {closeSetup();toast(AR?'كل شيء جاهز':'All set')}};
+}
+
+
+/* ---------- loans ---------- */
+let LOANS=[
+ {en:"Car finance",ar:"تمويل السيارة",c:"#7B7AA6",ic:"car",
+  kind:"rate",principal:90000,rate:4.5,count:60,every:1,start:"2025-03"},
+ {en:"Laptop instalments",ar:"أقساط اللابتوب",c:"#2E8B72",ic:"card",
+  kind:"free",principal:8000,count:4,every:1,start:"2026-07"},
+ {en:"Land balloon",ar:"دفعة الأرض",c:"#3A6E96",ic:"bank",
+  kind:"rate",principal:200000,rate:5,count:1,every:36,start:"2029-01"}];
+
+/* A loan is N payments, spaced `every` months apart, starting at `start`.
+   every=1,count=60 → normal monthly loan.  count=4 → instalments.  count=1 → balloon. */
+const loanPeriods=l=>Math.max(1,l.count||1);
+const loanEvery=l=>Math.max(1,l.every||1);
+const loanPeriodRate=l=>(l.rate||0)/100*(loanEvery(l)/12);
+const loanPayment=l=>{
+  const n=loanPeriods(l);
+  if(l.kind==='rate'){const i=loanPeriodRate(l);
+    return i>0? l.principal*i/(1-Math.pow(1+i,-n)) : l.principal/n}
+  if(l.kind==='profit')return (l.principal+(l.profit||0))/n;
+  return l.principal/n;
+};
+/* months from now until a given YYYY-MM (negative = in the past) */
+const monthsUntil=str=>{const [y,mm]=str.split('-').map(Number);return (y-YR)*12+((mm-1)-MO)};
+const loanElapsed=l=>-monthsUntil(l.start);
+const loanPaidCount=l=>{
+  const e=loanElapsed(l);
+  if(e<0)return 0;
+  return Math.max(0,Math.min(loanPeriods(l),Math.floor(e/loanEvery(l))+1));
+};
+const loanTotal=l=>loanPayment(l)*loanPeriods(l);
+const loanCost=l=>loanTotal(l)-l.principal;
+const loanRemaining=l=>Math.max(0,loanPayment(l)*(loanPeriods(l)-loanPaidCount(l)));
+const loanBalance=l=>{
+  const k=loanPaidCount(l),n=loanPeriods(l);
+  if(l.kind==='rate'){const i=loanPeriodRate(l);
+    if(i<=0)return Math.max(0,l.principal-l.principal/n*k);
+    const pmt=loanPayment(l);
+    return Math.max(0,l.principal*Math.pow(1+i,k)-pmt*((Math.pow(1+i,k)-1)/i))}
+  return Math.max(0,l.principal-l.principal/n*k);
+};
+const loanSplit=l=>{
+  if(l.kind!=='rate')return {int:loanCost(l)/loanPeriods(l),pri:loanPayment(l)-loanCost(l)/loanPeriods(l)};
+  const int=loanBalance(l)*loanPeriodRate(l);
+  return {int,pri:loanPayment(l)-int};
+};
+/* month index of the final payment, relative to now */
+const loanMonthsLeft=l=>{
+  const k=loanPaidCount(l),n=loanPeriods(l);
+  if(k>=n)return 0;
+  return Math.max(1,monthsUntil(l.start)+(n-1)*loanEvery(l));
+};
+const loanNextDue=l=>{
+  const k=loanPaidCount(l),n=loanPeriods(l);
+  if(k>=n)return null;
+  const [y,mm]=l.start.split('-').map(Number);
+  return new Date(y,mm-1+k*loanEvery(l),1);
+};
+const fmtMon=d=>d?(AR?`${MN_AR[d.getMonth()]} ${d.getFullYear()}`:`${MN_EN[d.getMonth()]} ${d.getFullYear()}`):'—';
+const loanEndDate=l=>{const [y,mm]=l.start.split('-').map(Number);
+  return new Date(y,mm-1+(loanPeriods(l)-1)*loanEvery(l),1)};
+/* what actually leaves the account this month */
+const loanDueNow=l=>{
+  const e=loanElapsed(l);
+  if(e<0||loanPaidCount(l)>loanPeriods(l))return 0;
+  return (e%loanEvery(l)===0&&Math.floor(e/loanEvery(l))<loanPeriods(l))?loanPayment(l):0;
+};
+/* what you should put aside each month to meet it */
+const loanAccrual=l=>{
+  const left=loanRemaining(l);if(left<=0)return 0;
+  return left/Math.max(1,loanMonthsLeft(l));
+};
+const activeLoans=()=>LOANS.filter(l=>loanPaidCount(l)<loanPeriods(l));
+const loansMonthly=()=>activeLoans().reduce((a,l)=>a+loanAccrual(l),0);
+const loansDueNow=()=>activeLoans().reduce((a,l)=>a+loanDueNow(l),0);
+const loansOwed=()=>activeLoans().reduce((a,l)=>a+loanRemaining(l),0);
+const kindLabel=k=>k==='rate'?(AR?'بفائدة':'Interest'):k==='profit'?(AR?'مرابحة':'Profit rate'):(AR?'بدون فائدة':'Interest-free');
+const freqLabel=l=>{
+  const n=loanPeriods(l),e=loanEvery(l);
+  if(n===1)return AR?'دفعة واحدة':'One payment';
+  if(e===1)return AR?`${n} قسط شهري`:`${n} monthly`;
+  if(e===3)return AR?`${n} أقساط ربع سنوية`:`${n} quarterly`;
+  if(e===12)return AR?`${n} أقساط سنوية`:`${n} yearly`;
+  return AR?`${n} أقساط كل ${e} أشهر`:`${n} payments every ${e} months`;
+};
+
+function loansView(){
+  const act=activeLoans();
+  const owed=loansOwed(),acc=loansMonthly(),due=loansDueNow();
+  const totalAll=act.reduce((a,l)=>a+loanTotal(l),0);
+  const paid=act.reduce((a,l)=>a+loanPayment(l)*loanPaidCount(l),0);
+  const pct=totalAll?Math.min(100,paid/totalAll*100):0;
+  const last=act.slice().sort((a,b)=>loanEndDate(b)-loanEndDate(a))[0];
+  document.getElementById('budWrap').innerHTML=`
+  <div class="hero" style="margin-top:16px">
+    <div class="lab">${AR?'إجمالي المتبقي':'Still owed'}</div>
+    <div class="row"><div class="big">${mn(owed)}<small>QAR</small></div></div>
+    <div style="height:7px;background:rgba(255,255,255,.22);border-radius:99px;margin-top:16px">
+      <i style="display:block;height:100%;width:${pct}%;background:#fff;border-radius:99px"></i></div>
+    <div class="hstats" style="margin-top:14px">
+      <div><div class="k">${AR?'مستحق هذا الشهر':'Due now'}</div><div class="v">${mn(due)}</div></div>
+      <div><div class="k">${AR?'يُخصَّص شهرياً':'Set aside'}</div><div class="v">${mn(acc)}</div></div>
+      <div><div class="k">${AR?'آخر دفعة':'Debt free'}</div>
+        <div class="v" style="font-size:12px">${last?fmtMon(loanEndDate(last)):'—'}</div></div>
+    </div></div>
+
+  ${act.length?`<div class="card"><div class="chead"><h3>${AR?'القروض':'Loans'}</h3></div>
+  ${act.map(l=>{
+    const k=loanPaidCount(l),n=loanPeriods(l),p=k/n*100,nx=loanNextDue(l),d=loanDueNow(l);
+    return `<button class="brow" data-loan="${LOANS.indexOf(l)}"><div class="btop">
+      <span class="tic" style="width:32px;height:32px;border-radius:10px;background:${l.c}1F;color:${l.c}">${svg(l.ic)}</span>
+      <span class="nm">${L(l)}<span style="display:block;font-size:10.5px;color:var(--muted);font-weight:500;margin-top:2px">
+        ${freqLabel(l)} · ${kindLabel(l.kind)}</span></span>
+      <span class="sp">${mn(loanPayment(l))}${n>1?`<b> ×${n-k}</b>`:''}</span></div>
+      <div class="btr"><i style="width:${p}%;background:${l.c}"></i></div>
+      <div class="bfoot">
+        <span>${d>0?(AR?'مستحق هذا الشهر':'Due this month'):(AR?'التالي ':'Next ')+fmtMon(nx)}</span>
+        <span class="r">${mn(loanRemaining(l))} ${AR?'متبقٍ':'left'}</span></div></button>`}).join('')}</div>`
+  :`<div class="card"><div class="empty"><div class="ill">${svg('bank')}</div>
+    <h4>${AR?'لا توجد قروض':'No loans'}</h4>
+    <p>${AR?'أضف قرضاً — شهرياً، أقساطاً، أو دفعة واحدة بعد سنوات.'
+      :'Add a loan — monthly, a few instalments, or a single payment years out.'}</p></div></div>`}
+  <button class="primary" id="addLoan">${AR?'إضافة قرض':'Add loan'}</button>`;
+  document.getElementById('addLoan').onclick=()=>loanForm(-1);
+}
+
+function loanSheet(i){
+  const l=LOANS[i],k=loanPaidCount(l),n=loanPeriods(l),sp=loanSplit(l);
+  const paid=loanPayment(l)*k, cost=loanCost(l), acc=loanAccrual(l), ml=loanMonthsLeft(l);
+  const lump=n===1, nonMonthly=loanEvery(l)>1||lump;
+  openSheet(`<div class="shead"><span class="tic" style="width:44px;height:44px;border-radius:14px;background:${l.c}1F;color:${l.c}">${svg(l.ic)}</span>
+    <span class="nm"><span class="t">${L(l)}</span>
+    <span class="s">${freqLabel(l)} · ${kindLabel(l.kind)}${l.kind==='rate'?' '+l.rate+'%':''}</span></span></div>
+
+    <p style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:16px">${AR
+      ?`اقترضت <b style="color:var(--ink)">${mn(l.principal)}</b> وستسدّد <b style="color:var(--ink)">${mn(loanTotal(l))}</b>${
+        lump?` دفعة واحدة في ${fmtMon(loanEndDate(l))}`:` على ${n} ${n===2?'دفعتين':'دفعات'} تنتهي ${fmtMon(loanEndDate(l))}`}. ${
+        cost>0?`تكلفة الاقتراض <b style="color:var(--ink)">${mn(cost)}</b> أي ${(cost/l.principal*100).toFixed(1)}٪.`:'لا توجد تكلفة إضافية.'}`
+      :`You borrowed <b style="color:var(--ink)">${mn(l.principal)}</b> and will repay <b style="color:var(--ink)">${mn(loanTotal(l))}</b>${
+        lump?` in one payment in ${fmtMon(loanEndDate(l))}`:` across ${n} payments, ending ${fmtMon(loanEndDate(l))}`}. ${
+        cost>0?`Borrowing costs <b style="color:var(--ink)">${mn(cost)}</b>, or ${(cost/l.principal*100).toFixed(1)}% of what you took.`:'It costs nothing extra.'}`}</p>
+
+    <div class="yrow"><span class="col"><span class="nm">${lump?(AR?'الدفعة':'The payment'):(AR?'كل دفعة':'Each payment')}</span>
+      <span class="sub">${AR?'التالية':'next'} ${fmtMon(loanNextDue(l))}</span></span>
+      <span class="val">${mn(loanPayment(l))}</span></div>
+    ${nonMonthly?`<div class="yrow"><span class="col"><span class="nm">${AR?'خصّص شهرياً':'Set aside monthly'}</span>
+      <span class="sub">${AR?`${mn(loanRemaining(l))} على ${ml} شهراً`:`${mn(loanRemaining(l))} over ${ml} months`}</span></span>
+      <span class="val" style="color:var(--teal)">${mn(acc)}</span></div>`:''}
+    <div class="yrow"><span class="col"><span class="nm">${AR?'سُدّد':'Paid so far'}</span>
+      <span class="sub">${k} ${AR?'من':'of'} ${n}</span></span><span class="val">${mn(paid)}</span></div>
+    <div class="yrow"><span class="col"><span class="nm">${AR?'المتبقي':'Still to pay'}</span></span>
+      <span class="val">${mn(loanRemaining(l))}</span></div>
+    ${l.kind==='rate'&&!lump?`<div class="yrow"><span class="col"><span class="nm">${AR?'أصل الدين':'Outstanding principal'}</span>
+      <span class="sub">${AR?'أقل من المتبقي — الفائدة تُدفع مقدماً':'lower than the amount left — interest is front-loaded'}</span></span>
+      <span class="val">${mn(loanBalance(l))}</span></div>
+    <div class="yrow total"><span class="col"><span class="nm">${AR?'الدفعة القادمة':'Next payment'}</span>
+      <span class="sub">${AR?`أصل ${mn(sp.pri)} · فائدة ${mn(sp.int)}`:`${mn(sp.pri)} principal · ${mn(sp.int)} interest`}</span></span>
+      <span class="val">${mn(loanPayment(l))}</span></div>`:''}
+
+    <div class="sbtns"><button class="sbtn edit" id="loanEdit">${AR?'تعديل':'Edit'}</button>
+      <button class="sbtn del" id="loanDel">${AR?'حذف':'Delete'}</button></div>`);
+  document.getElementById('loanEdit').onclick=()=>{closeSheet();loanForm(i)};
+  document.getElementById('loanDel').onclick=()=>{
+    LOANS.splice(i,1);save();closeSheet();reflow();toast(AR?'تم الحذف':'Loan removed')};
+}
+
+const PRESETS=[
+ {enL:"Monthly",arL:"شهري",every:1,count:12},
+ {enL:"Instalments",arL:"أقساط",every:1,count:4},
+ {enL:"Quarterly",arL:"ربع سنوي",every:3,count:4},
+ {enL:"One payment",arL:"دفعة واحدة",every:36,count:1}];
+
+function loanForm(i){
+  const isNew=i<0;
+  const l=isNew?{en:'',ar:'',c:PALETTE[LOANS.length%PALETTE.length],ic:'bank',
+    kind:'free',principal:0,rate:0,profit:0,count:4,every:1,
+    start:`${YR}-${String(MO+1).padStart(2,'0')}`}:JSON.parse(JSON.stringify(LOANS[i]));
+  openSheet(`<div class="shead"><span class="nm"><span class="t">${
+    isNew?(AR?'قرض جديد':'New loan'):(AR?'تعديل القرض':'Edit loan')}</span></span></div>
+  <div class="nform" style="padding:0">
+    <input id="lEn" placeholder="${AR?'اسم القرض':'Loan name'}" value="${l.en}">
+
+    <p class="eyebrow" style="margin:16px 0 6px">${AR?'المبلغ':'Amount borrowed'}</p>
+    <input id="lP" type="number" inputmode="numeric" value="${l.principal||''}" placeholder="0">
+
+    <p class="eyebrow" style="margin:18px 0 8px">${AR?'كيف تُسدَّد':'How it is repaid'}</p>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">${PRESETS.map((q,qi)=>
+      `<button class="cpill" data-pre="${qi}">${AR?q.arL:q.enL}</button>`).join('')}</div>
+    <div style="display:flex;gap:9px;margin-top:12px">
+      <div style="flex:1"><p class="eyebrow" style="margin-bottom:5px">${AR?'عدد الدفعات':'Payments'}</p>
+        <input id="lN" type="number" inputmode="numeric" value="${l.count}"></div>
+      <div style="flex:1"><p class="eyebrow" style="margin-bottom:5px">${AR?'كل (أشهر)':'Every (months)'}</p>
+        <input id="lE" type="number" inputmode="numeric" value="${l.every}"></div></div>
+
+    <p class="eyebrow" style="margin:18px 0 8px">${AR?'التكلفة':'Cost of borrowing'}</p>
+    <div class="seg seg3"><div class="thumb" id="lThumb"></div>
+      <button data-lk="free">${AR?'بدون':'None'}</button>
+      <button data-lk="profit">${AR?'مرابحة':'Profit'}</button>
+      <button data-lk="rate">${AR?'فائدة':'Interest'}</button></div>
+    <div id="lCostWrap"></div>
+
+    <p class="eyebrow" style="margin:16px 0 6px">${AR?'أول دفعة':'First payment'}</p>
+    <input id="lS" type="month" value="${l.start}">
+
+    <div class="card" style="margin-top:16px" id="lPrev"></div>
+    <button class="primary" id="lSave">${AR?'حفظ':'Save'}</button>
+  </div>`);
+
+  const kindOrder=['free','profit','rate'];
+  function setKind(k){
+    l.kind=k;
+    document.querySelectorAll('[data-lk]').forEach(b=>b.classList.toggle('on',b.dataset.lk===k));
+    const n=kindOrder.indexOf(k),rtl=document.documentElement.dir==='rtl';
+    document.getElementById('lThumb').style.transform=`translateX(${rtl?-100*n:100*n}%)`;
+    document.getElementById('lCostWrap').innerHTML=
+      k==='rate'?`<p class="eyebrow" style="margin:14px 0 6px">${AR?'نسبة سنوية ٪':'Annual rate %'}</p>
+        <input id="lR" type="number" inputmode="decimal" step="0.1" value="${l.rate||''}" placeholder="0">`
+      :k==='profit'?`<p class="eyebrow" style="margin:14px 0 6px">${AR?'إجمالي الربح':'Total profit'}</p>
+        <input id="lF" type="number" inputmode="numeric" value="${l.profit||''}" placeholder="0">`:'';
+    const ex=document.getElementById('lR')||document.getElementById('lF');
+    if(ex)ex.oninput=preview;
+    preview();
+  }
+  function preview(){
+    l.principal=parseFloat(document.getElementById('lP').value)||0;
+    l.count=Math.max(1,parseInt(document.getElementById('lN').value)||1);
+    l.every=Math.max(1,parseInt(document.getElementById('lE').value)||1);
+    l.start=document.getElementById('lS').value||l.start;
+    const r=document.getElementById('lR'),f=document.getElementById('lF');
+    if(r)l.rate=parseFloat(r.value)||0;
+    if(f)l.profit=parseFloat(f.value)||0;
+    const pmt=loanPayment(l),cost=loanCost(l),acc=loanAccrual(l),ml=loanMonthsLeft(l);
+    const lump=loanPeriods(l)===1;
+    document.getElementById('lPrev').innerHTML=!l.principal?
+      `<p style="font-size:11.5px;color:var(--muted);text-align:center;padding:6px 0">${
+        AR?'أدخل المبلغ لرؤية الحساب':'Enter an amount to see the numbers'}</p>`:
+      `<div class="yrow"><span class="col"><span class="nm">${
+        lump?(AR?'الدفعة':'The payment'):(AR?'كل دفعة':'Each payment')}</span>
+        <span class="sub">${freqLabel(l)} · ${AR?'تنتهي':'ends'} ${fmtMon(loanEndDate(l))}</span></span>
+        <span class="val">${mn(pmt)}</span></div>
+      ${(loanEvery(l)>1||lump)?`<div class="yrow"><span class="col"><span class="nm">${
+        AR?'خصّص شهرياً':'Set aside monthly'}</span>
+        <span class="sub">${AR?`على ${ml} شهراً`:`over ${ml} months`}</span></span>
+        <span class="val" style="color:var(--teal)">${mn(acc)}</span></div>`:''}
+      <div class="yrow total"><span class="col"><span class="nm">${AR?'الإجمالي':'Total repaid'}</span>
+        <span class="sub">${cost>0?(AR?`تكلفة ${mn(cost)} · ${(cost/l.principal*100).toFixed(1)}٪`
+          :`${mn(cost)} cost · ${(cost/l.principal*100).toFixed(1)}%`):(AR?'بدون تكلفة':'no extra cost')}</span></span>
+        <span class="val">${mn(loanTotal(l))}</span></div>`;
+  }
+  document.querySelectorAll('[data-pre]').forEach(b=>b.onclick=()=>{
+    const q=PRESETS[+b.dataset.pre];
+    document.getElementById('lN').value=q.count;
+    document.getElementById('lE').value=q.every;
+    document.querySelectorAll('[data-pre]').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');preview()});
+  document.querySelectorAll('[data-lk]').forEach(b=>b.onclick=()=>setKind(b.dataset.lk));
+  ['lP','lN','lE','lS'].forEach(id=>document.getElementById(id).oninput=preview);
+  setKind(l.kind);
+  document.getElementById('lSave').onclick=()=>{
+    const en=document.getElementById('lEn').value.trim();
+    if(!en){toast(AR?'أدخل اسماً':'Enter a name');return}
+    if(!l.principal){toast(AR?'أدخل المبلغ':'Enter the amount');return}
+    l.en=en;l.ar=l.ar||en;
+    if(isNew)LOANS.push(l); else LOANS[i]=l;
+    save();closeSheet();reflow();toast(AR?'تم الحفظ':'Saved');};
 }
 
 /* ---------- sheets ---------- */
@@ -834,7 +1345,8 @@ function catSheet(i){
   document.getElementById('catBudget').onclick=()=>budgetSheet(i);
 }
 function txSheet(i){
-  const m=Mo(),t=m.tx[i];if(!t)return;const c=CATS[t.ci];
+  const m=Mo(),t=m.tx[i];if(!t)return;
+  const c=t.t==='i'?INCOME_CATS[t.ii]:CATS[t.ci];if(!c)return;
   editingTx=i;
   openSheet(`<div class="shead"><span class="tic" style="width:44px;height:44px;border-radius:14px;background:${c.c}1F;color:${c.c}">${svg(c.ic)}</span>
     <span class="nm"><span class="t">${L(t)}</span><span class="s">${L(c)}</span></span>
@@ -1017,22 +1529,32 @@ let MEM=null;                      // fallback when storage is blocked (e.g. pre
 function rawGet(){try{return localStorage.getItem(KEY)}catch(e){return MEM}}
 function rawSet(v){try{localStorage.setItem(KEY,v)}catch(e){MEM=v}}
 function snapshot(){
-  return {v:1,ar:AR,cur:CUR,
-    cats:CATS.map(c=>({en:c.en,b:c.b,items:c.items.map(i=>({en:i.en,ar:i.ar}))})),
+  return {v:2,ar:AR,cur:CUR,profile:PROFILE,
+    cats:CATS.map(c=>({en:c.en,ar:c.ar,b:c.b,c:c.c,ic:c.ic,
+      items:c.items.map(i=>({en:i.en,ar:i.ar}))})),
     funds:FUNDS.map(f=>({en:f.en,annual:f.annual,months:f.months})),
+    loans:LOANS,
     months:Object.fromEntries(KEYS.map(k=>[k,MONTHS[k].tx]))};
 }
 function save(){try{rawSet(JSON.stringify(snapshot()))}catch(e){console.warn('save failed',e)}}
 function load(){
   const raw=rawGet();if(!raw)return false;
   let d;try{d=JSON.parse(raw)}catch(e){return false}
-  if(!d||d.v!==1)return false;
-  (d.cats||[]).forEach(sc=>{const c=CATS.find(x=>x.en===sc.en);if(!c)return;
-    c.b=sc.b;
-    (sc.items||[]).forEach(si=>{if(!c.items.find(x=>x.en===si.en))c.items.push({en:si.en,ar:si.ar,w:0})})});
+  if(!d||!(d.v===1||d.v===2))return false;
+  if(d.profile)PROFILE={...PROFILE,...d.profile};
+  if(d.v===2&&Array.isArray(d.cats)&&d.cats.length){
+    CATS.length=0;
+    d.cats.forEach(sc=>CATS.push({en:sc.en,ar:sc.ar||sc.en,b:sc.b,c:sc.c||'#2E8B72',
+      ic:sc.ic||'tag',items:(sc.items||[]).map(i=>({en:i.en,ar:i.ar||i.en,w:0}))}));
+  } else {
+    (d.cats||[]).forEach(sc=>{const c=CATS.find(x=>x.en===sc.en);if(!c)return;
+      c.b=sc.b;
+      (sc.items||[]).forEach(si=>{if(!c.items.find(x=>x.en===si.en))c.items.push({en:si.en,ar:si.ar,w:0})})});
+  }
   (d.funds||[]).forEach(sf=>{const f=FUNDS.find(x=>x.en===sf.en);if(!f)return;
     f.annual=sf.annual;f.months=sf.months||{}});
   Object.entries(d.months||{}).forEach(([k,tx])=>{if(MONTHS[k]){MONTHS[k].tx=tx||[];recompute(MONTHS[k])}});
+  if(Array.isArray(d.loans))LOANS=d.loans;
   if(typeof d.ar==='boolean')AR=d.ar;
   if(d.cur&&MONTHS[d.cur])CUR=d.cur;
   return true;
@@ -1055,7 +1577,7 @@ function importData(file){
 function lastExport(){try{return localStorage.getItem(KEY+'.lastExport')}catch(e){return null}}
 
 /* ---------- add flow ---------- */
-let amt='',pickedCat=-1,editIdx=null,pickDay=null,pickAcc=0;
+let amt='',pickedCat=-1,editIdx=null,pickDay=null,pickAcc=0,txType='e';
 const ov=()=>document.getElementById('addov');
 function flatPickable(){
   const m=Mo(),out=[];
@@ -1068,12 +1590,21 @@ function drawPad(){document.getElementById('pad').innerHTML=
   ['1','2','3','4','5','6','7','8','9','.','0','⌫'].map(k=>
   `<button class="key ${(k==='.'||k==='⌫')?'fn':''}" data-k="${k}">${k}</button>`).join('')}
 function drawItems(){
-  const its=flatPickable();window._pick=its;
+  const inc=txType==='i';
+  const its=inc?INCOME_CATS.map((c,i)=>({...c,ii:i})):flatPickable();
+  window._pick=its;
   document.getElementById('igrid').innerHTML=its.map((it,i)=>`<button class="itile" data-it="${i}">
     <span class="ii" style="background:${it.c}1F;color:${it.c}">${svg(it.ic)}</span>
     <span class="nn">${L(it)}</span></button>`).join('')
-    +`<button class="itile new" data-new="1"><span class="ii">${svg('plus')}</span>
-      <span class="nn">${AR?'بند جديد':'New item'}</span></button>`;
+    +(inc?'':`<button class="itile new" data-new="1"><span class="ii">${svg('plus')}</span>
+      <span class="nn">${AR?'بند جديد':'New item'}</span></button>`);
+  const th=document.getElementById('txThumb');
+  if(th){const rtl=document.documentElement.dir==='rtl';
+    th.style.transform=`translateX(${inc?(rtl?'-100%':'100%'):'0%'})`}
+  document.getElementById('ttExp').textContent=AR?'مصروف':'Expense';
+  document.getElementById('ttInc').textContent=AR?'دخل':'Income';
+  document.getElementById('ttExp').classList.toggle('on',!inc);
+  document.getElementById('ttInc').classList.toggle('on',inc);
 }
 function addTexts(){
   document.getElementById('addtitle').textContent=editIdx!==null
@@ -1095,6 +1626,7 @@ function openAdd(tx,idx){
   if(!isNow()){CUR='2026-08';render()}
   editIdx=(typeof idx==='number')?idx:null;
   amt=(tx&&tx.a)?String(tx.a):'';
+  txType=(tx&&tx.t==='i')?'i':'e';
   pickDay=(tx&&tx.day)?tx.day:Mo().elapsed;
   pickAcc=(tx&&typeof tx.acc==='number')?tx.acc:0;
   paintAmt();drawPad();drawItems();addTexts();
@@ -1111,7 +1643,8 @@ function commit(i){
   const m=Mo(),pick=window._pick[i];
   if(editIdx!==null)m.tx.splice(editIdx,1);
   const day=pickDay||m.elapsed;
-  m.tx.unshift({en:pick.en,ar:pick.ar,ci:pick.ci,a:val,day,acc:pickAcc});
+  if(txType==='i')m.tx.unshift({t:'i',en:pick.en,ar:pick.ar,ii:pick.ii,a:val,day,acc:pickAcc});
+  else m.tx.unshift({en:pick.en,ar:pick.ar,ci:pick.ci,a:val,day,acc:pickAcc});
   m.tx.sort((a,b)=>b.day-a.day);
   recompute(m);
   const wasEdit=editIdx!==null;save();
@@ -1136,12 +1669,15 @@ function render(){
   const m=Mo();
   document.documentElement.dir=AR?'rtl':'ltr';document.documentElement.lang=AR?'ar':'en';
   document.getElementById('lang').textContent=AR?'English':'العربية';
-  document.getElementById('greet').textContent=AR?'أهلاً علي':'Hi, Ali';
+  document.getElementById('greet').textContent=PROFILE.name
+    ?(AR?'أهلاً '+PROFILE.name:'Hi, '+PROFILE.name)
+    :(AR?'أهلاً بك':'Welcome');
   const yr=document.getElementById('v-bud').classList.contains('on')&&BUD!=='m';
   document.getElementById('sub').textContent=yr?'2026':(AR?m.ar:m.en);
   document.getElementById('perbtn').textContent=(yr?'2026':(AR?m.shAr:m.sh))+' ▾';
   document.querySelector('[data-i="segM"]').textContent=AR?'شهري':'Monthly';
   document.querySelector('[data-i="segY"]').textContent=AR?'سنوي':'Annual';
+  document.querySelector('[data-i="segL"]').textContent=AR?'قروض':'Loans';
   document.querySelector('[data-i="nav1"]').lastChild.textContent=AR?'الرئيسية':'Home';
   document.querySelector('[data-i="nav2"]').lastChild.textContent=AR?'التحليلات':'Insights';
   document.querySelector('[data-i="nav3"]').lastChild.textContent=AR?'الميزانيات':'Budgets';
@@ -1159,6 +1695,10 @@ function reflow(){ANIM=true;render()}
 document.querySelector('.addb').onclick=()=>openAdd();
 document.getElementById('budclose').onclick=()=>{
   document.getElementById('budov').classList.remove('on');reflow();};
+document.getElementById('catovclose').onclick=()=>{
+  if(catEdit){drawCatManager();return}
+  document.getElementById('catov').classList.remove('on');reflow();};
+document.getElementById('setupSkip').onclick=closeSetup;
 document.addEventListener('click',e=>{
   if(e.target.closest('#editBudgets'))openBudgetEditor();});
 document.getElementById('perbtn').onclick=monthSheet;
@@ -1191,6 +1731,8 @@ document.getElementById('nisave').onclick=()=>{
   document.getElementById('addnew').style.display='none';
   document.getElementById('addmain').style.display='';
   drawItems();toast((AR?'أُضيف البند · ':'Item added · ')+nm);};
+document.getElementById('ttExp').onclick=()=>{txType='e';drawItems()};
+document.getElementById('ttInc').onclick=()=>{txType='i';drawItems()};
 document.getElementById('chipdate').onclick=dateSheet;
 document.getElementById('chipacc').onclick=accSheet;
 document.addEventListener('click',e=>{
@@ -1224,6 +1766,8 @@ document.addEventListener('click',e=>{
   if(tx&&isNow()){txSheet(+tx.dataset.tx);return}
   if(e.target.closest('[data-goy]')){
     document.querySelector('[data-b="y"]').click();return}
+  if(e.target.closest('[data-gol]')){document.querySelector('[data-b="l"]').click();return}
+  const ln=e.target.closest('[data-loan]');if(ln){loanSheet(+ln.dataset.loan);return}
   const fd=e.target.closest('[data-fund]');if(fd){fundSheet(+fd.dataset.fund);return}
   const c=e.target.closest('[data-cat]');if(c)catSheet(+c.dataset.cat);});
 document.querySelectorAll('.ni').forEach(b=>b.onclick=()=>{
@@ -1234,8 +1778,9 @@ document.querySelectorAll('.ni').forEach(b=>b.onclick=()=>{
 document.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.seg button').forEach(x=>x.classList.remove('on'));
   b.classList.add('on');BUD=b.dataset.b;reflow();});
-load();
+const had=load();
 render();
+if(!PROFILE.setup&&!PROFILE.name)setTimeout(openSetup,400);
 
 </script>
 </body>
