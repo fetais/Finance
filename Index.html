@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F7F7F4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Finance V2">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Finance%20V2%22%2C%22short_name%22%3A%22Finance%22%2C%22start_url%22%3A%22.%2F%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23F7F7F4%22%2C%22theme_color%22%3A%22%230F5C56%22%7D">
+<title>Finance V2 — Personal Finance Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F7F4;--surface:#FFFFFF;--ink:#111512;--muted:#6F756F;--soft:#ECEDE8;--line:#E1E3DD;
+  --teal:#0F5C56;--teal-2:#DDEBE8;--teal-3:#F0F7F5;--amber:#A8680B;--amber-bg:#FFF4DE;
+  --red:#B73A32;--red-bg:#FDECEA;--green:#2F745D;--blue:#3B6E94;--purple:#756B9C;
+  --radius:18px;--shadow:0 12px 32px rgba(17,21,18,.08);
+  --font:'Space Grotesk','Cairo',system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:#E9EAE5}
+body{margin:0;background:#E9EAE5;color:var(--ink);font-family:var(--font);display:flex;justify-content:center;min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{color:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid rgba(15,92,86,.24);outline-offset:2px}
+button,[role="button"]{min-height:44px}
+button{cursor:pointer}
+[hidden]{display:none!important}
+.app{width:100%;max-width:430px;min-height:100vh;background:var(--bg);position:relative;padding-bottom:104px;overflow-x:hidden}
+.app-header{position:sticky;top:0;z-index:25;background:rgba(247,247,244,.93);backdrop-filter:blur(18px);border-bottom:1px solid rgba(225,227,221,.72);padding:calc(13px + env(safe-area-inset-top)) 16px 11px}
+.header-row{display:flex;align-items:center;gap:10px}
+.identity{flex:1;min-width:0}
+.greeting{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.period-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.header-actions{display:flex;align-items:center;gap:7px}
+.icon-btn,.period-btn,.lang-btn{border:1px solid var(--line);background:var(--surface);border-radius:13px;display:inline-flex;align-items:center;justify-content:center}
+.icon-btn{width:44px;padding:0}
+.period-btn{padding:0 12px;font-size:12px;font-weight:700;gap:6px;white-space:nowrap}
+.lang-btn{padding:0 10px;font-size:11.5px;font-weight:700}
+.sample-strip{display:flex;align-items:center;justify-content:center;gap:7px;background:#FFF5D9;color:#785106;border-bottom:1px solid #EFDDA9;font-size:11.5px;font-weight:700;padding:7px 14px}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
+main{padding:15px 16px 24px}
+.view{display:none}.view.active{display:block}
+.view-title{font-size:23px;line-height:1.2;margin:2px 0 4px;font-weight:700;letter-spacing:-.025em}
+.view-subtitle{font-size:12.5px;line-height:1.55;color:var(--muted);margin:0 0 14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-top:13px}
+.card:first-child{margin-top:0}
+.hero{background:var(--ink);color:#fff;border:none;padding:21px;border-radius:22px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:210px;height:210px;border-radius:50%;right:-95px;top:-105px;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 68%);pointer-events:none}
+[dir="rtl"] .hero:after{right:auto;left:-95px}
+.hero>*{position:relative;z-index:1}
+.hero-label{font-size:11px;font-weight:700;opacity:.62;letter-spacing:.08em;text-transform:uppercase}
+[dir="rtl"] .hero-label{text-transform:none;letter-spacing:0;font-size:12px}
+.hero-value{font-size:38px;line-height:1.08;font-weight:700;letter-spacing:-.045em;margin-top:7px;font-variant-numeric:tabular-nums}
+.hero-value.negative{color:#FFB9B3}
+.currency{font-size:12px;font-weight:700;opacity:.58;margin-inline-start:6px;letter-spacing:0}
+.hero-desc{font-size:11.5px;line-height:1.55;opacity:.62;margin-top:8px;max-width:330px}
+.hero-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 16px;border-top:1px solid rgba(255,255,255,.15);margin-top:17px;padding-top:15px}
+.hero-metric-label{font-size:10.5px;opacity:.56;margin-bottom:4px}
+.hero-metric-value{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+.hero-link{border:0;background:transparent;color:#fff;padding:7px 0 0;min-height:auto;font-size:11.5px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}
+.section-title{font-size:13px;font-weight:700;margin:0}
+.section-link{border:0;background:transparent;color:var(--teal);min-height:auto;padding:3px 0;font-size:11.5px;font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:11.5px;line-height:1.55}
+.metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.metric{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.metric-label{font-size:11px;color:var(--muted);line-height:1.35}
+.metric-value{font-size:20px;font-weight:700;margin-top:5px;font-variant-numeric:tabular-nums;letter-spacing:-.025em}
+.metric-note{font-size:10.5px;color:var(--muted);margin-top:3px}
+.attention-list,.list{display:flex;flex-direction:column}
+.attention{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.attention:last-child{border-bottom:0;padding-bottom:2px}
+.status-icon{width:35px;height:35px;flex:none;border-radius:11px;display:flex;align-items:center;justify-content:center}
+.status-icon.warn{background:var(--amber-bg);color:var(--amber)}
+.status-icon.danger{background:var(--red-bg);color:var(--red)}
+.status-icon.good{background:var(--teal-3);color:var(--teal)}
+.attention-main{flex:1;min-width:0}
+.attention-title{font-size:12.5px;font-weight:700;line-height:1.4}
+.attention-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-top:2px}
+.attention-action{border:0;background:transparent;color:var(--teal);font-size:11px;font-weight:700;min-height:auto;padding:4px 0}
+.row{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid var(--line);width:100%;background:transparent;border-left:0;border-right:0;border-top:0;text-align:start}
+.row:last-child{border-bottom:0}
+.row-icon{width:39px;height:39px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--soft)}
+.row-main{flex:1;min-width:0}
+.row-title{display:block;font-size:13px;font-weight:700;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub{display:block;font-size:10.8px;color:var(--muted);line-height:1.45;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-side{text-align:end;flex:none;max-width:128px;white-space:nowrap}
+.row-amount{display:block;font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.row-amount.positive{color:var(--teal)}
+.row-amount.negative{color:var(--red)}
+.row-tag{display:block;font-size:9.8px;color:var(--muted);margin-top:3px}
+.chev{color:#9A9F99;width:18px;height:18px;flex:none}
+.quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.quick{border:1px solid var(--line);background:var(--surface);border-radius:15px;padding:10px 5px 9px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:7px;min-width:0}
+.quick-ic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+.quick-name{font-size:9.8px;font-weight:700;line-height:1.25;text-align:center;width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.progress-track{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;position:relative}
+.progress-fill{height:100%;border-radius:99px;background:var(--teal);display:block}
+.progress-fill.warn{background:var(--amber)}
+.progress-fill.danger{background:var(--red)}
+.progress-row{margin:13px 0}
+.progress-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:7px;align-items:baseline}
+.progress-name{font-size:12.5px;font-weight:700}
+.progress-values{font-size:10.8px;color:var(--muted);font-variant-numeric:tabular-nums}
+.progress-note{display:flex;justify-content:space-between;gap:8px;font-size:10.5px;color:var(--muted);margin-top:6px}
+.segmented{display:flex;background:#E9EAE5;border-radius:14px;padding:4px;gap:2px;margin-bottom:13px}
+.segmented button{flex:1;border:0;background:transparent;border-radius:11px;font-size:11.5px;font-weight:700;color:var(--muted);padding:0 7px}
+.segmented button.active{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(17,21,18,.08)}
+.primary,.secondary,.danger-btn,.ghost-btn{width:100%;border-radius:15px;border:0;padding:0 15px;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px}
+.primary{background:var(--teal);color:#fff}
+.secondary{background:var(--teal-2);color:var(--teal)}
+.danger-btn{background:var(--red-bg);color:var(--red)}
+.ghost-btn{background:var(--surface);border:1px solid var(--line)}
+.btn-row{display:flex;gap:9px;margin-top:14px}.btn-row>*{flex:1}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:5px 9px;font-size:10px;font-weight:700;background:var(--soft);color:var(--muted)}
+.badge.warn{background:var(--amber-bg);color:var(--amber)}
+.badge.danger{background:var(--red-bg);color:var(--red)}
+.badge.good{background:var(--teal-3);color:var(--teal)}
+.empty{text-align:center;padding:27px 18px}
+.empty-icon{width:66px;height:66px;border-radius:22px;background:var(--teal-3);color:var(--teal);display:flex;align-items:center;justify-content:center;margin:0 auto 15px}
+.empty-title{font-size:16px;font-weight:700;margin:0}
+.empty-desc{font-size:12px;color:var(--muted);line-height:1.6;margin:7px auto 0;max-width:280px}
+.bottom-nav{position:fixed;z-index:30;bottom:0;width:100%;max-width:430px;background:rgba(255,255,255,.95);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);align-items:end;padding:8px 6px calc(10px + env(safe-area-inset-bottom))}
+.nav-btn{border:0;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:9.5px;font-weight:700;padding:3px 2px}
+.nav-btn svg{width:22px;height:22px}.nav-btn.active{color:var(--teal)}
+.fab-wrap{display:flex;justify-content:center;align-items:flex-end}
+.fab{width:52px;height:52px;border-radius:17px;border:0;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px rgba(17,21,18,.2);transform:translateY(-8px)}
+.fab svg{width:24px;height:24px}
+.overlay{position:fixed;inset:0;z-index:80;display:none;align-items:flex-end;justify-content:center;background:rgba(17,21,18,.43);backdrop-filter:blur(3px)}
+.overlay.open{display:flex}
+.sheet{width:100%;max-width:430px;max-height:89vh;background:var(--surface);border-radius:25px 25px 0 0;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.sheet-head{display:flex;align-items:center;gap:10px;padding:10px 18px 11px;border-bottom:1px solid var(--line)}
+.grab{position:absolute;left:50%;transform:translateX(-50%);width:38px;height:4px;background:#D9DDD6;border-radius:99px;margin-top:-2px}
+.sheet-title{font-size:15px;font-weight:700;flex:1;margin-top:8px}
+.close-btn{border:0;background:var(--soft);width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-top:5px}
+.sheet-body{overflow-y:auto;padding:17px 18px calc(24px + env(safe-area-inset-bottom))}
+.full-overlay{position:fixed;inset:0;z-index:90;background:var(--bg);display:none;max-width:430px;margin:0 auto;flex-direction:column}
+.full-overlay.open{display:flex}
+.full-head{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 16px 10px;border-bottom:1px solid var(--line);background:rgba(247,247,244,.96)}
+.full-title{font-size:15px;font-weight:700;flex:1}
+.full-body{flex:1;overflow-y:auto;padding:16px 16px 28px}
+.field{margin-top:13px}
+.field:first-child{margin-top:0}
+label,.field-label{display:block;font-size:11.5px;font-weight:700;margin-bottom:6px;color:#3D443E}
+input,select,textarea{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:13px;padding:12px 13px;color:var(--ink);font-size:16px;min-height:46px}
+textarea{min-height:86px;resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{border-color:var(--teal)}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.amount-input{font-size:36px;font-weight:700;text-align:center;letter-spacing:-.035em;padding:17px 10px;direction:ltr}
+.help{font-size:10.8px;color:var(--muted);line-height:1.5;margin-top:6px}
+.check-row{display:flex;align-items:flex-start;gap:9px;border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px}
+.check-row input{width:20px;height:20px;min-height:0;flex:none;margin-top:1px}
+.check-copy{font-size:11.5px;line-height:1.45}.check-copy b{display:block;font-size:12px;margin-bottom:2px}
+.chip-row{display:flex;gap:7px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}.chip-row::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:0 12px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:6px;min-height:39px}
+.chip.active{border-color:var(--teal);color:var(--teal);background:var(--teal-3)}
+.form-actions{display:flex;gap:9px;margin-top:18px}.form-actions>*{flex:1}
+.toast{position:fixed;z-index:120;bottom:calc(92px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,18px);width:calc(100% - 32px);max-width:398px;background:var(--ink);color:#fff;border-radius:15px;padding:12px 14px;display:flex;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:.25s}
+.toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+.toast-msg{font-size:12px;line-height:1.4;flex:1}.toast button{border:0;background:transparent;color:#C8F169;font-size:12px;font-weight:700;min-height:auto;padding:4px}
+.chart{height:132px;display:flex;align-items:flex-end;gap:3px;border-bottom:1px solid var(--line);padding-top:9px}
+.bar{flex:1;min-width:3px;border-radius:4px 4px 0 0;background:var(--teal);height:2px;position:relative}
+.bar.weekend{background:#B9812E}.bar.zero{background:#E7E9E4;height:3px!important}
+.chart-axis{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:6px}
+.insight-card{border-inline-start:4px solid var(--teal);padding-inline-start:14px}
+.insight-card.warn{border-inline-start-color:var(--amber)}.insight-card.danger{border-inline-start-color:var(--red)}
+.insight-title{font-size:13px;font-weight:700;line-height:1.45}.insight-body{font-size:11.5px;color:var(--muted);line-height:1.6;margin-top:5px}
+.insight-rec{font-size:11.5px;line-height:1.55;margin-top:8px;background:var(--soft);border-radius:11px;padding:9px 10px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px}.kv:last-child{border-bottom:0}.kv span:last-child{font-weight:700;text-align:end;font-variant-numeric:tabular-nums}
+.notice{border-radius:14px;padding:11px 12px;background:var(--teal-3);color:#244A45;font-size:11px;line-height:1.55}.notice.warn{background:var(--amber-bg);color:#744C05}.notice.danger{background:var(--red-bg);color:#7C2721}
+.divider{height:1px;background:var(--line);margin:15px 0}
+.settings-row{display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:1px solid var(--line);width:100%;border-top:0;border-left:0;border-right:0;background:transparent;text-align:start}.settings-row:last-child{border-bottom:0}
+.settings-copy{flex:1;min-width:0}.settings-title{display:block;font-size:12.5px;font-weight:700}.settings-sub{display:block;font-size:10.8px;color:var(--muted);line-height:1.45;margin-top:2px}
+.file-input{display:none}
+bdi{unicode-bidi:isolate}
+@media (max-width:350px){.hero-value{font-size:33px}.quick-grid{grid-template-columns:repeat(3,1fr)}.header-actions{gap:4px}.lang-btn{padding:0 7px}.period-btn{padding:0 8px}.metric-value{font-size:18px}}
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="app-header">
+    <div class="header-row">
+      <div class="identity">
+        <div class="greeting" id="greeting">Welcome</div>
+        <div class="period-sub" id="periodSub"></div>
+      </div>
+      <div class="header-actions">
+        <button class="period-btn" id="periodButton" data-action="choose-month" aria-label="Choose month"></button>
+        <button class="lang-btn" id="languageButton" data-action="toggle-language">العربية</button>
+        <button class="icon-btn" data-action="go-settings" aria-label="Settings" id="settingsButton"></button>
+      </div>
+    </div>
+  </header>
+  <div class="sample-strip" id="sampleStrip" hidden><span class="dot"></span><span id="sampleStripText">Sample Data</span></div>
+  <main>
+    <section class="view active" id="view-home"></section>
+    <section class="view" id="view-accounts"></section>
+    <section class="view" id="view-plan"></section>
+    <section class="view" id="view-insights"></section>
+    <section class="view" id="view-settings"></section>
+  </main>
+  <nav class="bottom-nav" aria-label="Primary navigation">
+    <button class="nav-btn active" data-nav="home" id="nav-home"></button>
+    <button class="nav-btn" data-nav="accounts" id="nav-accounts"></button>
+    <div class="fab-wrap"><button class="fab" data-action="new-transaction" aria-label="Add transaction" id="fab"></button></div>
+    <button class="nav-btn" data-nav="plan" id="nav-plan"></button>
+    <button class="nav-btn" data-nav="insights" id="nav-insights"></button>
+  </nav>
+</div>
+
+<div class="overlay" id="sheetOverlay" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="sheet-head"><span class="grab"></span><div class="sheet-title" id="sheetTitle"></div><button class="close-btn" data-action="close-sheet" aria-label="Close" id="sheetClose"></button></div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+</div>
+
+<div class="full-overlay" id="transactionOverlay" aria-hidden="true">
+  <div class="full-head"><button class="close-btn" data-action="close-transaction" aria-label="Close" id="transactionClose"></button><div class="full-title" id="transactionTitle"></div></div>
+  <div class="full-body">
+    <form id="transactionForm" novalidate>
+      <div class="segmented" id="transactionTypeTabs"></div>
+      <div class="field"><label for="txAmount" id="txAmountLabel"></label><input class="amount-input" id="txAmount" name="amount" inputmode="decimal" autocomplete="off" placeholder="0.00" required></div>
+      <div class="input-row">
+        <div class="field"><label for="txDate" id="txDateLabel"></label><input id="txDate" name="date" type="date" required></div>
+        <div class="field"><label for="txAccount" id="txAccountLabel"></label><select id="txAccount" name="account"></select></div>
+      </div>
+      <div id="txDynamicFields"></div>
+      <div class="field"><label for="txNote" id="txNoteLabel"></label><textarea id="txNote" name="note" maxlength="240"></textarea></div>
+      <label class="check-row" id="txPlannedWrap"><input type="checkbox" id="txPlanned"><span class="check-copy"><b id="txPlannedTitle"></b><span id="txPlannedDesc"></span></span></label>
+      <label class="check-row" id="txRecurringWrap"><input type="checkbox" id="txRecurring"><span class="check-copy"><b id="txRecurringTitle"></b><span id="txRecurringDesc"></span></span></label>
+      <div id="txRecurringFields" hidden>
+        <div class="input-row">
+          <div class="field"><label for="txFrequency" id="txFrequencyLabel"></label><select id="txFrequency"><option value="monthly">Monthly</option><option value="annual">Annual</option></select></div>
+          <div class="field"><label for="txOccurrences" id="txOccurrencesLabel"></label><input id="txOccurrences" type="number" min="2" max="24" value="6" inputmode="numeric"></div>
+        </div>
+      </div>
+      <button class="primary" type="submit" id="txSaveButton" style="margin-top:18px"></button>
+    </form>
+  </div>
+</div>
+
+<input class="file-input" type="file" id="importFile" accept="application/json,.json">
+<div class="toast" id="toast" role="status" aria-live="polite"><div class="toast-msg" id="toastMessage"></div><button id="toastUndo" hidden></button></div>
+
+<script>
+'use strict';
+/* =========================================================
+   FINANCE V2 — DATA, CALCULATION AND LOCALIZATION LAYER
+   All money is stored as integer dirhams (QAR × 100).
+   ========================================================= */
+const SCHEMA_VERSION=3;
+const STORAGE_KEY='qfin.v3';
+const LEGACY_KEY='qfin.v1';
+const PRE_RESTORE_KEY='qfin.v3.preRestore';
+const DAY_MS=86400000;
+const NOW=new Date();
+NOW.setHours(12,0,0,0);
+
+/* Safe storage wrapper: normal browsers use localStorage; restricted previews fall back to memory. */
+const MEMORY_STORE=window.__QFIN_MEMORY_STORE__||(window.__QFIN_MEMORY_STORE__=new Map());
+function storeGet(key){
+  try{return window.localStorage.getItem(key)}catch(err){return MEMORY_STORE.has(key)?MEMORY_STORE.get(key):null}
+}
+function storeSet(key,value){
+  const text=String(value);
+  try{window.localStorage.setItem(key,text)}catch(err){MEMORY_STORE.set(key,text)}
+}
+function storeRemove(key){
+  try{window.localStorage.removeItem(key)}catch(err){MEMORY_STORE.delete(key)}
+}
+
+const ICONS={
+  home:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>',
+  wallet:'<path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H18v3"/><rect x="3" y="7.5" width="18" height="12.5" rx="3"/><circle cx="17" cy="14" r="1.2"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  target:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4"/><path d="M12 2v3M22 12h-3M12 22v-3M2 12h3"/>',
+  chart:'<path d="M4 20V11M10 20V5M16 20v-8M22 20H2"/>',
+  settings:'<circle cx="12" cy="12" r="3"/><path d="M12 2.5v2M12 19.5v2M21.5 12h-2M4.5 12h-2M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4M18.7 18.7l-1.4-1.4M6.7 6.7 5.3 5.3"/>',
+  calendar:'<rect x="3.5" y="5" width="17" height="16" rx="3.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  alert:'<path d="M12 3 2.8 20h18.4z"/><path d="M12 9v5M12 17.3v.2"/>',
+  check:'<path d="m5 12 4 4L19 6"/>',
+  bank:'<path d="M3 9.5 12 4l9 5.5M5 9.5V19M9.5 9.5V19M14.5 9.5V19M19 9.5V19M2.5 19h19"/>',
+  card:'<rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M2.5 10h19M6 15h3"/>',
+  cash:'<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9h.01M18 15h.01"/>',
+  transfer:'<path d="M5 8h14M15 4l4 4-4 4M19 16H5M9 12l-4 4 4 4"/>',
+  income:'<path d="M12 3v13M7 11l5 5 5-5M5 21h14"/>',
+  expense:'<path d="M12 21V8M7 13l5-5 5 5M5 3h14"/>',
+  refund:'<path d="M9 7H4v-5M4.5 7A9 9 0 1 1 3 15"/>',
+  loan:'<path d="M4 8h16v11H4zM7 8V5h10v3M8 13h8M8 16h5"/>',
+  edit:'<path d="m4 16-.8 4.8L8 20l11-11-4-4zM13.5 6.5l4 4"/>',
+  trash:'<path d="M4 6.5h16M9.5 6.5V4.5h5v2M6 6.5 7 20.5h10L18 6.5"/>',
+  chevron:'<path d="m9 5 7 7-7 7"/>',
+  close:'<path d="m6 6 12 12M18 6 6 18"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18"/>',
+  download:'<path d="M12 3v13M7 11l5 5 5-5M4 21h16"/>',
+  upload:'<path d="M12 21V8M7 13l5-5 5 5M4 3h16"/>',
+  shield:'<path d="M12 3 4.5 6v6c0 4.5 3.2 7.9 7.5 9 4.3-1.1 7.5-4.5 7.5-9V6z"/>',
+  tag:'<path d="M3 11V4h7l10 10-7 7z"/><circle cx="7.5" cy="7.5" r="1.3"/>',
+  cart:'<circle cx="9.5" cy="20" r="1.3"/><circle cx="17.5" cy="20" r="1.3"/><path d="M2 3h3l2.6 12.2h11L21 7H6"/>',
+  cup:'<path d="M5 8h11v6a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 9.5h2.2a2.4 2.4 0 0 1 0 4.8H16M4 21.5h14"/>',
+  car:'<path d="M4 16.5V12l1.8-4.5h12.4L20 12v4.5M4 16.5h16"/><circle cx="7.6" cy="17.6" r="1.5"/><circle cx="16.4" cy="17.6" r="1.5"/>',
+  repeat:'<path d="M17 2.5 20.5 6 17 9.5M20 6H7.5a3.5 3.5 0 0 0 0 7h9a3.5 3.5 0 0 1 0 7H3.5M7 21.5 3.5 18 7 14.5"/>',
+  bag:'<path d="M5 8h14l-1.1 12H6.1zM9 8V6.2a3 3 0 0 1 6 0V8"/>',
+  plane:'<path d="M21.5 3 2.8 11.2l7 2.6 2.6 7zM21.5 3 9.8 13.8"/>',
+  school:'<path d="M12 4 2 9l10 5 10-5zM6 11.5V17c0 1.6 2.7 3 6 3s6-1.4 6-3v-5.5"/>',
+  tool:'<path d="M15.6 3.6a5 5 0 0 0-6.4 6.4L3 16.2V21h4.8l6.2-6.2a5 5 0 0 0 6.4-6.4l-3 3-2.9-.7-.7-2.9z"/>',
+  heart:'<path d="M12 20.5S3.5 15.2 3.5 9.6A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 8.5 2.3c0 5.6-8.5 10.9-8.5 10.9z"/>',
+  more:'<circle cx="5.5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18.5" cy="12" r="1.5"/>',
+  search:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 10v7M12 7h.01"/>'
+};
+function svg(name,cls=''){return `<svg ${cls?`class="${cls}"`:''} viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||ICONS.info}</svg>`}
+
+const TYPE_META={
+  current:{en:'Current account',ar:'حساب جارٍ',icon:'bank',asset:true},
+  savings:{en:'Savings account',ar:'حساب توفير',icon:'wallet',asset:true},
+  cash:{en:'Cash',ar:'نقد',icon:'cash',asset:true},
+  deposit:{en:'Deposit account',ar:'وديعة',icon:'bank',asset:true},
+  credit:{en:'Credit card',ar:'بطاقة ائتمانية',icon:'card',asset:false},
+  loan:{en:'Loan / financing',ar:'قرض أو تمويل',icon:'loan',asset:false}
+};
+const COLORS=['#2E8B72','#C98A3E','#3A6E96','#7B7AA6','#9A6685','#6E9455','#B07C25','#4E7A80'];
+const CATEGORY_ICONS=['cart','cup','home','car','repeat','bag','plane','school','tool','heart','tag'];
+
+let state=null;
+const ui={view:'home',planTab:'budgets',selectedMonth:monthKey(NOW),editingTxId:null,txType:'expense',prefillMerchantId:null,pendingImport:null,pendingConfirm:null,lastFocus:null};
+let toastTimer=null;
+let undoAction=null;
+
+function x(en,ar){return state?.settings?.language==='ar'?ar:en}
+function isAr(){return state?.settings?.language==='ar'}
+function esc(value){return String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]))}
+function nameOf(obj){if(!obj)return x('Unknown','غير معروف');return isAr()?(obj.nameAr||obj.ar||obj.nameEn||obj.en):(obj.nameEn||obj.en||obj.nameAr||obj.ar)}
+function uid(prefix='id'){return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`}
+function toMinor(value){const n=Number(String(value??'').replace(/,/g,''));return Number.isFinite(n)?Math.round(n*100):0}
+function fromMinor(value){return (Number(value||0)/100).toFixed(2)}
+function money(value,{sign=false,compact=false}={}){
+  const n=Number(value||0)/100;
+  const abs=Math.abs(n);
+  const decimals=Math.abs(abs-Math.round(abs))<.005?0:2;
+  const locale=isAr()?'ar-QA':'en-QA';
+  const num=new Intl.NumberFormat(locale,{minimumFractionDigits:decimals,maximumFractionDigits:decimals,notation:compact?'compact':'standard'}).format(abs);
+  const prefix=sign?(n>0?'+':n<0?'−':''):n<0?'−':'';
+  return `<bdi>${prefix}${num} ${isAr()?'ر.ق':'QAR'}</bdi>`;
+}
+function moneyText(value){const n=Number(value||0)/100;const abs=Math.abs(n);const decimals=Math.abs(abs-Math.round(abs))<.005?0:2;const num=new Intl.NumberFormat(isAr()?'ar-QA':'en-QA',{minimumFractionDigits:decimals,maximumFractionDigits:decimals}).format(abs);return `${n<0?'−':''}${num} ${isAr()?'ر.ق':'QAR'}`}
+function dateAtNoon(input){const d=input instanceof Date?new Date(input):new Date(`${input}T12:00:00`);d.setHours(12,0,0,0);return d}
+function isoDate(input){const d=input instanceof Date?input:dateAtNoon(input);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function monthKey(input){const d=input instanceof Date?input:dateAtNoon(input);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`}
+function addDays(input,n){const d=dateAtNoon(input);d.setDate(d.getDate()+n);return d}
+function addMonths(input,n){const d=dateAtNoon(input);const day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+n);const max=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,max));return d}
+function daysBetween(a,b){return Math.round((dateAtNoon(b)-dateAtNoon(a))/DAY_MS)}
+function monthsBetween(a,b){const x1=dateAtNoon(a),x2=dateAtNoon(b);return (x2.getFullYear()-x1.getFullYear())*12+x2.getMonth()-x1.getMonth()}
+function startOfMonth(key){return dateAtNoon(`${key}-01`)}
+function endOfMonth(key){const d=startOfMonth(key);return new Date(d.getFullYear(),d.getMonth()+1,0,12)}
+function daysInMonth(key){return endOfMonth(key).getDate()}
+function dateInMonth(key,day){return isoDate(new Date(startOfMonth(key).getFullYear(),startOfMonth(key).getMonth(),Math.min(day,daysInMonth(key)),12))}
+function formatDate(iso,{short=false}={}){if(!iso)return '—';return new Intl.DateTimeFormat(isAr()?'ar-QA':'en-GB',short?{day:'numeric',month:'short'}:{day:'numeric',month:'short',year:'numeric'}).format(dateAtNoon(iso))}
+function formatMonth(key){return new Intl.DateTimeFormat(isAr()?'ar-QA':'en-GB',{month:'long',year:'numeric'}).format(startOfMonth(key))}
+function formatMonthShort(key){return new Intl.DateTimeFormat(isAr()?'ar-QA':'en-GB',{month:'short'}).format(startOfMonth(key))}
+function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+function pct(v,total){return total>0?clamp(v/total*100,0,100):0}
+function sum(arr,fn=x=>x){return arr.reduce((a,b)=>a+Number(fn(b)||0),0)}
+function todayISO(){return isoDate(NOW)}
+function isFutureDate(iso){return dateAtNoon(iso)>NOW}
+function nextPayday(){
+  const day=clamp(Number(state.profile.paydayDay||25),1,28);
+  let d=new Date(NOW.getFullYear(),NOW.getMonth(),day,12);
+  if(d<=NOW)d=new Date(NOW.getFullYear(),NOW.getMonth()+1,day,12);
+  return d;
+}
+function monthOptions(){const out=[];for(let i=-12;i<=12;i++)out.push(monthKey(addMonths(new Date(NOW.getFullYear(),NOW.getMonth(),1,12),i)));return out}
+
+function emptyState(){
+  return {
+    version:SCHEMA_VERSION,
+    createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),
+    settings:{language:'en',currency:'QAR',sampleMode:false,minimumBufferMinor:500000,horizonDays:30,lastExport:null},
+    profile:{name:'',regularMonthlyIncomeMinor:0,paydayDay:25},
+    accounts:[],categories:defaultCategories(),merchants:[],transactions:[],plannedExpenses:[],loans:[]
+  };
+}
+function defaultCategories(){
+  return [
+    {id:'cat-groceries',nameEn:'Groceries',nameAr:'البقالة',budgetMonthlyMinor:220000,color:'#2E8B72',icon:'cart',group:'essential',active:true},
+    {id:'cat-dining',nameEn:'Dining Out',nameAr:'المطاعم',budgetMonthlyMinor:180000,color:'#C98A3E',icon:'cup',group:'lifestyle',active:true},
+    {id:'cat-housing',nameEn:'Housing & Utilities',nameAr:'السكن والخدمات',budgetMonthlyMinor:250000,color:'#3A6E96',icon:'home',group:'essential',active:true},
+    {id:'cat-transport',nameEn:'Transport',nameAr:'المواصلات',budgetMonthlyMinor:110000,color:'#7B7AA6',icon:'car',group:'essential',active:true},
+    {id:'cat-subscriptions',nameEn:'Subscriptions',nameAr:'الاشتراكات',budgetMonthlyMinor:50000,color:'#9A6685',icon:'repeat',group:'lifestyle',active:true},
+    {id:'cat-shopping',nameEn:'Shopping',nameAr:'التسوق',budgetMonthlyMinor:80000,color:'#6E9455',icon:'bag',group:'lifestyle',active:true}
+  ];
+}
+function sampleState(){
+  const s=emptyState();s.settings.sampleMode=true;s.profile={name:'Ali',regularMonthlyIncomeMinor:4000000,paydayDay:25};
+  s.accounts=[
+    {id:'acc-current',nameEn:'QNB Current',nameAr:'الحساب الجاري QNB',type:'current',institution:'QNB',openingBalanceMinor:2350000,currency:'QAR',includeInSafe:true,active:true,color:'#2E8B72'},
+    {id:'acc-savings',nameEn:'Savings',nameAr:'التوفير',type:'savings',institution:'QNB',openingBalanceMinor:6500000,currency:'QAR',includeInSafe:false,active:true,color:'#3A6E96'},
+    {id:'acc-cash',nameEn:'Cash',nameAr:'النقد',type:'cash',institution:'',openingBalanceMinor:90000,currency:'QAR',includeInSafe:true,active:true,color:'#C98A3E'},
+    {id:'acc-credit',nameEn:'QNB Credit Card',nameAr:'بطاقة QNB الائتمانية',type:'credit',institution:'QNB',openingBalanceMinor:-420000,creditLimitMinor:3000000,currency:'QAR',includeInSafe:false,active:true,color:'#9A6685'},
+    {id:'acc-car-loan',nameEn:'Car Finance Liability',nameAr:'التزام تمويل السيارة',type:'loan',institution:'Bank',openingBalanceMinor:-7400000,currency:'QAR',includeInSafe:false,active:true,color:'#7B7AA6'},
+    {id:'acc-laptop-loan',nameEn:'Laptop Instalments',nameAr:'أقساط الحاسوب',type:'loan',institution:'Retailer',openingBalanceMinor:-400000,currency:'QAR',includeInSafe:false,active:true,color:'#4E7A80'}
+  ];
+  s.merchants=[
+    {id:'mer-lulu',nameEn:'Lulu Hypermarket',nameAr:'لولو هايبرماركت',categoryId:'cat-groceries',lastAccountId:'acc-current',icon:'cart',color:'#2E8B72'},
+    {id:'mer-meera',nameEn:'Al Meera',nameAr:'الميرة',categoryId:'cat-groceries',lastAccountId:'acc-current',icon:'cart',color:'#2E8B72'},
+    {id:'mer-turkey',nameEn:'Turkey Central',nameAr:'تركي سنترال',categoryId:'cat-dining',lastAccountId:'acc-credit',icon:'cup',color:'#C98A3E'},
+    {id:'mer-coffee',nameEn:'Espresso Lab',nameAr:'إسبريسو لاب',categoryId:'cat-dining',lastAccountId:'acc-credit',icon:'cup',color:'#C98A3E'},
+    {id:'mer-talabat',nameEn:'Talabat',nameAr:'طلبات',categoryId:'cat-dining',lastAccountId:'acc-credit',icon:'cup',color:'#C98A3E'},
+    {id:'mer-kahramaa',nameEn:'Kahramaa',nameAr:'كهرماء',categoryId:'cat-housing',lastAccountId:'acc-current',icon:'home',color:'#3A6E96'},
+    {id:'mer-ooredoo',nameEn:'Ooredoo',nameAr:'أوريدو',categoryId:'cat-subscriptions',lastAccountId:'acc-current',icon:'repeat',color:'#9A6685'},
+    {id:'mer-woqod',nameEn:'Woqod',nameAr:'وقود',categoryId:'cat-transport',lastAccountId:'acc-current',icon:'car',color:'#7B7AA6'},
+    {id:'mer-virgin',nameEn:'Virgin Megastore',nameAr:'فيرجن ميغاستور',categoryId:'cat-shopping',lastAccountId:'acc-credit',icon:'bag',color:'#6E9455'}
+  ];
+  const cur=monthKey(NOW),day=Math.max(1,NOW.getDate());
+  const d=n=>dateInMonth(cur,Math.max(1,day-n));
+  const tx=(id,type,amount,date,extra={})=>({id,type,amountMinor:amount,date,planned:false,cleared:true,note:'',createdAt:new Date().toISOString(),modifiedAt:new Date().toISOString(),...extra});
+  s.transactions=[
+    tx('tx-salary','income',4000000,d(day-1),{destinationAccountId:'acc-current',nameEn:'Salary',nameAr:'الراتب'}),
+    tx('tx-credit-pay','transfer',500000,d(12),{sourceAccountId:'acc-current',destinationAccountId:'acc-credit',nameEn:'Credit card payment',nameAr:'سداد البطاقة الائتمانية'}),
+    tx('tx-lulu-1','expense',36500,d(10),{sourceAccountId:'acc-current',categoryId:'cat-groceries',merchantId:'mer-lulu',nameEn:'Lulu Hypermarket',nameAr:'لولو هايبرماركت'}),
+    tx('tx-meera-1','expense',14200,d(8),{sourceAccountId:'acc-current',categoryId:'cat-groceries',merchantId:'mer-meera',nameEn:'Al Meera',nameAr:'الميرة'}),
+    tx('tx-dining-1','expense',17600,d(7),{sourceAccountId:'acc-credit',categoryId:'cat-dining',merchantId:'mer-turkey',nameEn:'Turkey Central',nameAr:'تركي سنترال'}),
+    tx('tx-coffee-1','expense',3800,d(6),{sourceAccountId:'acc-credit',categoryId:'cat-dining',merchantId:'mer-coffee',nameEn:'Espresso Lab',nameAr:'إسبريسو لاب'}),
+    tx('tx-fuel-1','expense',17000,d(5),{sourceAccountId:'acc-current',categoryId:'cat-transport',merchantId:'mer-woqod',nameEn:'Woqod',nameAr:'وقود'}),
+    tx('tx-kahramaa','expense',44200,d(4),{sourceAccountId:'acc-current',categoryId:'cat-housing',merchantId:'mer-kahramaa',nameEn:'Kahramaa',nameAr:'كهرماء'}),
+    tx('tx-talabat','expense',9100,d(3),{sourceAccountId:'acc-credit',categoryId:'cat-dining',merchantId:'mer-talabat',nameEn:'Talabat',nameAr:'طلبات'}),
+    tx('tx-lulu-2','expense',28300,d(2),{sourceAccountId:'acc-current',categoryId:'cat-groceries',merchantId:'mer-lulu',nameEn:'Lulu Hypermarket',nameAr:'لولو هايبرماركت'}),
+    tx('tx-ooredoo-future','expense',29500,isoDate(addDays(NOW,5)),{sourceAccountId:'acc-current',categoryId:'cat-subscriptions',merchantId:'mer-ooredoo',nameEn:'Ooredoo Mobile',nameAr:'أوريدو موبايل',planned:true,recurring:true,seriesId:'series-ooredoo'}),
+    tx('tx-school-future','expense',2200000,isoDate(addMonths(NOW,4)),{sourceAccountId:'acc-savings',categoryId:'cat-housing',nameEn:'School fees payment',nameAr:'دفع الرسوم الدراسية',planned:true,meta:{plannedExpenseId:'pe-school',excludeFromBudget:true}})
+  ];
+  const activity=(id,type,amount,date,note='')=>({id,type,amountMinor:amount,date,note,createdAt:new Date().toISOString()});
+  s.plannedExpenses=[
+    {id:'pe-school',nameEn:'School Fees',nameAr:'الرسوم الدراسية',targetMinor:2200000,dueDate:isoDate(addMonths(NOW,4)),fundingStartDate:isoDate(addMonths(NOW,-4)),recurrence:'annual',linkedAccountId:'acc-savings',priority:'high',icon:'school',color:'#3A6E96',active:true,activities:[activity('pea-school-1','deposit',700000,isoDate(addMonths(NOW,-3))),activity('pea-school-2','deposit',400000,isoDate(addMonths(NOW,-1)))],history:[]},
+    {id:'pe-travel',nameEn:'Travel',nameAr:'السفر',targetMinor:1800000,dueDate:isoDate(addMonths(NOW,10)),fundingStartDate:isoDate(addMonths(NOW,-2)),recurrence:'annual',linkedAccountId:'acc-savings',priority:'medium',icon:'plane',color:'#2E8B72',active:true,activities:[activity('pea-travel-1','deposit',500000,isoDate(addMonths(NOW,-1)))],history:[]},
+    {id:'pe-insurance',nameEn:'Insurance',nameAr:'التأمين',targetMinor:400000,dueDate:isoDate(addMonths(NOW,2)),fundingStartDate:isoDate(addMonths(NOW,-4)),recurrence:'annual',linkedAccountId:'acc-savings',priority:'high',icon:'shield',color:'#C98A3E',active:true,activities:[activity('pea-ins-1','deposit',180000,isoDate(addMonths(NOW,-2)))],history:[]}
+  ];
+  s.loans=[
+    {id:'loan-car',nameEn:'Car Finance',nameAr:'تمويل السيارة',mode:'statement',liabilityAccountId:'acc-car-loan',sourceAccountId:'acc-current',paymentAmountMinor:180000,nextDueDate:isoDate(addDays(NOW,12)),remainingPayments:42,frequencyMonths:1,annualRatePct:4.5,totalProfitMinor:0,originalPrincipalMinor:9000000,active:true,color:'#7B7AA6',icon:'car',payments:[]},
+    {id:'loan-laptop',nameEn:'Laptop Instalments',nameAr:'أقساط الحاسوب',mode:'calculated',liabilityAccountId:'acc-laptop-loan',sourceAccountId:'acc-current',paymentAmountMinor:200000,nextDueDate:isoDate(addDays(NOW,4)),remainingPayments:2,frequencyMonths:1,annualRatePct:0,totalProfitMinor:0,originalPrincipalMinor:800000,active:true,color:'#4E7A80',icon:'card',payments:[]}
+  ];
+  return s;
+}
+
+function normalizeState(candidate){
+  const base=emptyState();
+  const s={...base,...candidate};
+  s.version=SCHEMA_VERSION;
+  s.settings={...base.settings,...(candidate.settings||{})};
+  s.profile={...base.profile,...(candidate.profile||{})};
+  ['accounts','categories','merchants','transactions','plannedExpenses','loans'].forEach(k=>{if(!Array.isArray(s[k]))s[k]=[]});
+  s.accounts=s.accounts.map(a=>({active:true,includeInSafe:false,currency:'QAR',color:'#2E8B72',...a}));
+  s.categories=s.categories.map(c=>({active:true,group:'lifestyle',icon:'tag',color:'#2E8B72',...c}));
+  s.plannedExpenses=s.plannedExpenses.map(p=>({active:true,activities:[],history:[],priority:'medium',recurrence:'once',...p}));
+  s.loans=s.loans.map(l=>({active:true,payments:[],frequencyMonths:1,remainingPayments:1,mode:'statement',...l}));
+  return s;
+}
+function validateState(candidate){
+  if(!candidate||typeof candidate!=='object')return {ok:false,error:'Not an object'};
+  if(Number(candidate.version)!==SCHEMA_VERSION)return {ok:false,error:`Unsupported schema version ${candidate.version??'unknown'}`};
+  for(const key of ['accounts','categories','transactions','plannedExpenses','loans'])if(!Array.isArray(candidate[key]))return {ok:false,error:`Missing ${key}`};
+  const ids=new Set();
+  for(const group of ['accounts','categories','merchants','transactions','plannedExpenses','loans']){
+    for(const item of candidate[group]||[]){if(!item.id||ids.has(item.id))return {ok:false,error:`Invalid or duplicate ID in ${group}`};ids.add(item.id)}
+  }
+  return {ok:true};
+}
+function saveState(){state.updatedAt=new Date().toISOString();storeSet(STORAGE_KEY,JSON.stringify(state))}
+function loadState(){
+  try{
+    const raw=storeGet(STORAGE_KEY);
+    if(raw){const parsed=JSON.parse(raw),v=validateState(parsed);if(v.ok)return normalizeState(parsed)}
+  }catch(err){console.warn('V3 load failed',err)}
+  const migrated=migrateLegacy();
+  if(migrated)return migrated;
+  return emptyState();
+}
+function migrateLegacy(){
+  const raw=storeGet(LEGACY_KEY);if(!raw)return null;
+  try{
+    const d=JSON.parse(raw);if(!d||!(d.v===1||d.v===2))return null;
+    storeSet(`${LEGACY_KEY}.backup.${Date.now()}`,raw);
+    const s=emptyState();s.settings.language=d.ar?'ar':'en';s.settings.sampleMode=false;
+    s.profile={name:d.profile?.name||'',regularMonthlyIncomeMinor:toMinor(d.profile?.salary||0),paydayDay:25};
+    const oldAccounts=[
+      {id:'acc-legacy-cash',nameEn:'Cash',nameAr:'نقد',type:'cash',openingBalanceMinor:0,includeInSafe:true,color:'#2E8B72'},
+      {id:'acc-legacy-debit',nameEn:'Debit Account',nameAr:'حساب الخصم',type:'current',openingBalanceMinor:0,includeInSafe:true,color:'#3A6E96'},
+      {id:'acc-legacy-credit',nameEn:'Credit Card',nameAr:'بطاقة ائتمانية',type:'credit',openingBalanceMinor:0,includeInSafe:false,color:'#9A6685'},
+      {id:'acc-legacy-wallet',nameEn:'Digital Wallet',nameAr:'محفظة رقمية',type:'current',openingBalanceMinor:0,includeInSafe:true,color:'#7B7AA6'}
+    ];
+    s.accounts=oldAccounts.map(a=>({...a,institution:'',currency:'QAR',active:true}));
+    const cats=(d.cats||[]).map((c,i)=>({id:`legacy-cat-${i}`,nameEn:c.en||c.ar||`Category ${i+1}`,nameAr:c.ar||c.en||`فئة ${i+1}`,budgetMonthlyMinor:toMinor(c.b||0),color:c.c||COLORS[i%COLORS.length],icon:c.ic||'tag',group:'lifestyle',active:true}));
+    s.categories=cats.length?cats:defaultCategories();
+    const merchantMap=new Map();
+    const getMerchant=(t,catId)=>{
+      const key=(t.en||t.ar||'Unknown').toLowerCase();if(merchantMap.has(key))return merchantMap.get(key);
+      const id=`legacy-mer-${merchantMap.size}`;merchantMap.set(key,id);s.merchants.push({id,nameEn:t.en||t.ar||'Unknown',nameAr:t.ar||t.en||'غير معروف',categoryId:catId,lastAccountId:oldAccounts[t.acc||0]?.id||oldAccounts[0].id,icon:'tag',color:'#2E8B72'});return id;
+    };
+    Object.entries(d.months||{}).forEach(([key,rows])=>{
+      (rows||[]).forEach((t,i)=>{
+        const date=dateInMonth(key,Number(t.day||1));const planned=isFutureDate(date);const account=oldAccounts[t.acc||0]?.id||oldAccounts[0].id;
+        if(t.t==='i')s.transactions.push({id:`legacy-tx-${key}-${i}`,type:'income',amountMinor:toMinor(t.a),date,destinationAccountId:account,nameEn:t.en||'Income',nameAr:t.ar||'دخل',planned,cleared:!planned,note:'',createdAt:new Date().toISOString(),modifiedAt:new Date().toISOString()});
+        else{const catId=s.categories[t.ci]?.id||s.categories[0]?.id;const merchantId=getMerchant(t,catId);s.transactions.push({id:`legacy-tx-${key}-${i}`,type:'expense',amountMinor:toMinor(t.a),date,sourceAccountId:account,categoryId:catId,merchantId,nameEn:t.en||'Expense',nameAr:t.ar||'مصروف',planned,cleared:!planned,note:'',createdAt:new Date().toISOString(),modifiedAt:new Date().toISOString()})}
+      });
+    });
+    s.plannedExpenses=(d.funds||[]).map((f,i)=>{
+      const due=new Date(NOW.getFullYear(),11,31,12);if(due<NOW)due.setFullYear(due.getFullYear()+1);
+      const activities=[];Object.entries(f.deposits||{}).forEach(([k,v],j)=>activities.push({id:`legacy-pe-${i}-d-${j}`,type:'deposit',amountMinor:toMinor(v),date:`${k}-01`,note:'',createdAt:new Date().toISOString()}));
+      Object.entries(f.months||{}).forEach(([k,v],j)=>activities.push({id:`legacy-pe-${i}-p-${j}`,type:'payment',amountMinor:toMinor(v),date:`${k}-01`,note:'',createdAt:new Date().toISOString()}));
+      return {id:`legacy-pe-${i}`,nameEn:f.en||f.ar||`Planned expense ${i+1}`,nameAr:f.ar||f.en||`مصروف مخطط ${i+1}`,targetMinor:toMinor(f.annual||0),dueDate:isoDate(due),fundingStartDate:`${NOW.getFullYear()}-01-01`,recurrence:'annual',linkedAccountId:'acc-legacy-debit',priority:'medium',icon:f.ic||'tag',color:f.c||COLORS[i%COLORS.length],active:true,activities,history:[]};
+    });
+    s.loans=(d.loans||[]).map((l,i)=>{
+      const accId=`legacy-loan-acc-${i}`;s.accounts.push({id:accId,nameEn:`${l.en||'Loan'} liability`,nameAr:`التزام ${l.ar||l.en||'القرض'}`,type:'loan',institution:'',openingBalanceMinor:-toMinor(l.principal||0),currency:'QAR',includeInSafe:false,active:true,color:l.c||COLORS[i%COLORS.length]});
+      const count=Math.max(1,Number(l.count||1));const payment=l.kind==='profit'?((Number(l.principal||0)+Number(l.profit||0))/count):(Number(l.principal||0)/count);
+      return {id:`legacy-loan-${i}`,nameEn:l.en||'Loan',nameAr:l.ar||l.en||'قرض',mode:l.kind==='rate'?'calculated':'statement',liabilityAccountId:accId,sourceAccountId:'acc-legacy-debit',paymentAmountMinor:toMinor(payment),nextDueDate:l.start?`${l.start}-01`:todayISO(),remainingPayments:count,frequencyMonths:Math.max(1,Number(l.every||1)),annualRatePct:Number(l.rate||0),totalProfitMinor:toMinor(l.profit||0),originalPrincipalMinor:toMinor(l.principal||0),active:true,color:l.c||COLORS[i%COLORS.length],icon:l.ic||'loan',payments:[]};
+    });
+    saveStateToObject(s);return s;
+  }catch(err){console.warn('Legacy migration failed',err);return null}
+}
+function saveStateToObject(s){s.updatedAt=new Date().toISOString();storeSet(STORAGE_KEY,JSON.stringify(s))}
+
+/* ------------------ authoritative ledger calculations ------------------ */
+function accountById(id){return state.accounts.find(a=>a.id===id)}
+function categoryById(id){return state.categories.find(c=>c.id===id)}
+function merchantById(id){return state.merchants.find(m=>m.id===id)}
+function plannedById(id){return state.plannedExpenses.find(p=>p.id===id)}
+function loanById(id){return state.loans.find(l=>l.id===id)}
+function transactionById(id){return state.transactions.find(t=>t.id===id)}
+function isAssetAccount(a){return !!TYPE_META[a?.type]?.asset}
+function txIsPosted(t,through=NOW){return !t.planned&&dateAtNoon(t.date)<=dateAtNoon(through)}
+function accountTransactionDelta(accountId,through=NOW){
+  let delta=0;
+  for(const t of state.transactions){
+    if(!txIsPosted(t,through))continue;
+    const a=Number(t.amountMinor||0);
+    if(t.type==='expense'&&t.sourceAccountId===accountId)delta-=a;
+    else if(t.type==='income'&&t.destinationAccountId===accountId)delta+=a;
+    else if(t.type==='refund'&&t.destinationAccountId===accountId)delta+=a;
+    else if(t.type==='transfer'){
+      if(t.sourceAccountId===accountId)delta-=a;
+      if(t.destinationAccountId===accountId)delta+=a;
+    }else if(t.type==='adjustment'&&t.destinationAccountId===accountId)delta+=Number(t.signedAmountMinor??a);
+  }
+  return delta;
+}
+function accountBalance(accountId,through=NOW){const a=accountById(accountId);return a?Number(a.openingBalanceMinor||0)+accountTransactionDelta(accountId,through):0}
+function accountDisplayBalance(a){const b=accountBalance(a.id);return isAssetAccount(a)?b:Math.abs(Math.min(0,b))}
+/* Archived accounts remain part of net worth; `active` only controls new-entry lists. */
+function totalAssets(){return sum(state.accounts.filter(a=>isAssetAccount(a)),a=>Math.max(0,accountBalance(a.id)))}
+function totalLiabilities(){return sum(state.accounts.filter(a=>!isAssetAccount(a)),a=>Math.max(0,-accountBalance(a.id)))}
+function netWorth(){return totalAssets()-totalLiabilities()}
+function liquidCash(){return sum(state.accounts.filter(a=>a.active&&isAssetAccount(a)&&a.includeInSafe),a=>Math.max(0,accountBalance(a.id)))}
+function selectedMonthTransactions({actualOnly=true}={}){return state.transactions.filter(t=>monthKey(t.date)===ui.selectedMonth&&(!actualOnly||!t.planned))}
+function ordinaryExpense(t){return t.type==='expense'&&!t.meta?.excludeFromBudget}
+function categorySpend(categoryId,key=ui.selectedMonth){
+  let value=0;
+  state.transactions.forEach(t=>{if(monthKey(t.date)!==key||t.planned||t.categoryId!==categoryId||t.meta?.excludeFromBudget)return;if(t.type==='expense')value+=t.amountMinor;if(t.type==='refund')value-=t.amountMinor});
+  return Math.max(0,value);
+}
+function monthOrdinarySpend(key=ui.selectedMonth){
+  let value=0;
+  state.transactions.forEach(t=>{if(monthKey(t.date)!==key||t.planned||t.meta?.excludeFromBudget)return;if(t.type==='expense')value+=t.amountMinor;if(t.type==='refund')value-=t.amountMinor});
+  return Math.max(0,value);
+}
+function monthIncome(key=ui.selectedMonth){return sum(state.transactions.filter(t=>monthKey(t.date)===key&&!t.planned&&t.type==='income'),t=>t.amountMinor)}
+function monthReservedContributions(key=ui.selectedMonth){return sum(state.plannedExpenses,p=>sum((p.activities||[]).filter(a=>a.type==='deposit'&&monthKey(a.date)===key),a=>a.amountMinor))}
+function monthPlannedExpensePayments(key=ui.selectedMonth){return sum(state.plannedExpenses,p=>sum((p.activities||[]).filter(a=>a.type==='payment'&&monthKey(a.date)===key),a=>a.amountMinor))}
+function monthActualLoanPayments(key=ui.selectedMonth){return sum(state.loans,l=>sum((l.payments||[]).filter(p=>monthKey(p.paidDate)===key),p=>p.amountMinor))}
+function monthCashOutflow(key=ui.selectedMonth){
+  const rows=state.transactions.filter(t=>monthKey(t.date)===key&&!t.planned);
+  const expenses=sum(rows.filter(t=>t.type==='expense'&&isAssetAccount(accountById(t.sourceAccountId))),t=>t.amountMinor)-sum(rows.filter(t=>t.type==='refund'&&isAssetAccount(accountById(t.destinationAccountId))),t=>t.amountMinor);
+  const debtPayments=sum(rows.filter(t=>t.type==='transfer'&&isAssetAccount(accountById(t.sourceAccountId))&&!isAssetAccount(accountById(t.destinationAccountId))),t=>t.amountMinor);
+  return expenses+debtPayments;
+}
+function totalBudget(){return sum(state.categories.filter(c=>c.active),c=>c.budgetMonthlyMinor)}
+function budgetRemaining(key=ui.selectedMonth){return totalBudget()-monthOrdinarySpend(key)}
+function spendingDayCount(key=ui.selectedMonth){const end=endOfMonth(key);if(key===monthKey(NOW))return NOW.getDate();if(end<NOW)return daysInMonth(key);return 0}
+function categoryProjection(c,key=ui.selectedMonth){const spent=categorySpend(c.id,key),elapsed=spendingDayCount(key),dim=daysInMonth(key);return elapsed>0&&key===monthKey(NOW)?Math.round(spent/elapsed*dim):spent}
+function transactionLabel(t){if(t.type==='transfer'){const s=accountById(t.sourceAccountId),d=accountById(t.destinationAccountId);return `${nameOf(s)} → ${nameOf(d)}`}return nameOf(t)}
+function transactionSignedAmount(t){if(t.type==='income'||t.type==='refund')return t.amountMinor;if(t.type==='adjustment')return Number(t.signedAmountMinor||0);if(t.type==='expense')return -t.amountMinor;return -t.amountMinor}
+
+/* ------------------ planned-expense calculations ------------------ */
+function plannedDeposited(p){return sum(p.activities.filter(a=>a.type==='deposit'),a=>a.amountMinor)}
+function plannedPaid(p){return sum(p.activities.filter(a=>a.type==='payment'),a=>a.amountMinor)}
+function plannedReserved(p){return plannedDeposited(p)-plannedPaid(p)}
+function plannedComplete(p){return plannedPaid(p)>=p.targetMinor&&p.targetMinor>0}
+function plannedRequiredAt(p,date=NOW){
+  if(plannedComplete(p))return 0;
+  const start=dateAtNoon(p.fundingStartDate),due=dateAtNoon(p.dueDate),at=dateAtNoon(date);
+  if(at<=start)return 0;if(due<=start)return p.targetMinor;if(at>=due)return p.targetMinor;
+  const progress=(at-start)/(due-start);return Math.round(p.targetMinor*progress);
+}
+function plannedBehind(p,date=NOW){return Math.max(0,plannedRequiredAt(p,date)-Math.max(0,plannedReserved(p)))}
+function plannedAhead(p,date=NOW){return Math.max(0,Math.max(0,plannedReserved(p))-plannedRequiredAt(p,date))}
+function plannedMonthlyContribution(p){
+  if(plannedComplete(p))return 0;
+  const remaining=Math.max(0,p.targetMinor-Math.max(0,plannedReserved(p)));const days=Math.max(1,daysBetween(NOW,p.dueDate));const periods=Math.max(1,Math.ceil(days/30.4375));return Math.ceil(remaining/periods/100)*100;
+}
+function requiredContributionUntil(p,horizon){return Math.max(0,plannedRequiredAt(p,horizon)-Math.max(0,plannedReserved(p)))}
+function totalReserved(){return sum(state.plannedExpenses.filter(p=>p.active),p=>Math.max(0,plannedReserved(p)))}
+function totalPlannedTargets(){return sum(state.plannedExpenses.filter(p=>p.active&&!plannedComplete(p)),p=>p.targetMinor)}
+function advancePlannedCycle(p){
+  if(!plannedComplete(p)||p.recurrence==='once')return;
+  const carry=Math.max(0,plannedReserved(p));
+  p.history=p.history||[];p.history.unshift({completedAt:new Date().toISOString(),targetMinor:p.targetMinor,dueDate:p.dueDate,activities:p.activities});
+  const oldDue=dateAtNoon(p.dueDate);let nextDue=oldDue;
+  if(p.recurrence==='annual')nextDue=addMonths(oldDue,12);else if(p.recurrence==='quarterly')nextDue=addMonths(oldDue,3);else if(p.recurrence==='monthly')nextDue=addMonths(oldDue,1);
+  p.fundingStartDate=todayISO();p.dueDate=isoDate(nextDue);p.activities=carry?[{id:uid('pea'),type:'deposit',amountMinor:carry,date:todayISO(),note:x('Carried from prior cycle','مرحّل من الدورة السابقة'),createdAt:new Date().toISOString()}]:[];
+}
+
+/* ------------------ loan calculations and actual payment ledger ------------------ */
+function loanOutstanding(l){const a=accountById(l.liabilityAccountId);return a?Math.max(0,-accountBalance(a.id)):Math.max(0,l.originalPrincipalMinor-sum(l.payments,p=>p.principalMinor||0))}
+function calculatedLoanPayment(l){
+  if(l.paymentAmountMinor>0)return l.paymentAmountMinor;
+  const principal=loanOutstanding(l),n=Math.max(1,l.remainingPayments||1),r=(Number(l.annualRatePct||0)/100)*(Math.max(1,l.frequencyMonths||1)/12);
+  return r>0?Math.round(principal*r/(1-Math.pow(1+r,-n))):Math.round(principal/n);
+}
+function loanSchedule(l){
+  const schedule=[];const pmt=calculatedLoanPayment(l);const n=Math.max(1,Number(l.remainingPayments||1));const every=Math.max(1,Number(l.frequencyMonths||1));
+  for(let i=0;i<n;i++){
+    const due=isoDate(addMonths(l.nextDueDate,i*every));const paidRows=(l.payments||[]).filter(p=>p.dueDate===due);const paid=sum(paidRows,p=>p.amountMinor);let status='scheduled';
+    if(paid>=pmt-1)status='paid';else if(paid>0)status='partial';else if(dateAtNoon(due)<NOW)status='late';else if(dateAtNoon(due)<=addDays(NOW,7))status='due';
+    schedule.push({index:i,dueDate:due,scheduledMinor:pmt,paidMinor:paid,remainingMinor:Math.max(0,pmt-paid),status});
+  }
+  return schedule;
+}
+function loanDueWithin(l,horizon){return loanSchedule(l).filter(r=>r.status!=='paid'&&dateAtNoon(r.dueDate)<=dateAtNoon(horizon))}
+function totalLoanOutstanding(){return sum(state.loans.filter(l=>l.active),loanOutstanding)}
+function totalLoanDueWithin(horizon){return sum(state.loans.filter(l=>l.active),l=>sum(loanDueWithin(l,horizon),r=>r.remainingMinor))}
+function nextLoanDue(l){return loanSchedule(l).find(r=>r.status!=='paid')||null}
+function loanDebtFreeDate(l){const s=loanSchedule(l);return s.length?s[s.length-1].dueDate:null}
+function estimatedCalculatedSplit(l,paymentAmount){
+  const outstanding=loanOutstanding(l);const rate=(Number(l.annualRatePct||0)/100)*(Math.max(1,l.frequencyMonths||1)/12);const finance=Math.min(paymentAmount,Math.round(outstanding*rate));return {financeMinor:finance,principalMinor:Math.max(0,paymentAmount-finance)};
+}
+
+/* ------------------ upcoming, forecasting and safe-to-spend ------------------ */
+function scheduledTransactionsWithin(horizon){return state.transactions.filter(t=>t.planned&&dateAtNoon(t.date)>=NOW&&dateAtNoon(t.date)<=dateAtNoon(horizon))}
+function overdueScheduledTransactions(){return state.transactions.filter(t=>t.planned&&dateAtNoon(t.date)<NOW)}
+function expectedSalaryWithin(horizon){const payday=nextPayday();return payday<=dateAtNoon(horizon)?Number(state.profile.regularMonthlyIncomeMinor||0):0}
+function safeToSpend(){
+  const horizon=addDays(NOW,Number(state.settings.horizonDays||30));
+  const scheduled=scheduledTransactionsWithin(horizon),overdue=overdueScheduledTransactions();
+  const expectedScheduledIncome=sum(scheduled.filter(t=>t.type==='income'),t=>t.amountMinor);
+  const profileIncome=Number(state.profile.regularMonthlyIncomeMinor||0);
+  const hasScheduledIncome=scheduled.some(t=>t.type==='income'&&(t.meta?.salary||/salary|راتب/i.test(`${t.nameEn||''} ${t.nameAr||''}`)||(profileIncome>0&&Math.abs(t.amountMinor-profileIncome)<=Math.max(100,profileIncome*.02))));
+  const billRows=[...scheduled,...overdue].filter(t=>t.type==='expense'&&!t.meta?.plannedExpenseId);
+  const scheduledBills=sum(billRows,t=>t.amountMinor);
+  const salary=hasScheduledIncome?0:expectedSalaryWithin(horizon);
+  const loanDue=totalLoanDueWithin(horizon);
+  const activePlans=state.plannedExpenses.filter(p=>p.active&&!plannedComplete(p));
+  const reservedInLiquid=sum(activePlans.filter(p=>{const a=accountById(p.linkedAccountId);return !a||!isAssetAccount(a)||a.includeInSafe}),p=>Math.max(0,plannedReserved(p)));
+  const requiredPlans=sum(activePlans,p=>requiredContributionUntil(p,horizon));
+  const buffer=Number(state.settings.minimumBufferMinor||0);
+  const grossCash=liquidCash(),cash=Math.max(0,grossCash-Math.min(grossCash,reservedInLiquid));
+  const cashAfter=cash+expectedScheduledIncome+salary-scheduledBills-loanDue-requiredPlans-buffer;
+  const rawBudgetLeft=budgetRemaining(monthKey(NOW));
+  const scheduledBudgetSpend=sum(billRows.filter(t=>monthKey(t.date)===monthKey(NOW)&&!t.meta?.excludeFromBudget),t=>t.amountMinor);
+  const budgetLeft=rawBudgetLeft-scheduledBudgetSpend,total=totalBudget();
+  const safe=total>0?Math.min(cashAfter,budgetLeft):cashAfter;
+  return {horizon,grossCash,cash,expectedIncome:expectedScheduledIncome+salary,scheduledBills,loanDue,reservedInLiquid,requiredPlans,buffer,cashAfter,rawBudgetLeft,scheduledBudgetSpend,budgetLeft,safe,daily:safe>0?Math.floor(safe/Math.max(1,daysBetween(NOW,endOfMonth(monthKey(NOW)))+1)):safe};
+}
+function upcomingItems(days=30){
+  const horizon=addDays(NOW,days),items=[];
+  scheduledTransactionsWithin(horizon).forEach(t=>items.push({kind:'transaction',date:t.date,title:transactionLabel(t),amount:t.type==='income'?t.amountMinor:-t.amountMinor,ref:t.id,icon:t.type==='income'?'income':'calendar',color:t.type==='income'?'#2E8B72':'#7B7AA6'}));
+  state.loans.filter(l=>l.active).forEach(l=>loanDueWithin(l,horizon).forEach(r=>items.push({kind:'loan',date:r.dueDate,title:nameOf(l),amount:-r.remainingMinor,ref:l.id,icon:l.icon||'loan',color:l.color||'#7B7AA6'})));
+  state.plannedExpenses.filter(p=>p.active&&!plannedComplete(p)&&dateAtNoon(p.dueDate)<=horizon).forEach(p=>items.push({kind:'planned',date:p.dueDate,title:nameOf(p),amount:-Math.max(0,p.targetMinor-plannedReserved(p)),ref:p.id,icon:p.icon||'target',color:p.color||'#2E8B72'}));
+  return items.sort((a,b)=>dateAtNoon(a.date)-dateAtNoon(b.date));
+}
+
+/* ------------------ insight rules ------------------ */
+function buildInsights(){
+  const out=[];const current=monthKey(NOW);const safe=safeToSpend();
+  if(safe.safe<0)out.push({severity:'danger',title:x('Safe to Spend is negative','المبلغ الآمن للإنفاق سالب'),body:x(`Committed obligations exceed the available amount by ${moneyText(-safe.safe)}.`,`تتجاوز الالتزامات المبلغ المتاح بمقدار ${moneyText(-safe.safe)}.`),rec:x('Review upcoming bills, planned-expense contributions and the minimum cash buffer.','راجع الفواتير القادمة ومساهمات المصروفات المخططة والحد الأدنى للاحتياطي النقدي.'),action:'safe-breakdown'});
+  state.categories.filter(c=>c.active).forEach(c=>{const sp=categorySpend(c.id,current),projection=categoryProjection(c,current);if(c.budgetMonthlyMinor>0&&projection>c.budgetMonthlyMinor*1.05){const over=projection-c.budgetMonthlyMinor;const remain=Math.max(0,daysInMonth(current)-NOW.getDate());const allowance=Math.max(0,c.budgetMonthlyMinor-sp);out.push({severity:'warn',title:x(`${nameOf(c)} is projected over budget`,`${nameOf(c)} متوقع أن يتجاوز الميزانية`),body:x(`Current spending is ${moneyText(sp)} and the month-end projection is ${moneyText(projection)}, around ${moneyText(over)} above budget.`,`الإنفاق الحالي ${moneyText(sp)} والتوقع لنهاية الشهر ${moneyText(projection)}، أي نحو ${moneyText(over)} فوق الميزانية.`),rec:remain?x(`Keep the remaining spend below ${moneyText(allowance)} or about ${moneyText(Math.floor(allowance/remain))} per day.`,`اجعل الإنفاق المتبقي أقل من ${moneyText(allowance)} أو نحو ${moneyText(Math.floor(allowance/remain))} يومياً.`):x('Review the category before setting next month’s budget.','راجع الفئة قبل تحديد ميزانية الشهر القادم.'),action:'open-category',ref:c.id})}});
+  state.plannedExpenses.filter(p=>p.active&&!plannedComplete(p)).forEach(p=>{const behind=plannedBehind(p);if(behind>100){out.push({severity:dateAtNoon(p.dueDate)<addDays(NOW,45)?'danger':'warn',title:x(`${nameOf(p)} is behind its funding plan`,`${nameOf(p)} متأخر عن خطة التمويل`),body:x(`${moneyText(behind)} should already have been reserved based on the funding period.`,`كان ينبغي تخصيص ${moneyText(behind)} إضافية وفقاً لفترة التمويل.`),rec:x(`Reserve about ${moneyText(plannedMonthlyContribution(p))} per month to reach the target by ${formatDate(p.dueDate)}.`,`خصص نحو ${moneyText(plannedMonthlyContribution(p))} شهرياً للوصول إلى الهدف بحلول ${formatDate(p.dueDate)}.`),action:'open-planned',ref:p.id})}});
+  state.loans.filter(l=>l.active).forEach(l=>{const late=loanSchedule(l).filter(r=>r.status==='late'||r.status==='partial');if(late.length){out.push({severity:'danger',title:x(`${nameOf(l)} has an unpaid scheduled amount`,`${nameOf(l)} لديه مبلغ مستحق غير مسدد`),body:x(`${moneyText(sum(late,r=>r.remainingMinor))} remains unpaid across ${late.length} scheduled payment(s).`,`يتبقى ${moneyText(sum(late,r=>r.remainingMinor))} غير مسدد عبر ${late.length} دفعة مجدولة.`),rec:x('Record the actual payment or update the schedule using the lender’s statement.','سجل الدفعة الفعلية أو حدّث الجدول وفق كشف جهة التمويل.'),action:'open-loan',ref:l.id})}});
+  const overdue=overdueScheduledTransactions();if(overdue.length)out.push({severity:'danger',title:x('Scheduled transactions are overdue','توجد عمليات مجدولة متأخرة'),body:x(`${overdue.length} scheduled item(s) have passed their date without being marked paid.`,`${overdue.length} عملية مجدولة تجاوزت تاريخها دون تسجيلها كمدفوعة.`),rec:x('Confirm, edit or delete each item so forecasts remain reliable.','أكد كل عملية أو عدلها أو احذفها حتى تبقى التوقعات موثوقة.'),action:'show-overdue'});
+  return out.slice(0,8);
+}
+
+function showToast(message,undo=null){
+  clearTimeout(toastTimer);undoAction=undo;const el=document.getElementById('toast'),msg=document.getElementById('toastMessage'),btn=document.getElementById('toastUndo');msg.textContent=message;btn.textContent=x('Undo','تراجع');btn.hidden=!undo;el.classList.add('show');toastTimer=setTimeout(()=>{el.classList.remove('show');undoAction=null},4200);
+}
+function closeToast(){document.getElementById('toast').classList.remove('show');undoAction=null;clearTimeout(toastTimer)}
+/* =========================================================
+   RENDERING LAYER
+   ========================================================= */
+function renderAll(){
+  document.documentElement.lang=isAr()?'ar':'en';document.documentElement.dir=isAr()?'rtl':'ltr';
+  renderHeader();renderNav();renderHome();renderAccounts();renderPlan();renderInsights();renderSettings();
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${ui.view}`));
+  document.querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===ui.view));
+}
+function renderHeader(){
+  document.getElementById('greeting').textContent=state.profile.name?x(`Hello, ${state.profile.name}`,`مرحباً، ${state.profile.name}`):x('Welcome','مرحباً بك');
+  document.getElementById('periodSub').textContent=formatMonth(ui.selectedMonth);
+  document.getElementById('periodButton').innerHTML=`${esc(formatMonthShort(ui.selectedMonth))} ${svg('chevron')}`;
+  document.getElementById('languageButton').textContent=isAr()?'English':'العربية';
+  document.getElementById('settingsButton').innerHTML=svg('settings');
+  const strip=document.getElementById('sampleStrip');strip.hidden=!state.settings.sampleMode;document.getElementById('sampleStripText').textContent=x('Sample Data — not real financial information','بيانات تجريبية — ليست معلومات مالية حقيقية');
+  document.getElementById('sheetClose').innerHTML=svg('close');document.getElementById('transactionClose').innerHTML=svg('close');document.getElementById('fab').innerHTML=svg('plus');
+}
+function renderNav(){
+  document.getElementById('nav-home').innerHTML=`${svg('home')}<span>${x('Home','الرئيسية')}</span>`;
+  document.getElementById('nav-accounts').innerHTML=`${svg('wallet')}<span>${x('Accounts','الحسابات')}</span>`;
+  document.getElementById('nav-plan').innerHTML=`${svg('target')}<span>${x('Plan','التخطيط')}</span>`;
+  document.getElementById('nav-insights').innerHTML=`${svg('chart')}<span>${x('Insights','التحليلات')}</span>`;
+}
+function colorBg(color){return `${color}1C`}
+function categoryStatus(c,key=ui.selectedMonth){const spent=categorySpend(c.id,key),budget=c.budgetMonthlyMinor,projection=categoryProjection(c,key);if(projection>budget*1.05)return 'danger';if(projection>budget*.9)return 'warn';return 'good'}
+function rowChevron(){return `<span class="chev">${svg('chevron')}</span>`}
+function transactionIcon(t){if(t.type==='income')return 'income';if(t.type==='transfer')return 'transfer';if(t.type==='refund')return 'refund';return merchantById(t.merchantId)?.icon||categoryById(t.categoryId)?.icon||'expense'}
+function transactionColor(t){if(t.type==='income'||t.type==='refund')return '#2E8B72';if(t.type==='transfer')return '#3A6E96';return merchantById(t.merchantId)?.color||categoryById(t.categoryId)?.color||'#7B7AA6'}
+function transactionSub(t){
+  const bits=[];if(t.type==='expense'||t.type==='refund'){const c=categoryById(t.categoryId);if(c)bits.push(nameOf(c))}if(t.type==='transfer')bits.push(x('Transfer','تحويل'));if(t.planned)bits.push(dateAtNoon(t.date)<NOW?x('Overdue','متأخر'):x('Scheduled','مجدول'));bits.push(formatDate(t.date,{short:true}));return bits.join(' · ');
+}
+function transactionRow(t){const signed=transactionSignedAmount(t),color=transactionColor(t);return `<button class="row" data-action="open-transaction" data-id="${esc(t.id)}"><span class="row-icon" style="background:${colorBg(color)};color:${color}">${svg(transactionIcon(t))}</span><span class="row-main"><span class="row-title">${esc(transactionLabel(t))}</span><span class="row-sub">${esc(transactionSub(t))}</span></span><span class="row-side"><span class="row-amount ${signed>0?'positive':''}">${money(signed,{sign:true})}</span>${t.planned?`<span class="row-tag">${x('Not posted','غير مرحلة')}</span>`:''}</span>${rowChevron()}</button>`}
+function accountRow(a){
+  const balance=accountBalance(a.id),asset=isAssetAccount(a),display=asset?balance:Math.max(0,-balance);const meta=TYPE_META[a.type]||TYPE_META.current;const sub=[x(meta.en,meta.ar),a.institution].filter(Boolean).join(' · ');
+  return `<button class="row" data-action="open-account" data-id="${esc(a.id)}"><span class="row-icon" style="background:${colorBg(a.color)};color:${a.color}">${svg(meta.icon)}</span><span class="row-main"><span class="row-title">${esc(nameOf(a))}</span><span class="row-sub">${esc(sub)}</span></span><span class="row-side"><span class="row-amount ${!asset&&display>0?'negative':''}">${money(display)}</span><span class="row-tag">${asset?x('Balance','الرصيد'):x('Owed','مستحق')}</span></span>${rowChevron()}</button>`;
+}
+function plannedRow(p){
+  const reserved=Math.max(0,plannedReserved(p)),target=p.targetMinor,behind=plannedBehind(p),complete=plannedComplete(p),status=complete?'good':behind>0?'warn':'good';
+  return `<button class="row" data-action="open-planned" data-id="${esc(p.id)}"><span class="row-icon" style="background:${colorBg(p.color)};color:${p.color}">${svg(p.icon||'target')}</span><span class="row-main"><span class="row-title">${esc(nameOf(p))}</span><span class="row-sub">${complete?x('Cycle completed','اكتملت الدورة'):x(`Due ${formatDate(p.dueDate)}`,`الاستحقاق ${formatDate(p.dueDate)}`)}</span></span><span class="row-side"><span class="row-amount">${money(reserved)}</span><span class="row-tag">${complete?x('Completed','مكتمل'):behind?x(`${moneyText(behind)} behind`,`${moneyText(behind)} متأخر`):x('On track','على المسار')}</span></span>${rowChevron()}</button>`;
+}
+function loanRow(l){const due=nextLoanDue(l),out=loanOutstanding(l);return `<button class="row" data-action="open-loan" data-id="${esc(l.id)}"><span class="row-icon" style="background:${colorBg(l.color)};color:${l.color}">${svg(l.icon||'loan')}</span><span class="row-main"><span class="row-title">${esc(nameOf(l))}</span><span class="row-sub">${due?x(`Next ${formatDate(due.dueDate)}`,`القادم ${formatDate(due.dueDate)}`):x('No remaining schedule','لا توجد دفعات متبقية')}</span></span><span class="row-side"><span class="row-amount negative">${money(out)}</span><span class="row-tag">${x('Outstanding','الرصيد المستحق')}</span></span>${rowChevron()}</button>`}
+
+function renderHome(){
+  const root=document.getElementById('view-home'),current=ui.selectedMonth===monthKey(NOW),txs=selectedMonthTransactions({actualOnly:false}).slice().sort((a,b)=>dateAtNoon(b.date)-dateAtNoon(a.date));
+  if(!state.accounts.some(a=>a.active&&isAssetAccount(a))){
+    root.innerHTML=`<div class="card"><div class="empty"><div class="empty-icon">${svg('wallet')}</div><h2 class="empty-title">${x('Start with your first account','ابدأ بإضافة حسابك الأول')}</h2><p class="empty-desc">${x('Accounts are required before the app can calculate balances, transfers and Safe to Spend.','الحسابات مطلوبة قبل أن يتمكن التطبيق من حساب الأرصدة والتحويلات والمبلغ الآمن للإنفاق.')}</p><div class="btn-row"><button class="primary" data-action="add-account">${x('Add account','إضافة حساب')}</button><button class="secondary" data-action="load-sample">${x('Load sample','تحميل التجريبي')}</button></div></div></div>`;return;
+  }
+  const quick=topMerchants().slice(0,4);const attentions=current?buildInsights().slice(0,3):[];
+  if(current){
+    const safe=safeToSpend(),commitments=safe.scheduledBills+safe.loanDue+safe.requiredPlans;
+    root.innerHTML=`
+      <div class="hero">
+        <div class="hero-label">${x('Safe to Spend','المبلغ الآمن للإنفاق')}</div>
+        <div class="hero-value ${safe.safe<0?'negative':''}">${money(safe.safe)}</div>
+        <div class="hero-desc">${x(`After obligations due within ${state.settings.horizonDays} days and your selected cash buffer.`,`بعد الالتزامات المستحقة خلال ${state.settings.horizonDays} يوماً والاحتياطي النقدي المحدد.`)}</div>
+        <button class="hero-link" data-action="safe-breakdown">${x('See calculation','عرض طريقة الحساب')}</button>
+        <div class="hero-grid">
+          <div><div class="hero-metric-label">${x('Unreserved cash','النقد غير المخصص')}</div><div class="hero-metric-value">${money(safe.cash)}</div></div>
+          <div><div class="hero-metric-label">${x('Budget remaining','المتبقي من الميزانية')}</div><div class="hero-metric-value">${money(safe.budgetLeft)}</div></div>
+          <div><div class="hero-metric-label">${x('Committed next','الالتزامات القادمة')}</div><div class="hero-metric-value">${money(commitments)}</div></div>
+          <div><div class="hero-metric-label">${x('Suggested per day','المقترح يومياً')}</div><div class="hero-metric-value">${money(safe.daily)}</div></div>
+        </div>
+      </div>
+      ${quick.length?`<div class="card"><div class="section-head"><h2 class="section-title">${x('Quick add','إضافة سريعة')}</h2><button class="section-link" data-action="new-transaction">${x('More','المزيد')}</button></div><div class="quick-grid">${quick.map(m=>`<button class="quick" data-action="quick-add" data-id="${esc(m.id)}"><span class="quick-ic" style="background:${colorBg(m.color)};color:${m.color}">${svg(m.icon||'tag')}</span><span class="quick-name">${esc(nameOf(m))}</span></button>`).join('')}</div></div>`:''}
+      <div class="card"><div class="section-head"><h2 class="section-title">${x('Needs attention','يتطلب الانتباه')}</h2><button class="section-link" data-action="go-insights">${x('All insights','كل التحليلات')}</button></div>${attentions.length?`<div class="attention-list">${attentions.map(insightMini).join('')}</div>`:`<div class="notice">${x('No material issues detected from the available data.','لم يتم رصد مشكلات جوهرية بناءً على البيانات المتاحة.')}</div>`}</div>
+      ${renderUpcomingCard()}
+      ${renderProgressCard()}
+      ${renderAllocationCard()}
+      <div class="card"><div class="section-head"><h2 class="section-title">${x('Recent transactions','آخر العمليات')}</h2><button class="section-link" data-action="show-transactions">${x('View all','عرض الكل')}</button></div>${txs.length?txs.slice(0,8).map(transactionRow).join(''):`<div class="empty"><p class="empty-desc">${x('No transactions in this month.','لا توجد عمليات في هذا الشهر.')}</p></div>`}</div>`;
+  }else{
+    const spend=monthOrdinarySpend(),income=monthIncome(),outflow=monthCashOutflow();
+    root.innerHTML=`<div class="hero"><div class="hero-label">${x('Month summary','ملخص الشهر')}</div><div class="hero-value">${money(spend)}</div><div class="hero-desc">${x('Ordinary spending recorded for the selected month.','الإنفاق الاعتيادي المسجل للشهر المحدد.')}</div><div class="hero-grid"><div><div class="hero-metric-label">${x('Income','الدخل')}</div><div class="hero-metric-value">${money(income)}</div></div><div><div class="hero-metric-label">${x('Cash outflow','التدفق النقدي الخارج')}</div><div class="hero-metric-value">${money(outflow)}</div></div><div><div class="hero-metric-label">${x('Budget','الميزانية')}</div><div class="hero-metric-value">${money(totalBudget())}</div></div><div><div class="hero-metric-label">${x('Budget variance','انحراف الميزانية')}</div><div class="hero-metric-value">${money(totalBudget()-spend)}</div></div></div></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Transactions','العمليات')}</h2></div>${txs.length?txs.map(transactionRow).join(''):`<div class="empty"><p class="empty-desc">${x('No transactions in this month.','لا توجد عمليات في هذا الشهر.')}</p></div>`}</div>`;
+  }
+}
+function insightMini(i){return `<div class="attention"><span class="status-icon ${i.severity}">${svg(i.severity==='danger'?'alert':i.severity==='warn'?'alert':'check')}</span><div class="attention-main"><div class="attention-title">${esc(i.title)}</div><div class="attention-desc">${esc(i.body)}</div><button class="attention-action" data-action="${esc(i.action||'go-insights')}" ${i.ref?`data-id="${esc(i.ref)}"`:''}>${x('Review','مراجعة')}</button></div></div>`}
+function topMerchants(){
+  const score=new Map();state.transactions.filter(t=>!t.planned&&t.type==='expense'&&t.merchantId).forEach(t=>score.set(t.merchantId,(score.get(t.merchantId)||0)+1));
+  return state.merchants.filter(m=>merchantById(m.id)).sort((a,b)=>(score.get(b.id)||0)-(score.get(a.id)||0)||nameOf(a).localeCompare(nameOf(b)));
+}
+function renderUpcomingCard(){const items=upcomingItems(30).slice(0,6);return `<div class="card"><div class="section-head"><h2 class="section-title">${x('Coming up — 30 days','القادم خلال 30 يوماً')}</h2><button class="section-link" data-action="show-upcoming">${x('View all','عرض الكل')}</button></div>${items.length?items.map(upcomingRow).join(''):`<div class="notice">${x('Nothing scheduled in the next 30 days.','لا توجد التزامات مجدولة خلال الثلاثين يوماً القادمة.')}</div>`}</div>`}
+function upcomingRow(item){return `<button class="row" data-action="open-upcoming" data-kind="${item.kind}" data-id="${esc(item.ref)}"><span class="row-icon" style="background:${colorBg(item.color)};color:${item.color}">${svg(item.icon)}</span><span class="row-main"><span class="row-title">${esc(item.title)}</span><span class="row-sub">${esc(formatDate(item.date))}</span></span><span class="row-side"><span class="row-amount ${item.amount>0?'positive':'negative'}">${money(item.amount,{sign:true})}</span></span>${rowChevron()}</button>`}
+function renderProgressCard(){
+  const spend=monthOrdinarySpend(monthKey(NOW)),budget=totalBudget(),reserved=totalReserved(),targets=totalPlannedTargets();
+  return `<div class="card"><div class="section-head"><h2 class="section-title">${x('Progress','التقدم')}</h2><button class="section-link" data-action="go-plan">${x('Open plan','فتح التخطيط')}</button></div><div class="progress-row"><div class="progress-top"><span class="progress-name">${x('Monthly spending','الإنفاق الشهري')}</span><span class="progress-values">${money(spend)} / ${money(budget)}</span></div><div class="progress-track"><span class="progress-fill ${spend>budget?'danger':spend>budget*.85?'warn':''}" style="width:${pct(spend,budget)}%"></span></div><div class="progress-note"><span>${x('Budget used','المستخدم من الميزانية')}</span><span>${Math.round(budget?spend/budget*100:0)}%</span></div></div><div class="progress-row"><div class="progress-top"><span class="progress-name">${x('Planned expenses reserved','المخصص للمصروفات المخططة')}</span><span class="progress-values">${money(reserved)} / ${money(targets)}</span></div><div class="progress-track"><span class="progress-fill" style="width:${pct(reserved,targets)}%"></span></div><div class="progress-note"><span>${x('Across active plans','عبر الخطط النشطة')}</span><span>${Math.round(targets?reserved/targets*100:0)}%</span></div></div></div>`;
+}
+
+
+function renderAllocationCard(){
+  const key=monthKey(NOW),income=monthIncome(key);if(income<=0)return '';
+  const ordinary=monthOrdinarySpend(key),loans=monthActualLoanPayments(key),plannedPayments=monthPlannedExpensePayments(key),reserved=monthReservedContributions(key),unallocated=income-ordinary-loans-plannedPayments-reserved;
+  return `<div class="card"><div class="section-head"><h2 class="section-title">${x('Income allocation this month','توزيع الدخل هذا الشهر')}</h2><span class="badge">${money(income)}</span></div><div class="kv"><span>${x('Ordinary spending','الإنفاق الاعتيادي')}</span><span>−${money(ordinary)}</span></div><div class="kv"><span>${x('Actual loan payments','دفعات القروض الفعلية')}</span><span>−${money(loans)}</span></div><div class="kv"><span>${x('Planned-expense payments','دفعات المصروفات المخططة')}</span><span>−${money(plannedPayments)}</span></div><div class="kv"><span>${x('Newly reserved','المخصص حديثاً')}</span><span>−${money(reserved)}</span></div><div class="kv" style="font-size:13px"><span><b>${x('Unallocated income','الدخل غير المخصص')}</b></span><span style="color:${unallocated<0?'var(--red)':'var(--teal)'}">${money(unallocated)}</span></div><p class="help">${x('Credit-card repayments are not deducted again because card purchases are already included in ordinary spending.','لا يتم خصم سداد البطاقة الائتمانية مرة أخرى لأن مشتريات البطاقة مدرجة بالفعل ضمن الإنفاق الاعتيادي.')}</p></div>`;
+}
+
+function renderAccounts(){
+  const root=document.getElementById('view-accounts'),assets=state.accounts.filter(a=>a.active&&isAssetAccount(a)),liabs=state.accounts.filter(a=>a.active&&!isAssetAccount(a));
+  root.innerHTML=`<h1 class="view-title">${x('Accounts','الحسابات')}</h1><p class="view-subtitle">${x('Balances are calculated from opening balances and posted transactions.','تُحسب الأرصدة من الأرصدة الافتتاحية والعمليات المرحلة.')}</p><div class="hero"><div class="hero-label">${x('Net worth','صافي الثروة')}</div><div class="hero-value ${netWorth()<0?'negative':''}">${money(netWorth())}</div><div class="hero-grid"><div><div class="hero-metric-label">${x('Assets','الأصول')}</div><div class="hero-metric-value">${money(totalAssets())}</div></div><div><div class="hero-metric-label">${x('Liabilities','الالتزامات')}</div><div class="hero-metric-value">${money(totalLiabilities())}</div></div></div></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Asset accounts','حسابات الأصول')}</h2><button class="section-link" data-action="add-account">${x('Add','إضافة')}</button></div>${assets.length?assets.map(accountRow).join(''):`<div class="notice">${x('No asset accounts yet.','لا توجد حسابات أصول حتى الآن.')}</div>`}</div><div class="card"><div class="section-head"><h2 class="section-title">${x('Liabilities','الالتزامات')}</h2></div>${liabs.length?liabs.map(accountRow).join(''):`<div class="notice">${x('No liability accounts.','لا توجد حسابات التزامات.')}</div>`}</div>`;
+}
+
+function renderPlan(){
+  const root=document.getElementById('view-plan');
+  const tabs=[['budgets',x('Budgets','الميزانيات')],['planned',x('Planned expenses','المصروفات المخططة')],['loans',x('Loans','القروض')]];
+  let body='';if(ui.planTab==='budgets')body=renderBudgets();else if(ui.planTab==='planned')body=renderPlannedExpenses();else body=renderLoans();
+  root.innerHTML=`<h1 class="view-title">${x('Financial plan','الخطة المالية')}</h1><p class="view-subtitle">${x('Separate ordinary spending, future expenses and debt obligations.','افصل الإنفاق الاعتيادي والمصروفات المستقبلية والتزامات الدين.')}</p><div class="segmented">${tabs.map(([id,label])=>`<button class="${ui.planTab===id?'active':''}" data-action="plan-tab" data-id="${id}">${label}</button>`).join('')}</div>${body}`;
+}
+function renderBudgets(){
+  const spend=monthOrdinarySpend(),budget=totalBudget();
+  return `<div class="hero"><div class="hero-label">${x('Monthly budget remaining','المتبقي من الميزانية الشهرية')}</div><div class="hero-value ${budget-spend<0?'negative':''}">${money(budget-spend)}</div><div class="hero-grid"><div><div class="hero-metric-label">${x('Budget','الميزانية')}</div><div class="hero-metric-value">${money(budget)}</div></div><div><div class="hero-metric-label">${x('Spent','المنفق')}</div><div class="hero-metric-value">${money(spend)}</div></div></div></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Categories','الفئات')}</h2><button class="section-link" data-action="add-category">${x('Add category','إضافة فئة')}</button></div>${state.categories.filter(c=>c.active).map(c=>{const sp=categorySpend(c.id),status=categoryStatus(c),projection=categoryProjection(c);return `<button class="progress-row row" style="display:block;text-align:start" data-action="open-category" data-id="${esc(c.id)}"><div class="progress-top"><span class="progress-name">${esc(nameOf(c))}</span><span class="progress-values">${money(sp)} / ${money(c.budgetMonthlyMinor)}</span></div><div class="progress-track"><span class="progress-fill ${status==='danger'?'danger':status==='warn'?'warn':''}" style="width:${pct(sp,c.budgetMonthlyMinor)}%"></span></div><div class="progress-note"><span>${x(`Projected ${moneyText(projection)}`,`المتوقع ${moneyText(projection)}`)}</span><span>${c.group==='essential'?x('Essential','أساسي'):c.group==='financial'?x('Financial','مالي'):x('Lifestyle','نمط حياة')}</span></div></button>`}).join('')}</div>`;
+}
+function renderPlannedExpenses(){
+  const active=state.plannedExpenses.filter(p=>p.active);return `<div class="hero"><div class="hero-label">${x('Reserved for planned expenses','المخصص للمصروفات المخططة')}</div><div class="hero-value">${money(totalReserved())}</div><div class="hero-grid"><div><div class="hero-metric-label">${x('Active targets','الأهداف النشطة')}</div><div class="hero-metric-value">${money(totalPlannedTargets())}</div></div><div><div class="hero-metric-label">${x('Behind plan','المتأخر عن الخطة')}</div><div class="hero-metric-value">${money(sum(active,p=>plannedBehind(p)))}</div></div></div></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Planned expenses','المصروفات المخططة')}</h2><button class="section-link" data-action="add-planned">${x('Add','إضافة')}</button></div>${active.length?active.map(plannedRow).join(''):`<div class="empty"><div class="empty-icon">${svg('target')}</div><h2 class="empty-title">${x('No planned expenses','لا توجد مصروفات مخططة')}</h2><p class="empty-desc">${x('Add a due date and target so the app can calculate the required contribution.','أضف تاريخ استحقاق وهدفاً ليحسب التطبيق المساهمة المطلوبة.')}</p></div>`}</div>`;
+}
+function renderLoans(){
+  const active=state.loans.filter(l=>l.active),due=totalLoanDueWithin(addDays(NOW,30));return `<div class="hero"><div class="hero-label">${x('Outstanding debt','إجمالي الدين المتبقي')}</div><div class="hero-value">${money(totalLoanOutstanding())}</div><div class="hero-grid"><div><div class="hero-metric-label">${x('Due within 30 days','مستحق خلال 30 يوماً')}</div><div class="hero-metric-value">${money(due)}</div></div><div><div class="hero-metric-label">${x('Active facilities','التمويلات النشطة')}</div><div class="hero-metric-value">${active.length}</div></div></div></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Loans and financing','القروض والتمويل')}</h2><button class="section-link" data-action="add-loan">${x('Add','إضافة')}</button></div>${active.length?active.map(loanRow).join(''):`<div class="empty"><div class="empty-icon">${svg('loan')}</div><h2 class="empty-title">${x('No loans recorded','لا توجد قروض مسجلة')}</h2><p class="empty-desc">${x('Track actual due dates and payments rather than assuming payments were made.','تتبع تواريخ الاستحقاق والدفعات الفعلية بدلاً من افتراض السداد.')}</p></div>`}</div>`;
+}
+
+function renderInsights(){
+  const root=document.getElementById('view-insights'),insights=buildInsights(),key=ui.selectedMonth;const daily=new Array(daysInMonth(key)).fill(0);
+  state.transactions.filter(t=>monthKey(t.date)===key&&!t.planned&&ordinaryExpense(t)).forEach(t=>daily[dateAtNoon(t.date).getDate()-1]+=t.amountMinor);state.transactions.filter(t=>monthKey(t.date)===key&&!t.planned&&t.type==='refund'&&!t.meta?.excludeFromBudget).forEach(t=>daily[dateAtNoon(t.date).getDate()-1]-=t.amountMinor);
+  const max=Math.max(1,...daily),bars=daily.map((v,i)=>{const d=new Date(startOfMonth(key).getFullYear(),startOfMonth(key).getMonth(),i+1,12),weekend=[5,6].includes(d.getDay());return `<span class="bar ${v<=0?'zero':weekend?'weekend':''}" style="height:${v>0?Math.max(5,v/max*100):3}%" title="${formatDate(isoDate(d))}: ${moneyText(v)}"></span>`}).join('');
+  root.innerHTML=`<h1 class="view-title">${x('Actionable insights','تحليلات قابلة للتنفيذ')}</h1><p class="view-subtitle">${x('Transparent rules explain what happened, what may happen next and what action to consider.','قواعد واضحة تشرح ما حدث وما قد يحدث وما الإجراء الذي يستحق النظر.')}</p>${insights.length?insights.map(i=>`<div class="card insight-card ${i.severity}"><div class="insight-title">${esc(i.title)}</div><div class="insight-body">${esc(i.body)}</div><div class="insight-rec"><b>${x('Suggested action:','الإجراء المقترح:')}</b> ${esc(i.rec)}</div><button class="section-link" style="margin-top:9px" data-action="${esc(i.action||'go-plan')}" ${i.ref?`data-id="${esc(i.ref)}"`:''}>${x('Open relevant area','فتح القسم المرتبط')}</button></div>`).join(''):`<div class="card"><div class="notice">${x('No material issues are currently detected. More useful insights appear as transaction history grows.','لا توجد مشكلات جوهرية مكتشفة حالياً. ستظهر تحليلات أكثر فائدة مع نمو سجل العمليات.')}</div></div>`}<div class="card"><div class="section-head"><h2 class="section-title">${x('Daily spending rhythm','نمط الإنفاق اليومي')}</h2><span class="badge">${formatMonth(key)}</span></div><div class="chart" aria-label="Daily spending chart">${bars}</div><div class="chart-axis"><span>1</span><span>8</span><span>15</span><span>22</span><span>${daysInMonth(key)}</span></div></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Category forecast','توقع الفئات')}</h2></div>${state.categories.filter(c=>c.active).map(c=>{const sp=categorySpend(c.id,key),proj=categoryProjection(c,key),st=categoryStatus(c,key);return `<div class="progress-row"><div class="progress-top"><span class="progress-name">${esc(nameOf(c))}</span><span class="progress-values">${money(sp)} → ${money(proj)}</span></div><div class="progress-track"><span class="progress-fill ${st==='danger'?'danger':st==='warn'?'warn':''}" style="width:${pct(proj,c.budgetMonthlyMinor)}%"></span></div><div class="progress-note"><span>${x('Projected month end','المتوقع لنهاية الشهر')}</span><span>${money(c.budgetMonthlyMinor)} ${x('budget','ميزانية')}</span></div></div>`}).join('')}</div>`;
+}
+
+function renderSettings(){
+  const root=document.getElementById('view-settings');root.innerHTML=`<h1 class="view-title">${x('Settings','الإعدادات')}</h1><p class="view-subtitle">${x('Local-first controls, honest privacy information and validated backups.','إعدادات محلية ومعلومات خصوصية واضحة ونسخ احتياطية يتم التحقق منها.')}</p><div class="card"><button class="settings-row" data-action="edit-profile"><span class="row-icon" style="background:var(--teal-3);color:var(--teal)">${svg('wallet')}</span><span class="settings-copy"><span class="settings-title">${x('Profile and expected income','الملف والدخل المتوقع')}</span><span class="settings-sub">${esc(state.profile.name||x('No name','دون اسم'))} · ${money(state.profile.regularMonthlyIncomeMinor)} ${x('monthly','شهرياً')}</span></span>${rowChevron()}</button><button class="settings-row" data-action="edit-planning"><span class="row-icon" style="background:var(--amber-bg);color:var(--amber)">${svg('target')}</span><span class="settings-copy"><span class="settings-title">${x('Safe to Spend settings','إعدادات المبلغ الآمن')}</span><span class="settings-sub">${x(`Buffer ${moneyText(state.settings.minimumBufferMinor)} · ${state.settings.horizonDays} day horizon`,`احتياطي ${moneyText(state.settings.minimumBufferMinor)} · أفق ${state.settings.horizonDays} يوماً`)}</span></span>${rowChevron()}</button><button class="settings-row" data-action="toggle-language"><span class="row-icon" style="background:#EEF2F7;color:var(--blue)">${svg('globe')}</span><span class="settings-copy"><span class="settings-title">${x('Language','اللغة')}</span><span class="settings-sub">${isAr()?'العربية':'English'}</span></span>${rowChevron()}</button></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Data and backups','البيانات والنسخ الاحتياطي')}</h2></div><div class="notice">${x('Data are stored in this browser on this device. This standalone file does not provide cloud synchronization or bank-grade account security.','تُحفظ البيانات في هذا المتصفح على هذا الجهاز. لا يوفر هذا الملف المستقل مزامنة سحابية أو حماية مصرفية للحسابات.')}</div><div class="btn-row"><button class="secondary" data-action="export-backup">${svg('download')}${x('Export','تصدير')}</button><button class="secondary" data-action="export-encrypted">${svg('shield')}${x('Encrypted','مشفّر')}</button></div><button class="ghost-btn" style="margin-top:9px" data-action="import-backup">${svg('upload')}${x('Restore validated backup','استعادة نسخة تم التحقق منها')}</button>${state.settings.lastExport?`<p class="help">${x('Last export:','آخر تصدير:')} ${formatDate(state.settings.lastExport.slice(0,10))}</p>`:''}</div><div class="card"><div class="section-head"><h2 class="section-title">${x('Sample data','البيانات التجريبية')}</h2>${state.settings.sampleMode?`<span class="badge warn">${x('Active','مفعلة')}</span>`:''}</div><p class="small muted">${x('Sample mode uses fictional figures and merchants only to demonstrate the application.','يستخدم الوضع التجريبي أرقاماً ومتاجر خيالية لعرض وظائف التطبيق فقط.')}</p><div class="btn-row"><button class="secondary" data-action="load-sample">${x('Load sample data','تحميل بيانات تجريبية')}</button><button class="ghost-btn" data-action="clear-sample" ${state.settings.sampleMode?'':'disabled'}>${x('Clear sample','مسح التجريبي')}</button></div></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Reset options','خيارات إعادة الضبط')}</h2></div><button class="settings-row" data-action="clear-ledger"><span class="row-icon" style="background:var(--amber-bg);color:var(--amber)">${svg('trash')}</span><span class="settings-copy"><span class="settings-title">${x('Clear financial activity','مسح النشاط المالي')}</span><span class="settings-sub">${x('Removes transactions, planned-expense activity and recorded loan payments; keeps setup.','يحذف العمليات ونشاط المصروفات المخططة والدفعات المسجلة، مع إبقاء الإعدادات.')}</span></span>${rowChevron()}</button><button class="settings-row" data-action="reset-settings"><span class="row-icon" style="background:#EEF2F7;color:var(--blue)">${svg('settings')}</span><span class="settings-copy"><span class="settings-title">${x('Reset preferences','إعادة ضبط التفضيلات')}</span><span class="settings-sub">${x('Resets buffer, horizon and language preferences.','يعيد ضبط الاحتياطي والأفق وتفضيلات اللغة.')}</span></span>${rowChevron()}</button><button class="settings-row" data-action="delete-all"><span class="row-icon" style="background:var(--red-bg);color:var(--red)">${svg('trash')}</span><span class="settings-copy"><span class="settings-title" style="color:var(--red)">${x('Delete all app data','حذف جميع بيانات التطبيق')}</span><span class="settings-sub">${x('Permanently removes accounts, transactions, plans, loans and profile data.','يحذف نهائياً الحسابات والعمليات والخطط والقروض وبيانات الملف.')}</span></span>${rowChevron()}</button></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Security statement','بيان الأمان')}</h2></div><p class="small muted">${x('No app-lock, biometric, cloud-sync or bank-connection control is displayed because this standalone HTML file cannot implement those production services responsibly. Encrypted export protects only the exported file when a strong password is used.','لا يتم عرض قفل للتطبيق أو بصمة أو مزامنة سحابية أو ربط مصرفي لأن ملف HTML المستقل لا يستطيع تنفيذ هذه الخدمات الإنتاجية بصورة مسؤولة. يحمي التصدير المشفّر ملف النسخة فقط عند استخدام كلمة مرور قوية.')}</p></div>`;
+}
+
+/* ------------------ sheet utilities ------------------ */
+function openSheet(title,html){ui.lastFocus=document.activeElement;document.getElementById('sheetTitle').textContent=title;document.getElementById('sheetBody').innerHTML=html;const o=document.getElementById('sheetOverlay');o.classList.add('open');o.setAttribute('aria-hidden','false');setTimeout(()=>document.getElementById('sheetClose').focus(),0)}
+function closeSheet(){const o=document.getElementById('sheetOverlay');o.classList.remove('open');o.setAttribute('aria-hidden','true');document.getElementById('sheetBody').innerHTML='';ui.pendingConfirm=null;if(ui.lastFocus?.focus)ui.lastFocus.focus()}
+function confirmSheet(title,body,confirmLabel,onConfirm,{danger=true}={}){ui.pendingConfirm=onConfirm;openSheet(title,`<div class="notice ${danger?'danger':'warn'}">${esc(body)}</div><div class="form-actions"><button class="ghost-btn" data-action="close-sheet">${x('Cancel','إلغاء')}</button><button class="${danger?'danger-btn':'primary'}" data-action="confirm-action">${esc(confirmLabel)}</button></div>`)}
+function safeBreakdownSheet(){const s=safeToSpend();openSheet(x('Safe to Spend calculation','حساب المبلغ الآمن للإنفاق'),`<div class="notice">${x(`Planning horizon ends ${formatDate(isoDate(s.horizon))}. The result is constrained by cash after commitments and by the monthly budget after scheduled ordinary spending.`,`ينتهي أفق التخطيط في ${formatDate(isoDate(s.horizon))}. والنتيجة مقيدة بالنقد بعد الالتزامات وبالميزانية الشهرية بعد الإنفاق الاعتيادي المجدول.`)}</div><div class="kv"><span>${x('Included liquid cash','النقد السائل المدرج')}</span><span>${money(s.grossCash)}</span></div>${s.reservedInLiquid?`<div class="kv"><span>${x('Already earmarked within included cash','مبالغ مخصصة داخل النقد المدرج')}</span><span>−${money(s.reservedInLiquid)}</span></div>`:''}<div class="kv"><span>${x('Unreserved liquid cash','النقد السائل غير المخصص')}</span><span>${money(s.cash)}</span></div><div class="kv"><span>${x('Expected income','الدخل المتوقع')}</span><span style="color:var(--teal)">+${money(s.expectedIncome)}</span></div><div class="kv"><span>${x('Scheduled and overdue bills','الفواتير المجدولة والمتأخرة')}</span><span>−${money(s.scheduledBills)}</span></div><div class="kv"><span>${x('Loan payments due','دفعات القروض المستحقة')}</span><span>−${money(s.loanDue)}</span></div><div class="kv"><span>${x('Required planned-expense funding','التمويل المطلوب للمصروفات المخططة')}</span><span>−${money(s.requiredPlans)}</span></div><div class="kv"><span>${x('Minimum cash buffer','الحد الأدنى للاحتياطي')}</span><span>−${money(s.buffer)}</span></div><div class="kv"><span>${x('Cash after commitments','النقد بعد الالتزامات')}</span><span>${money(s.cashAfter)}</span></div><div class="kv"><span>${x('Budget remaining before scheduled items','متبقي الميزانية قبل البنود المجدولة')}</span><span>${money(s.rawBudgetLeft)}</span></div>${s.scheduledBudgetSpend?`<div class="kv"><span>${x('Scheduled ordinary spending','الإنفاق الاعتيادي المجدول')}</span><span>−${money(s.scheduledBudgetSpend)}</span></div>`:''}<div class="kv"><span>${x('Budget available after commitments','الميزانية المتاحة بعد الالتزامات')}</span><span>${money(s.budgetLeft)}</span></div><div class="kv" style="font-size:14px"><span><b>${x('Safe to Spend','المبلغ الآمن للإنفاق')}</b></span><span style="color:${s.safe<0?'var(--red)':'var(--teal)'}">${money(s.safe)}</span></div>`)}
+/* =========================================================
+   DETAIL SHEETS AND EDITING FORMS
+   ========================================================= */
+function chooseMonthSheet(){
+  openSheet(x('Choose month','اختر الشهر'),monthOptions().map(k=>`<button class="row" data-action="select-month" data-id="${k}"><span class="row-icon" style="background:${k===monthKey(NOW)?'var(--teal-3)':'var(--soft)'};color:${k===monthKey(NOW)?'var(--teal)':'var(--muted)'}">${svg('calendar')}</span><span class="row-main"><span class="row-title">${esc(formatMonth(k))}</span><span class="row-sub">${k===monthKey(NOW)?x('Current month','الشهر الحالي'):k<monthKey(NOW)?x('Past month','شهر سابق'):x('Future planning month','شهر تخطيط مستقبلي')}</span></span>${k===ui.selectedMonth?`<span class="badge good">${x('Selected','محدد')}</span>`:rowChevron()}</button>`).join(''));
+}
+function accountOptions({assetsOnly=false,includeInactive=false,excludeId=null}={}){
+  return state.accounts.filter(a=>(includeInactive||a.active)&&(!assetsOnly||isAssetAccount(a))&&a.id!==excludeId).map(a=>`<option value="${esc(a.id)}">${esc(nameOf(a))} · ${esc(moneyText(isAssetAccount(a)?accountBalance(a.id):Math.max(0,-accountBalance(a.id))))}</option>`).join('');
+}
+function categoryOptions(selected=''){return `<option value="">${x('No category','دون فئة')}</option>`+state.categories.filter(c=>c.active).map(c=>`<option value="${esc(c.id)}" ${c.id===selected?'selected':''}>${esc(nameOf(c))}</option>`).join('')}
+function openAccount(id){
+  const a=accountById(id);if(!a)return;const balance=accountBalance(a.id),asset=isAssetAccount(a),display=asset?balance:Math.max(0,-balance);const related=state.transactions.filter(t=>t.sourceAccountId===id||t.destinationAccountId===id).sort((x,y)=>dateAtNoon(y.date)-dateAtNoon(x.date));
+  const credit=a.type==='credit'&&a.creditLimitMinor?`<div class="kv"><span>${x('Credit limit','الحد الائتماني')}</span><span>${money(a.creditLimitMinor)}</span></div><div class="kv"><span>${x('Utilization','نسبة الاستخدام')}</span><span>${Math.round(display/a.creditLimitMinor*100)}%</span></div>`:'';
+  openSheet(nameOf(a),`<div style="text-align:center;padding:4px 0 14px"><div class="row-icon" style="width:52px;height:52px;margin:0 auto 10px;background:${colorBg(a.color)};color:${a.color}">${svg(TYPE_META[a.type]?.icon||'wallet')}</div><div style="font-size:30px;font-weight:700">${money(display)}</div><div class="small muted">${asset?x('Current balance','الرصيد الحالي'):x('Amount owed','المبلغ المستحق')}</div></div><div class="kv"><span>${x('Account type','نوع الحساب')}</span><span>${x(TYPE_META[a.type]?.en||a.type,TYPE_META[a.type]?.ar||a.type)}</span></div><div class="kv"><span>${x('Included in Safe to Spend','مدرج في المبلغ الآمن')}</span><span>${a.includeInSafe?x('Yes','نعم'):x('No','لا')}</span></div>${credit}<div class="form-actions"><button class="secondary" data-action="edit-account" data-id="${esc(a.id)}">${svg('edit')}${x('Edit','تعديل')}</button><button class="ghost-btn" data-action="reconcile-account" data-id="${esc(a.id)}">${x('Reconcile','مطابقة')}</button></div><div class="divider"></div><div class="section-head"><h2 class="section-title">${x('Recent account activity','آخر نشاط للحساب')}</h2></div>${related.length?related.slice(0,12).map(transactionRow).join(''):`<div class="notice">${x('No activity recorded for this account.','لا يوجد نشاط مسجل لهذا الحساب.')}</div>`}<button class="danger-btn" style="margin-top:16px" data-action="archive-account" data-id="${esc(a.id)}">${x('Archive account','أرشفة الحساب')}</button>`);
+}
+function accountForm(id=null){
+  const existing=id?accountById(id):null;if(id&&!existing)return;const a=existing||{nameEn:'',nameAr:'',type:'current',institution:'',openingBalanceMinor:0,creditLimitMinor:0,includeInSafe:true,color:COLORS[state.accounts.length%COLORS.length]};const meta=TYPE_META[a.type]||TYPE_META.current;const current=existing?(isAssetAccount(a)?accountBalance(a.id):Math.max(0,-accountBalance(a.id))):0;
+  openSheet(existing?x('Edit account','تعديل الحساب'):x('New account','حساب جديد'),`<form id="accountForm"><div class="input-row"><div class="field"><label for="accNameEn">${x('English name','الاسم بالإنجليزية')}</label><input id="accNameEn" value="${esc(a.nameEn||'')}" required></div><div class="field"><label for="accNameAr">${x('Arabic name','الاسم بالعربية')}</label><input id="accNameAr" value="${esc(a.nameAr||'')}" dir="rtl"></div></div><div class="field"><label for="accType">${x('Account type','نوع الحساب')}</label><select id="accType">${Object.entries(TYPE_META).map(([key,m])=>`<option value="${key}" ${a.type===key?'selected':''}>${x(m.en,m.ar)}</option>`).join('')}</select></div><div class="field"><label for="accInstitution">${x('Institution','الجهة')}</label><input id="accInstitution" value="${esc(a.institution||'')}"></div><div class="field"><label for="accBalance">${isAssetAccount(a)?x('Current balance','الرصيد الحالي'):x('Current amount owed','المبلغ المستحق حالياً')}</label><input id="accBalance" inputmode="decimal" value="${fromMinor(existing?current:Math.abs(a.openingBalanceMinor||0))}" required><p class="help">${x('For liabilities, enter the positive amount currently owed.','بالنسبة للالتزامات، أدخل المبلغ الموجب المستحق حالياً.')}</p></div><div class="field" id="creditLimitField" ${a.type==='credit'?'':'hidden'}><label for="accCreditLimit">${x('Credit limit','الحد الائتماني')}</label><input id="accCreditLimit" inputmode="decimal" value="${fromMinor(a.creditLimitMinor||0)}"></div><label class="check-row" id="safeAccountWrap" ${isAssetAccount(a)?'':'hidden'}><input type="checkbox" id="accSafe" ${a.includeInSafe?'checked':''}><span class="check-copy"><b>${x('Include in Safe to Spend','إدراجه في المبلغ الآمن للإنفاق')}</b><span>${x('Use this account as available liquid cash. Savings can be excluded.','اعتبر رصيد هذا الحساب نقداً متاحاً. يمكن استبعاد حسابات التوفير.')}</span></span></label><button class="primary" type="submit" style="margin-top:18px">${x('Save account','حفظ الحساب')}</button></form>`);
+  const typeEl=document.getElementById('accType');typeEl.onchange=()=>{const m=TYPE_META[typeEl.value];document.getElementById('safeAccountWrap').hidden=!m.asset;document.getElementById('creditLimitField').hidden=typeEl.value!=='credit'};
+  document.getElementById('accountForm').onsubmit=e=>{e.preventDefault();const nameEn=document.getElementById('accNameEn').value.trim(),nameAr=document.getElementById('accNameAr').value.trim();if(!nameEn&&!nameAr){showToast(x('Enter an account name','أدخل اسم الحساب'));return}const type=typeEl.value,asset=TYPE_META[type].asset,entered=toMinor(document.getElementById('accBalance').value);if(entered<0){showToast(x('Enter a valid balance','أدخل رصيداً صحيحاً'));return}const desired=asset?entered:-entered;
+    if(existing){const before=accountBalance(existing.id);existing.nameEn=nameEn||nameAr;existing.nameAr=nameAr||nameEn;existing.type=type;existing.institution=document.getElementById('accInstitution').value.trim();existing.creditLimitMinor=toMinor(document.getElementById('accCreditLimit').value);existing.includeInSafe=asset&&document.getElementById('accSafe').checked;existing.openingBalanceMinor+=desired-before;}
+    else state.accounts.push({id:uid('acc'),nameEn:nameEn||nameAr,nameAr:nameAr||nameEn,type,institution:document.getElementById('accInstitution').value.trim(),openingBalanceMinor:desired,creditLimitMinor:toMinor(document.getElementById('accCreditLimit').value),currency:'QAR',includeInSafe:asset&&document.getElementById('accSafe').checked,active:true,color:a.color});
+    saveState();closeSheet();renderAll();showToast(x('Account saved','تم حفظ الحساب'));
+  };
+}
+function reconcileAccount(id){
+  const a=accountById(id);if(!a)return;const asset=isAssetAccount(a),current=asset?accountBalance(id):Math.max(0,-accountBalance(id));openSheet(x('Reconcile account','مطابقة الحساب'),`<form id="reconcileForm"><div class="notice">${x('Enter the balance shown by the financial institution. The app will create an auditable adjustment instead of rewriting prior transactions.','أدخل الرصيد الظاهر لدى الجهة المالية. سينشئ التطبيق تسوية قابلة للتتبع بدلاً من تعديل العمليات السابقة.')}</div><div class="field"><label for="reconcileValue">${asset?x('Actual balance','الرصيد الفعلي'):x('Actual amount owed','المبلغ المستحق الفعلي')}</label><input id="reconcileValue" inputmode="decimal" value="${fromMinor(current)}" required></div><div class="field"><label for="reconcileNote">${x('Note','ملاحظة')}</label><input id="reconcileNote" value="${x('Balance reconciliation','مطابقة الرصيد')}"></div><button class="primary" type="submit" style="margin-top:18px">${x('Create adjustment','إنشاء تسوية')}</button></form>`);document.getElementById('reconcileForm').onsubmit=e=>{e.preventDefault();const entered=toMinor(document.getElementById('reconcileValue').value),desired=asset?entered:-entered,currentSigned=accountBalance(id),diff=desired-currentSigned;if(Math.abs(diff)<1){closeSheet();showToast(x('Balance already matches','الرصيد متطابق بالفعل'));return}const tx={id:uid('tx'),type:'adjustment',amountMinor:Math.abs(diff),signedAmountMinor:diff,date:todayISO(),destinationAccountId:id,nameEn:'Balance adjustment',nameAr:'تسوية الرصيد',note:document.getElementById('reconcileNote').value.trim(),planned:false,cleared:true,createdAt:new Date().toISOString(),modifiedAt:new Date().toISOString()};state.transactions.push(tx);saveState();closeSheet();renderAll();showToast(x('Balance adjusted','تمت تسوية الرصيد'),()=>{state.transactions=state.transactions.filter(t=>t.id!==tx.id);saveState();renderAll()})}}
+
+function openCategory(id){
+  const c=categoryById(id);if(!c)return;const spend=categorySpend(id),projection=categoryProjection(c),related=state.transactions.filter(t=>t.categoryId===id&&!t.planned).sort((a,b)=>dateAtNoon(b.date)-dateAtNoon(a.date));openSheet(nameOf(c),`<div style="text-align:center;padding:4px 0 12px"><div class="row-icon" style="width:52px;height:52px;margin:0 auto 10px;background:${colorBg(c.color)};color:${c.color}">${svg(c.icon||'tag')}</div><div style="font-size:30px;font-weight:700">${money(spend)}</div><div class="small muted">${x('Spent in selected month','المنفق في الشهر المحدد')}</div></div><div class="kv"><span>${x('Monthly budget','الميزانية الشهرية')}</span><span>${money(c.budgetMonthlyMinor)}</span></div><div class="kv"><span>${x('Projected month end','المتوقع لنهاية الشهر')}</span><span>${money(projection)}</span></div><div class="kv"><span>${x('Classification','التصنيف')}</span><span>${c.group==='essential'?x('Essential','أساسي'):c.group==='financial'?x('Financial','مالي'):x('Lifestyle','نمط حياة')}</span></div><div class="form-actions"><button class="secondary" data-action="edit-category" data-id="${esc(c.id)}">${svg('edit')}${x('Edit','تعديل')}</button><button class="danger-btn" data-action="archive-category" data-id="${esc(c.id)}">${x('Archive','أرشفة')}</button></div><div class="divider"></div><div class="section-head"><h2 class="section-title">${x('Recent category activity','آخر نشاط للفئة')}</h2></div>${related.length?related.slice(0,10).map(transactionRow).join(''):`<div class="notice">${x('No activity recorded in this category.','لا يوجد نشاط مسجل في هذه الفئة.')}</div>`}`);
+}
+function categoryForm(id=null){
+  const existing=id?categoryById(id):null;const c=existing||{nameEn:'',nameAr:'',budgetMonthlyMinor:0,color:COLORS[state.categories.length%COLORS.length],icon:'tag',group:'lifestyle'};openSheet(existing?x('Edit category','تعديل الفئة'):x('New category','فئة جديدة'),`<form id="categoryForm"><div class="input-row"><div class="field"><label for="catNameEn">${x('English name','الاسم بالإنجليزية')}</label><input id="catNameEn" value="${esc(c.nameEn||'')}" required></div><div class="field"><label for="catNameAr">${x('Arabic name','الاسم بالعربية')}</label><input id="catNameAr" value="${esc(c.nameAr||'')}" dir="rtl"></div></div><div class="field"><label for="catBudget">${x('Monthly budget','الميزانية الشهرية')}</label><input id="catBudget" inputmode="decimal" value="${fromMinor(c.budgetMonthlyMinor)}" required></div><div class="field"><label for="catGroup">${x('Classification','التصنيف')}</label><select id="catGroup"><option value="essential" ${c.group==='essential'?'selected':''}>${x('Essential','أساسي')}</option><option value="lifestyle" ${c.group==='lifestyle'?'selected':''}>${x('Lifestyle','نمط حياة')}</option><option value="financial" ${c.group==='financial'?'selected':''}>${x('Financial','مالي')}</option></select></div><div class="field"><span class="field-label">${x('Color','اللون')}</span><div class="chip-row" id="catColors">${COLORS.map(col=>`<button type="button" class="chip ${col===c.color?'active':''}" data-action="select-color" data-color="${col}" style="color:${col}"><span class="dot" style="background:${col}"></span>${col}</button>`).join('')}</div></div><div class="field"><span class="field-label">${x('Icon','الأيقونة')}</span><div class="chip-row" id="catIcons">${CATEGORY_ICONS.map(ic=>`<button type="button" class="chip ${ic===c.icon?'active':''}" data-action="select-icon" data-icon="${ic}">${svg(ic)}</button>`).join('')}</div></div><input type="hidden" id="catColor" value="${c.color}"><input type="hidden" id="catIcon" value="${c.icon}"><button class="primary" type="submit" style="margin-top:18px">${x('Save category','حفظ الفئة')}</button></form>`);document.getElementById('categoryForm').onsubmit=e=>{e.preventDefault();const en=document.getElementById('catNameEn').value.trim(),ar=document.getElementById('catNameAr').value.trim(),budget=toMinor(document.getElementById('catBudget').value);if(!en&&!ar){showToast(x('Enter a category name','أدخل اسم الفئة'));return}if(budget<0){showToast(x('Enter a valid budget','أدخل ميزانية صحيحة'));return}const values={nameEn:en||ar,nameAr:ar||en,budgetMonthlyMinor:budget,group:document.getElementById('catGroup').value,color:document.getElementById('catColor').value,icon:document.getElementById('catIcon').value,active:true};if(existing)Object.assign(existing,values);else state.categories.push({id:uid('cat'),...values});saveState();closeSheet();renderAll();showToast(x('Category saved','تم حفظ الفئة'))};
+}
+
+function openPlanned(id){
+  const p=plannedById(id);if(!p)return;const reserved=plannedReserved(p),required=plannedRequiredAt(p),behind=plannedBehind(p),monthly=plannedMonthlyContribution(p),complete=plannedComplete(p),acts=p.activities.slice().sort((a,b)=>dateAtNoon(b.date)-dateAtNoon(a.date));openSheet(nameOf(p),`<div style="text-align:center;padding:4px 0 13px"><div class="row-icon" style="width:52px;height:52px;margin:0 auto 10px;background:${colorBg(p.color)};color:${p.color}">${svg(p.icon||'target')}</div><div style="font-size:30px;font-weight:700;color:${reserved<0?'var(--red)':'inherit'}">${money(Math.max(0,reserved))}</div><div class="small muted">${reserved<0?x(`Shortfall ${moneyText(-reserved)}`,`عجز ${moneyText(-reserved)}`):x('Currently reserved','المخصص حالياً')}</div></div><div class="kv"><span>${x('Target','الهدف')}</span><span>${money(p.targetMinor)}</span></div><div class="kv"><span>${x('Due date','تاريخ الاستحقاق')}</span><span>${formatDate(p.dueDate)}</span></div><div class="kv"><span>${x('Required by today','المطلوب حتى اليوم')}</span><span>${money(required)}</span></div><div class="kv"><span>${behind?x('Behind plan','متأخر عن الخطة'):x('Ahead / on track','متقدم أو على المسار')}</span><span style="color:${behind?'var(--amber)':'var(--teal)'}">${money(behind||plannedAhead(p))}</span></div><div class="kv"><span>${x('Required monthly contribution','المساهمة الشهرية المطلوبة')}</span><span>${money(monthly)}</span></div>${complete?`<div class="notice">${x('The current funding cycle is complete.','اكتملت دورة التمويل الحالية.')}</div>`:''}<div class="form-actions">${!complete?`<button class="primary" data-action="planned-deposit" data-id="${esc(p.id)}">${x('Reserve','تخصيص')}</button><button class="secondary" data-action="planned-payment" data-id="${esc(p.id)}">${x('Record payment','تسجيل دفعة')}</button>`:p.recurrence!=='once'?`<button class="primary" data-action="next-planned-cycle" data-id="${esc(p.id)}">${x('Start next cycle','بدء الدورة التالية')}</button>`:''}</div><div class="form-actions"><button class="secondary" data-action="edit-planned" data-id="${esc(p.id)}">${svg('edit')}${x('Edit','تعديل')}</button><button class="danger-btn" data-action="archive-planned" data-id="${esc(p.id)}">${x('Archive','أرشفة')}</button></div><div class="divider"></div><div class="section-head"><h2 class="section-title">${x('Activity','الحركة')}</h2></div>${acts.length?acts.map(a=>`<div class="row"><span class="row-icon" style="background:${a.type==='deposit'?'var(--teal-3)':'var(--soft)'};color:${a.type==='deposit'?'var(--teal)':'var(--ink)'}">${svg(a.type==='deposit'?'income':'expense')}</span><span class="row-main"><span class="row-title">${a.type==='deposit'?x('Reserved','تخصيص'):x('Payment','دفعة')}</span><span class="row-sub">${formatDate(a.date)}${a.note?` · ${esc(a.note)}`:''}</span></span><span class="row-amount ${a.type==='deposit'?'positive':''}">${a.type==='deposit'?'+':'−'}${money(a.amountMinor)}</span></div>`).join(''):`<div class="notice">${x('No activity recorded yet.','لم يتم تسجيل أي حركة بعد.')}</div>`}`);
+}
+function plannedForm(id=null){
+  const existing=id?plannedById(id):null;const p=existing||{nameEn:'',nameAr:'',targetMinor:0,dueDate:isoDate(addMonths(NOW,6)),fundingStartDate:todayISO(),recurrence:'annual',linkedAccountId:state.accounts.find(a=>a.active&&isAssetAccount(a))?.id||'',priority:'medium',icon:'target',color:COLORS[state.plannedExpenses.length%COLORS.length]};openSheet(existing?x('Edit planned expense','تعديل المصروف المخطط'):x('New planned expense','مصروف مخطط جديد'),`<form id="plannedForm"><div class="input-row"><div class="field"><label for="peNameEn">${x('English name','الاسم بالإنجليزية')}</label><input id="peNameEn" value="${esc(p.nameEn||'')}" required></div><div class="field"><label for="peNameAr">${x('Arabic name','الاسم بالعربية')}</label><input id="peNameAr" value="${esc(p.nameAr||'')}" dir="rtl"></div></div><div class="field"><label for="peTarget">${x('Target amount','المبلغ المستهدف')}</label><input id="peTarget" inputmode="decimal" value="${fromMinor(p.targetMinor)}" required></div><div class="input-row"><div class="field"><label for="peStart">${x('Funding start','بداية التمويل')}</label><input id="peStart" type="date" value="${p.fundingStartDate}" required></div><div class="field"><label for="peDue">${x('Due date','تاريخ الاستحقاق')}</label><input id="peDue" type="date" value="${p.dueDate}" required></div></div><div class="input-row"><div class="field"><label for="peRecurrence">${x('Recurrence','التكرار')}</label><select id="peRecurrence"><option value="once" ${p.recurrence==='once'?'selected':''}>${x('One time','مرة واحدة')}</option><option value="monthly" ${p.recurrence==='monthly'?'selected':''}>${x('Monthly','شهري')}</option><option value="quarterly" ${p.recurrence==='quarterly'?'selected':''}>${x('Quarterly','ربع سنوي')}</option><option value="annual" ${p.recurrence==='annual'?'selected':''}>${x('Annual','سنوي')}</option></select></div><div class="field"><label for="pePriority">${x('Priority','الأولوية')}</label><select id="pePriority"><option value="high" ${p.priority==='high'?'selected':''}>${x('High','عالية')}</option><option value="medium" ${p.priority==='medium'?'selected':''}>${x('Medium','متوسطة')}</option><option value="low" ${p.priority==='low'?'selected':''}>${x('Low','منخفضة')}</option></select></div></div><div class="field"><label for="peAccount">${x('Account holding the reserved money','الحساب الذي يحتفظ بالمبلغ المخصص')}</label><select id="peAccount">${accountOptions({assetsOnly:true})}</select></div><button class="primary" type="submit" style="margin-top:18px">${x('Save planned expense','حفظ المصروف المخطط')}</button></form>`);document.getElementById('peAccount').value=p.linkedAccountId||'';document.getElementById('plannedForm').onsubmit=e=>{e.preventDefault();const en=document.getElementById('peNameEn').value.trim(),ar=document.getElementById('peNameAr').value.trim(),target=toMinor(document.getElementById('peTarget').value),start=document.getElementById('peStart').value,due=document.getElementById('peDue').value;if((!en&&!ar)||target<=0){showToast(x('Enter a name and valid target','أدخل اسماً وهدفاً صحيحاً'));return}if(dateAtNoon(due)<=dateAtNoon(start)){showToast(x('Due date must be after the funding start','يجب أن يكون الاستحقاق بعد بداية التمويل'));return}const linkedAccountId=document.getElementById('peAccount').value;if(!linkedAccountId){showToast(x('Choose an account for the reserved money','اختر حساباً للاحتفاظ بالمبلغ المخصص'));return}const values={nameEn:en||ar,nameAr:ar||en,targetMinor:target,fundingStartDate:start,dueDate:due,recurrence:document.getElementById('peRecurrence').value,priority:document.getElementById('pePriority').value,linkedAccountId,active:true};if(existing)Object.assign(existing,values);else state.plannedExpenses.push({id:uid('pe'),...values,icon:p.icon,color:p.color,activities:[],history:[]});saveState();closeSheet();renderAll();showToast(x('Planned expense saved','تم حفظ المصروف المخطط'))};
+}
+function plannedDepositForm(id){const p=plannedById(id);if(!p)return;openSheet(x('Reserve money','تخصيص مبلغ'),`<form id="plannedDepositForm"><div class="notice">${x('This earmarks money for the planned expense. It does not create spending or change the bank balance. Record any real bank transfer separately.','يخصص هذا المبلغ للمصروف المخطط. لا ينشئ إنفاقاً ولا يغير رصيد البنك. سجل أي تحويل مصرفي فعلي بصورة مستقلة.')}</div><div class="field"><label for="peDepositAmount">${x('Amount to reserve','المبلغ المراد تخصيصه')}</label><input id="peDepositAmount" inputmode="decimal" value="${fromMinor(plannedMonthlyContribution(p))}" required></div><div class="field"><label for="peDepositDate">${x('Date','التاريخ')}</label><input id="peDepositDate" type="date" value="${todayISO()}" max="${todayISO()}" required></div><div class="field"><label for="peDepositNote">${x('Note','ملاحظة')}</label><input id="peDepositNote"></div><button class="primary" type="submit" style="margin-top:18px">${x('Reserve amount','تخصيص المبلغ')}</button></form>`);document.getElementById('plannedDepositForm').onsubmit=e=>{e.preventDefault();const amount=toMinor(document.getElementById('peDepositAmount').value);if(amount<=0){showToast(x('Enter a valid amount','أدخل مبلغاً صحيحاً'));return}const activity={id:uid('pea'),type:'deposit',amountMinor:amount,date:document.getElementById('peDepositDate').value,note:document.getElementById('peDepositNote').value.trim(),createdAt:new Date().toISOString()};p.activities.push(activity);saveState();closeSheet();renderAll();showToast(x('Amount reserved','تم تخصيص المبلغ'),()=>{p.activities=p.activities.filter(a=>a.id!==activity.id);saveState();renderAll()})}}
+function plannedPaymentForm(id){const p=plannedById(id);if(!p)return;const defaultAmount=Math.min(p.targetMinor,Math.max(0,plannedReserved(p)))||p.targetMinor;openSheet(x('Record planned-expense payment','تسجيل دفعة للمصروف المخطط'),`<form id="plannedPaymentForm"><div class="notice warn">${x('This creates an actual expense from the selected account and reduces the amount reserved for this plan. It is excluded from ordinary monthly category budgets.','ينشئ هذا مصروفاً فعلياً من الحساب المحدد ويخفض المبلغ المخصص لهذه الخطة. لا يدخل ضمن ميزانيات الفئات الشهرية الاعتيادية.')}</div><div class="field"><label for="pePayAmount">${x('Payment amount','مبلغ الدفعة')}</label><input id="pePayAmount" inputmode="decimal" value="${fromMinor(defaultAmount)}" required></div><div class="input-row"><div class="field"><label for="pePayDate">${x('Payment date','تاريخ الدفعة')}</label><input id="pePayDate" type="date" value="${todayISO()}" max="${todayISO()}" required></div><div class="field"><label for="pePayAccount">${x('Paid from','الدفع من')}</label><select id="pePayAccount">${accountOptions({assetsOnly:true})}</select></div></div><div class="field"><label for="pePayCategory">${x('Reporting category','فئة التقارير')}</label><select id="pePayCategory">${categoryOptions()}</select></div><div class="field"><label for="pePayNote">${x('Note','ملاحظة')}</label><input id="pePayNote"></div><button class="primary" type="submit" style="margin-top:18px">${x('Record payment','تسجيل الدفعة')}</button></form>`);document.getElementById('pePayAccount').value=p.linkedAccountId||state.accounts.find(a=>a.active&&isAssetAccount(a))?.id||'';document.getElementById('plannedPaymentForm').onsubmit=e=>{e.preventDefault();const amount=toMinor(document.getElementById('pePayAmount').value),date=document.getElementById('pePayDate').value,account=document.getElementById('pePayAccount').value;if(amount<=0||!account){showToast(x('Enter a valid payment and account','أدخل دفعة وحساباً صحيحين'));return}const paymentId=uid('pea'),txId=uid('tx'),note=document.getElementById('pePayNote').value.trim();const activity={id:paymentId,type:'payment',amountMinor:amount,date,accountId:account,transactionId:txId,note,createdAt:new Date().toISOString()};const tx={id:txId,type:'expense',amountMinor:amount,date,sourceAccountId:account,categoryId:document.getElementById('pePayCategory').value||null,nameEn:p.nameEn,nameAr:p.nameAr,note,planned:false,cleared:true,meta:{plannedExpenseId:p.id,excludeFromBudget:true,lockedRecord:true},createdAt:new Date().toISOString(),modifiedAt:new Date().toISOString()};p.activities.push(activity);state.transactions.push(tx);saveState();closeSheet();renderAll();showToast(x('Payment recorded','تم تسجيل الدفعة'),()=>{p.activities=p.activities.filter(a=>a.id!==paymentId);state.transactions=state.transactions.filter(t=>t.id!==txId);saveState();renderAll()})}}
+
+function openLoan(id){
+  const l=loanById(id);if(!l)return;const out=loanOutstanding(l),schedule=loanSchedule(l),next=nextLoanDue(l),paid=sum(l.payments,p=>p.amountMinor);openSheet(nameOf(l),`<div style="text-align:center;padding:4px 0 13px"><div class="row-icon" style="width:52px;height:52px;margin:0 auto 10px;background:${colorBg(l.color)};color:${l.color}">${svg(l.icon||'loan')}</div><div style="font-size:30px;font-weight:700">${money(out)}</div><div class="small muted">${x('Current outstanding liability','الالتزام الحالي المتبقي')}</div></div><div class="kv"><span>${x('Payment amount','مبلغ الدفعة')}</span><span>${money(calculatedLoanPayment(l))}</span></div><div class="kv"><span>${x('Next due date','تاريخ الاستحقاق القادم')}</span><span>${next?formatDate(next.dueDate):'—'}</span></div><div class="kv"><span>${x('Debt-free date','تاريخ انتهاء الدين')}</span><span>${loanDebtFreeDate(l)?formatDate(loanDebtFreeDate(l)):'—'}</span></div><div class="kv"><span>${x('Actual payments recorded','الدفعات الفعلية المسجلة')}</span><span>${money(paid)}</span></div><div class="form-actions"><button class="primary" data-action="loan-payment" data-id="${esc(l.id)}">${x('Record payment','تسجيل دفعة')}</button><button class="secondary" data-action="edit-loan" data-id="${esc(l.id)}">${svg('edit')}${x('Edit','تعديل')}</button></div><div class="divider"></div><div class="section-head"><h2 class="section-title">${x('Payment schedule','جدول الدفعات')}</h2></div>${schedule.slice(0,10).map(r=>`<div class="row"><span class="row-icon" style="background:${r.status==='paid'?'var(--teal-3)':r.status==='late'||r.status==='partial'?'var(--red-bg)':'var(--soft)'};color:${r.status==='paid'?'var(--teal)':r.status==='late'||r.status==='partial'?'var(--red)':'var(--muted)'}">${svg(r.status==='paid'?'check':'calendar')}</span><span class="row-main"><span class="row-title">${formatDate(r.dueDate)}</span><span class="row-sub">${r.status==='paid'?x('Paid','مدفوع'):r.status==='partial'?x('Partially paid','مدفوع جزئياً'):r.status==='late'?x('Late','متأخر'):r.status==='due'?x('Due soon','مستحق قريباً'):x('Scheduled','مجدول')}</span></span><span class="row-side"><span class="row-amount">${money(r.remainingMinor||r.scheduledMinor)}</span></span></div>`).join('')}<button class="danger-btn" style="margin-top:16px" data-action="archive-loan" data-id="${esc(l.id)}">${x('Archive financing','أرشفة التمويل')}</button>`);
+}
+function loanForm(id=null){
+  const existing=id?loanById(id):null;const l=existing||{nameEn:'',nameAr:'',mode:'statement',liabilityAccountId:null,sourceAccountId:state.accounts.find(a=>a.active&&isAssetAccount(a))?.id||'',paymentAmountMinor:0,nextDueDate:isoDate(addMonths(NOW,1)),remainingPayments:12,frequencyMonths:1,annualRatePct:0,totalProfitMinor:0,originalPrincipalMinor:0,color:COLORS[state.loans.length%COLORS.length],icon:'loan'};const outstanding=existing?loanOutstanding(l):0;openSheet(existing?x('Edit loan or financing','تعديل القرض أو التمويل'):x('New loan or financing','قرض أو تمويل جديد'),`<form id="loanForm"><div class="input-row"><div class="field"><label for="loanNameEn">${x('English name','الاسم بالإنجليزية')}</label><input id="loanNameEn" value="${esc(l.nameEn||'')}" required></div><div class="field"><label for="loanNameAr">${x('Arabic name','الاسم بالعربية')}</label><input id="loanNameAr" value="${esc(l.nameAr||'')}" dir="rtl"></div></div><div class="field"><label for="loanMode">${x('Entry mode','طريقة الإدخال')}</label><select id="loanMode"><option value="statement" ${l.mode==='statement'?'selected':''}>${x('Statement mode — use lender figures','وضع الكشف — استخدام أرقام جهة التمويل')}</option><option value="calculated" ${l.mode==='calculated'?'selected':''}>${x('Calculated mode — estimate payment','الوضع المحسوب — تقدير الدفعة')}</option></select></div><div class="input-row"><div class="field"><label for="loanOutstanding">${x('Current outstanding','المبلغ المتبقي حالياً')}</label><input id="loanOutstanding" inputmode="decimal" value="${fromMinor(outstanding)}" required></div><div class="field"><label for="loanOriginal">${x('Original amount','المبلغ الأصلي')}</label><input id="loanOriginal" inputmode="decimal" value="${fromMinor(l.originalPrincipalMinor||outstanding)}"></div></div><div class="input-row"><div class="field"><label for="loanPayment">${x('Contractual payment','الدفعة التعاقدية')}</label><input id="loanPayment" inputmode="decimal" value="${fromMinor(l.paymentAmountMinor)}"></div><div class="field"><label for="loanRate">${x('Annual rate %','النسبة السنوية %')}</label><input id="loanRate" inputmode="decimal" value="${Number(l.annualRatePct||0)}"></div></div><div class="input-row"><div class="field"><label for="loanNextDue">${x('Next due date','تاريخ الاستحقاق القادم')}</label><input id="loanNextDue" type="date" value="${l.nextDueDate}" required></div><div class="field"><label for="loanRemaining">${x('Remaining payments','الدفعات المتبقية')}</label><input id="loanRemaining" type="number" min="1" max="600" inputmode="numeric" value="${l.remainingPayments}" required></div></div><div class="field"><label for="loanFrequency">${x('Payment frequency','تكرار الدفعة')}</label><select id="loanFrequency"><option value="1" ${Number(l.frequencyMonths)===1?'selected':''}>${x('Monthly','شهري')}</option><option value="3" ${Number(l.frequencyMonths)===3?'selected':''}>${x('Quarterly','ربع سنوي')}</option><option value="6" ${Number(l.frequencyMonths)===6?'selected':''}>${x('Every six months','كل ستة أشهر')}</option><option value="12" ${Number(l.frequencyMonths)===12?'selected':''}>${x('Annual','سنوي')}</option></select></div><div class="field"><label for="loanSource">${x('Default payment account','حساب الدفع الافتراضي')}</label><select id="loanSource">${accountOptions({assetsOnly:true})}</select></div><p class="help">${x('In Statement Mode, use the lender’s contractual payment and outstanding balance. In Calculated Mode, leave payment at zero to estimate it from the rate and remaining periods.','في وضع الكشف، استخدم الدفعة التعاقدية والرصيد المتبقي لدى جهة التمويل. وفي الوضع المحسوب، اترك الدفعة صفراً لتقديرها من النسبة والفترات المتبقية.')}</p><button class="primary" type="submit" style="margin-top:18px">${x('Save financing','حفظ التمويل')}</button></form>`);document.getElementById('loanSource').value=l.sourceAccountId||'';document.getElementById('loanForm').onsubmit=e=>{e.preventDefault();const en=document.getElementById('loanNameEn').value.trim(),ar=document.getElementById('loanNameAr').value.trim(),out=toMinor(document.getElementById('loanOutstanding').value),remaining=Number(document.getElementById('loanRemaining').value);const sourceAccountId=document.getElementById('loanSource').value;if((!en&&!ar)||out<=0||remaining<1||!sourceAccountId){showToast(x('Enter a name, outstanding amount, payment account and valid schedule','أدخل اسماً ومبلغاً متبقياً وحساب دفع وجدولاً صحيحاً'));return}const values={nameEn:en||ar,nameAr:ar||en,mode:document.getElementById('loanMode').value,sourceAccountId,paymentAmountMinor:toMinor(document.getElementById('loanPayment').value),nextDueDate:document.getElementById('loanNextDue').value,remainingPayments:remaining,frequencyMonths:Number(document.getElementById('loanFrequency').value),annualRatePct:Number(document.getElementById('loanRate').value||0),originalPrincipalMinor:toMinor(document.getElementById('loanOriginal').value)||out,active:true};if(existing){Object.assign(existing,values);const account=accountById(existing.liabilityAccountId);if(account){const current=accountBalance(account.id);account.openingBalanceMinor+=(-out)-current;account.nameEn=`${values.nameEn} liability`;account.nameAr=`التزام ${values.nameAr}`}}
+    else{const accId=uid('acc');state.accounts.push({id:accId,nameEn:`${values.nameEn} liability`,nameAr:`التزام ${values.nameAr}`,type:'loan',institution:'',openingBalanceMinor:-out,currency:'QAR',includeInSafe:false,active:true,color:l.color});state.loans.push({id:uid('loan'),...values,liabilityAccountId:accId,totalProfitMinor:0,color:l.color,icon:l.icon,payments:[]})}saveState();closeSheet();renderAll();showToast(x('Financing saved','تم حفظ التمويل'))};
+}
+function loanPaymentForm(id){
+  const l=loanById(id);if(!l)return;const schedule=loanSchedule(l).filter(r=>r.status!=='paid');if(!schedule.length){showToast(x('No unpaid schedule remains','لا توجد دفعات غير مسددة'));return}const due=schedule[0],suggest=l.mode==='calculated'?estimatedCalculatedSplit(l,due.remainingMinor):{principalMinor:0,financeMinor:due.remainingMinor};openSheet(x('Record actual loan payment','تسجيل دفعة قرض فعلية'),`<form id="loanPaymentForm"><div class="notice ${l.mode==='statement'?'warn':''}">${l.mode==='statement'?x('Enter the principal reduction shown by the lender. Any difference between the cash payment and principal reduction is recorded as finance cost.','أدخل مقدار انخفاض أصل الدين وفق كشف جهة التمويل. يسجل الفرق بين الدفعة النقدية وانخفاض الأصل كتكلفة تمويل.'):x('The principal and finance-cost split is estimated from the current outstanding balance and annual rate. Confirm it against the lender statement.','يتم تقدير تقسيم الأصل وتكلفة التمويل من الرصيد الحالي والنسبة السنوية. تحقق منه وفق كشف جهة التمويل.')}</div><div class="field"><label for="loanPayDue">${x('Scheduled due date','تاريخ الاستحقاق المجدول')}</label><select id="loanPayDue">${schedule.map(r=>`<option value="${r.dueDate}">${formatDate(r.dueDate)} · ${moneyText(r.remainingMinor)}</option>`).join('')}</select></div><div class="input-row"><div class="field"><label for="loanPayAmount">${x('Cash payment','الدفعة النقدية')}</label><input id="loanPayAmount" inputmode="decimal" value="${fromMinor(due.remainingMinor)}" required></div><div class="field"><label for="loanPayPrincipal">${x('Principal reduction','انخفاض أصل الدين')}</label><input id="loanPayPrincipal" inputmode="decimal" value="${fromMinor(suggest.principalMinor)}" required></div></div><div class="input-row"><div class="field"><label for="loanPaidDate">${x('Paid date','تاريخ الدفع')}</label><input id="loanPaidDate" type="date" value="${todayISO()}" max="${todayISO()}" required></div><div class="field"><label for="loanPaySource">${x('Paid from','الدفع من')}</label><select id="loanPaySource">${accountOptions({assetsOnly:true})}</select></div></div><div class="notice" id="loanSplitPreview"></div><button class="primary" type="submit" style="margin-top:18px">${x('Record actual payment','تسجيل الدفعة الفعلية')}</button></form>`);document.getElementById('loanPaySource').value=l.sourceAccountId||'';const updatePreview=()=>{const amount=toMinor(document.getElementById('loanPayAmount').value),principal=Math.min(amount,toMinor(document.getElementById('loanPayPrincipal').value)),finance=Math.max(0,amount-principal);document.getElementById('loanSplitPreview').innerHTML=`${x('Principal:','الأصل:')} <b>${money(principal)}</b> · ${x('Finance cost:','تكلفة التمويل:')} <b>${money(finance)}</b>`};document.getElementById('loanPayAmount').oninput=updatePreview;document.getElementById('loanPayPrincipal').oninput=updatePreview;document.getElementById('loanPayDue').onchange=()=>{const r=schedule.find(q=>q.dueDate===document.getElementById('loanPayDue').value);if(r){document.getElementById('loanPayAmount').value=fromMinor(r.remainingMinor);if(l.mode==='calculated')document.getElementById('loanPayPrincipal').value=fromMinor(estimatedCalculatedSplit(l,r.remainingMinor).principalMinor);updatePreview()}};updatePreview();document.getElementById('loanPaymentForm').onsubmit=e=>{e.preventDefault();const amount=toMinor(document.getElementById('loanPayAmount').value),principal=Math.min(amount,toMinor(document.getElementById('loanPayPrincipal').value)),finance=amount-principal,source=document.getElementById('loanPaySource').value,dueDate=document.getElementById('loanPayDue').value,paidDate=document.getElementById('loanPaidDate').value;if(amount<=0||principal<0||!source){showToast(x('Enter valid payment information','أدخل معلومات دفع صحيحة'));return}const paymentId=uid('lp'),txIds=[];if(principal>0){const id=uid('tx');txIds.push(id);state.transactions.push({id,type:'transfer',amountMinor:principal,date:paidDate,sourceAccountId:source,destinationAccountId:l.liabilityAccountId,nameEn:`${l.nameEn} principal`,nameAr:`أصل ${l.nameAr}`,planned:false,cleared:true,note:'',meta:{loanPaymentId:paymentId,lockedRecord:true},createdAt:new Date().toISOString(),modifiedAt:new Date().toISOString()})}if(finance>0){const id=uid('tx');txIds.push(id);state.transactions.push({id,type:'expense',amountMinor:finance,date:paidDate,sourceAccountId:source,categoryId:null,nameEn:`${l.nameEn} finance cost`,nameAr:`تكلفة تمويل ${l.nameAr}`,planned:false,cleared:true,note:'',meta:{loanPaymentId:paymentId,excludeFromBudget:true,lockedRecord:true},createdAt:new Date().toISOString(),modifiedAt:new Date().toISOString()})}const payment={id:paymentId,dueDate,paidDate,amountMinor:amount,principalMinor:principal,financeCostMinor:finance,status:'paid',transactionIds:txIds,createdAt:new Date().toISOString()};l.payments.push(payment);saveState();closeSheet();renderAll();showToast(x('Loan payment recorded','تم تسجيل دفعة القرض'),()=>{l.payments=l.payments.filter(p=>p.id!==paymentId);state.transactions=state.transactions.filter(t=>!txIds.includes(t.id));saveState();renderAll()})}}
+
+function profileForm(){openSheet(x('Profile and expected income','الملف والدخل المتوقع'),`<form id="profileForm"><div class="field"><label for="profileName">${x('Name','الاسم')}</label><input id="profileName" value="${esc(state.profile.name||'')}"></div><div class="field"><label for="profileIncome">${x('Expected regular monthly income','الدخل الشهري المنتظم المتوقع')}</label><input id="profileIncome" inputmode="decimal" value="${fromMinor(state.profile.regularMonthlyIncomeMinor)}"></div><div class="field"><label for="profilePayday">${x('Usual payday (1–28)','يوم نزول الراتب المعتاد (1–28)')}</label><input id="profilePayday" type="number" min="1" max="28" value="${state.profile.paydayDay||25}"></div><p class="help">${x('Expected income is used only for forecasting. It does not become actual income until a posted income transaction exists.','يستخدم الدخل المتوقع للتنبؤ فقط، ولا يصبح دخلاً فعلياً إلا عند وجود عملية دخل مرحلة.')}</p><button class="primary" type="submit" style="margin-top:18px">${x('Save profile','حفظ الملف')}</button></form>`);document.getElementById('profileForm').onsubmit=e=>{e.preventDefault();state.profile.name=document.getElementById('profileName').value.trim();state.profile.regularMonthlyIncomeMinor=toMinor(document.getElementById('profileIncome').value);state.profile.paydayDay=clamp(Number(document.getElementById('profilePayday').value||25),1,28);saveState();closeSheet();renderAll();showToast(x('Profile saved','تم حفظ الملف'))}}
+function planningSettingsForm(){openSheet(x('Safe to Spend settings','إعدادات المبلغ الآمن للإنفاق'),`<form id="planningForm"><div class="field"><label for="planningBuffer">${x('Minimum cash buffer','الحد الأدنى للاحتياطي النقدي')}</label><input id="planningBuffer" inputmode="decimal" value="${fromMinor(state.settings.minimumBufferMinor)}"></div><div class="field"><label for="planningHorizon">${x('Planning horizon','أفق التخطيط')}</label><select id="planningHorizon"><option value="7" ${state.settings.horizonDays===7?'selected':''}>${x('7 days','7 أيام')}</option><option value="30" ${state.settings.horizonDays===30?'selected':''}>${x('30 days','30 يوماً')}</option><option value="60" ${state.settings.horizonDays===60?'selected':''}>${x('60 days','60 يوماً')}</option><option value="90" ${state.settings.horizonDays===90?'selected':''}>${x('90 days','90 يوماً')}</option></select></div><div class="notice">${x('Safe to Spend is the lower of cash after commitments and the remaining ordinary monthly budget.','المبلغ الآمن للإنفاق هو الأقل بين النقد بعد الالتزامات والمتبقي من الميزانية الشهرية الاعتيادية.')}</div><button class="primary" type="submit" style="margin-top:18px">${x('Save settings','حفظ الإعدادات')}</button></form>`);document.getElementById('planningForm').onsubmit=e=>{e.preventDefault();state.settings.minimumBufferMinor=toMinor(document.getElementById('planningBuffer').value);state.settings.horizonDays=Number(document.getElementById('planningHorizon').value);saveState();closeSheet();renderAll();showToast(x('Planning settings saved','تم حفظ إعدادات التخطيط'))}}
+/* =========================================================
+   TRANSACTION ENTRY, DETAIL AND RECURRING SCHEDULING
+   ========================================================= */
+function transactionAccountList(type){
+  if(type==='income')return state.accounts.filter(a=>a.active&&isAssetAccount(a));
+  if(type==='transfer')return state.accounts.filter(a=>a.active&&isAssetAccount(a));
+  return state.accounts.filter(a=>a.active&&a.type!=='loan');
+}
+function openTransaction(type='expense',{id=null,merchantId=null}={}){
+  const existing=id?transactionById(id):null;if(existing?.meta?.lockedRecord){showToast(x('This entry is managed from its linked plan or loan','تدار هذه العملية من الخطة أو القرض المرتبط'));return}
+  ui.editingTxId=id;ui.txType=existing?.type||type;ui.prefillMerchantId=merchantId||existing?.merchantId||null;
+  const overlay=document.getElementById('transactionOverlay');overlay.classList.add('open');overlay.setAttribute('aria-hidden','false');
+  document.getElementById('transactionTitle').textContent=existing?x('Edit transaction','تعديل العملية'):x('New transaction','عملية جديدة');
+  document.getElementById('txAmount').value=existing?fromMinor(existing.amountMinor):'';
+  document.getElementById('txDate').value=existing?.date||todayISO();
+  document.getElementById('txNote').value=existing?.note||'';
+  document.getElementById('txPlanned').checked=!!existing?.planned;
+  document.getElementById('txRecurring').checked=!!existing?.recurring;
+  document.getElementById('txRecurringFields').hidden=!existing?.recurring;
+  renderTransactionForm(existing);
+  setTimeout(()=>document.getElementById('txAmount').focus(),80);
+}
+function closeTransaction(){document.getElementById('transactionOverlay').classList.remove('open');document.getElementById('transactionOverlay').setAttribute('aria-hidden','true');ui.editingTxId=null;ui.prefillMerchantId=null}
+function renderTransactionForm(existing=null){
+  const types=[['expense','expense',x('Expense','مصروف')],['income','income',x('Income','دخل')],['transfer','transfer',x('Transfer','تحويل')],['refund','refund',x('Refund','استرداد')]];
+  document.getElementById('transactionTypeTabs').innerHTML=types.map(([id,ic,label])=>`<button type="button" class="${ui.txType===id?'active':''}" data-action="tx-type" data-id="${id}">${svg(ic)} ${label}</button>`).join('');
+  document.getElementById('txAmountLabel').textContent=x('Amount','المبلغ');document.getElementById('txDateLabel').textContent=x('Date','التاريخ');document.getElementById('txNoteLabel').textContent=x('Note','ملاحظة');
+  document.getElementById('txPlannedTitle').textContent=x('Schedule without posting','جدولة دون ترحيل');document.getElementById('txPlannedDesc').textContent=x('Scheduled items affect forecasts but not account balances until marked paid.','تؤثر العمليات المجدولة في التوقعات دون الأرصدة حتى يتم تسجيلها كمدفوعة.');
+  document.getElementById('txRecurringTitle').textContent=x('Create a recurring series','إنشاء سلسلة متكررة');document.getElementById('txRecurringDesc').textContent=x('Creates future scheduled copies; it does not connect to a bank.','ينشئ نسخاً مستقبلية مجدولة ولا يرتبط بالبنك.');
+  document.getElementById('txFrequencyLabel').textContent=x('Frequency','التكرار');document.getElementById('txOccurrencesLabel').textContent=x('Occurrences','عدد المرات');
+  document.querySelector('#txFrequency option[value="monthly"]').textContent=x('Monthly','شهري');document.querySelector('#txFrequency option[value="annual"]').textContent=x('Annual','سنوي');
+  document.getElementById('txSaveButton').textContent=existing?x('Save changes','حفظ التعديلات'):x('Save transaction','حفظ العملية');
+  const accounts=transactionAccountList(ui.txType);const accountSelect=document.getElementById('txAccount');accountSelect.innerHTML=accounts.map(a=>`<option value="${esc(a.id)}">${esc(nameOf(a))} · ${esc(moneyText(isAssetAccount(a)?accountBalance(a.id):Math.max(0,-accountBalance(a.id))))}</option>`).join('');
+  document.getElementById('txAccountLabel').textContent=ui.txType==='income'||ui.txType==='refund'?x('Deposit to','الإيداع في'):x('Pay from','الدفع من');
+  let selectedAccount=existing?(existing.sourceAccountId||existing.destinationAccountId):null;
+  const pref=merchantById(ui.prefillMerchantId);if(!selectedAccount&&pref)selectedAccount=pref.lastAccountId;if(selectedAccount&&accounts.some(a=>a.id===selectedAccount))accountSelect.value=selectedAccount;
+  renderTxDynamic(existing);
+  const recurringAllowed=['expense','income'].includes(ui.txType);document.getElementById('txRecurringWrap').hidden=!recurringAllowed;if(!recurringAllowed){document.getElementById('txRecurring').checked=false;document.getElementById('txRecurringFields').hidden=true}
+  document.getElementById('txPlannedWrap').hidden=false;
+}
+function renderTxDynamic(existing=null){
+  const root=document.getElementById('txDynamicFields');
+  if(ui.txType==='transfer'){
+    root.innerHTML=`<div class="field"><label for="txDestination">${x('Transfer to','التحويل إلى')}</label><select id="txDestination">${state.accounts.filter(a=>a.active&&a.id!==document.getElementById('txAccount').value).map(a=>`<option value="${esc(a.id)}">${esc(nameOf(a))}</option>`).join('')}</select></div>`;
+    if(existing?.destinationAccountId)document.getElementById('txDestination').value=existing.destinationAccountId;
+    return;
+  }
+  if(ui.txType==='income'){
+    root.innerHTML=`<div class="field"><label for="txDescription">${x('Income description','وصف الدخل')}</label><input id="txDescription" value="${esc(existing?.nameEn||'')}" placeholder="${x('Salary, business income…','راتب، دخل أعمال…')}" required></div>`;return;
+  }
+  const merchantId=ui.prefillMerchantId||existing?.merchantId||'';const selectedMerchant=merchantById(merchantId);const categoryId=existing?.categoryId||selectedMerchant?.categoryId||'';const quick=topMerchants().slice(0,8);
+  root.innerHTML=`${quick.length?`<div class="field"><span class="field-label">${x('Frequent merchants','المتاجر المتكررة')}</span><div class="chip-row">${quick.map(m=>`<button type="button" class="chip ${m.id===merchantId?'active':''}" data-action="tx-merchant" data-id="${esc(m.id)}">${svg(m.icon||'tag')}${esc(nameOf(m))}</button>`).join('')}</div></div>`:''}<div class="field"><label for="txMerchant">${ui.txType==='refund'?x('Refund from','الاسترداد من'):x('Merchant or description','المتجر أو الوصف')}</label><select id="txMerchant"><option value="">${x('Custom description','وصف مخصص')}</option>${state.merchants.map(m=>`<option value="${esc(m.id)}" ${m.id===merchantId?'selected':''}>${esc(nameOf(m))}</option>`).join('')}</select></div><div class="field" id="txCustomNameWrap" ${merchantId?'hidden':''}><label for="txDescription">${x('Description','الوصف')}</label><input id="txDescription" value="${esc(existing&&!existing.merchantId?existing.nameEn||'':'')}" placeholder="${x('Enter merchant or purpose','أدخل المتجر أو الغرض')}"></div><div class="field"><label for="txCategory">${x('Category','الفئة')}</label><select id="txCategory">${categoryOptions(categoryId)}</select></div>`;
+  const merchantSelect=document.getElementById('txMerchant');merchantSelect.onchange=()=>{const m=merchantById(merchantSelect.value);document.getElementById('txCustomNameWrap').hidden=!!m;if(m){document.getElementById('txCategory').value=m.categoryId||'';const accounts=transactionAccountList(ui.txType);if(accounts.some(a=>a.id===m.lastAccountId))document.getElementById('txAccount').value=m.lastAccountId;ui.prefillMerchantId=m.id}else ui.prefillMerchantId=null};
+}
+function selectTxMerchant(id){const m=merchantById(id);if(!m)return;ui.prefillMerchantId=id;const current=ui.editingTxId?transactionById(ui.editingTxId):null;renderTxDynamic(current);const accounts=transactionAccountList(ui.txType);if(accounts.some(a=>a.id===m.lastAccountId))document.getElementById('txAccount').value=m.lastAccountId}
+function saveTransactionFromForm(e){
+  e.preventDefault();const existing=ui.editingTxId?transactionById(ui.editingTxId):null;const amount=toMinor(document.getElementById('txAmount').value),date=document.getElementById('txDate').value,accountId=document.getElementById('txAccount').value;if(amount<=0||!date||!accountId){showToast(x('Enter a valid amount, date and account','أدخل مبلغاً وتاريخاً وحساباً صحيحاً'));return}
+  const planned=document.getElementById('txPlanned').checked||isFutureDate(date);const common={amountMinor:amount,date,planned,cleared:!planned,note:document.getElementById('txNote').value.trim(),recurring:document.getElementById('txRecurring').checked,modifiedAt:new Date().toISOString()};let base={};
+  if(ui.txType==='transfer'){
+    const destination=document.getElementById('txDestination')?.value;if(!destination||destination===accountId){showToast(x('Choose two different accounts','اختر حسابين مختلفين'));return}base={type:'transfer',sourceAccountId:accountId,destinationAccountId:destination,nameEn:'Transfer',nameAr:'تحويل'};
+  }else if(ui.txType==='income'){
+    const desc=document.getElementById('txDescription')?.value.trim();if(!desc){showToast(x('Enter an income description','أدخل وصف الدخل'));return}base={type:'income',destinationAccountId:accountId,nameEn:desc,nameAr:desc};
+  }else{
+    const merchantId=document.getElementById('txMerchant')?.value||null,categoryId=document.getElementById('txCategory')?.value||null;let merchant=merchantById(merchantId),desc=document.getElementById('txDescription')?.value.trim();if(!categoryId){showToast(x('Choose a category','اختر فئة'));return}if(!merchant&&!desc){showToast(x('Choose a merchant or enter a description','اختر متجراً أو أدخل وصفاً'));return}if(!merchant){merchant={id:uid('mer'),nameEn:desc,nameAr:desc,categoryId,lastAccountId:accountId,icon:categoryById(categoryId)?.icon||'tag',color:categoryById(categoryId)?.color||'#2E8B72'};state.merchants.push(merchant)}else{merchant.lastAccountId=accountId;merchant.categoryId=categoryId}
+    base={type:ui.txType,categoryId,merchantId:merchant.id,nameEn:merchant.nameEn,nameAr:merchant.nameAr};if(ui.txType==='expense')base.sourceAccountId=accountId;else base.destinationAccountId=accountId;
+  }
+  if(existing){const idx=state.transactions.findIndex(t=>t.id===existing.id);state.transactions[idx]={...existing,...base,...common,id:existing.id,createdAt:existing.createdAt||new Date().toISOString()};saveState();closeTransaction();renderAll();showToast(x('Transaction updated','تم تحديث العملية'));return}
+  const recurring=common.recurring&&['expense','income'].includes(base.type);const occurrences=recurring?clamp(Number(document.getElementById('txOccurrences').value||6),2,24):1;const frequency=document.getElementById('txFrequency').value;const seriesId=recurring?uid('series'):null;const created=[];
+  for(let i=0;i<occurrences;i++){
+    const occurrenceDate=i===0?date:isoDate(addMonths(date,frequency==='annual'?12*i:i));const isPlanned=i===0?planned:true;const tx={id:uid('tx'),...base,...common,date:occurrenceDate,planned:isPlanned,cleared:!isPlanned,recurring,seriesId,createdAt:new Date().toISOString(),modifiedAt:new Date().toISOString()};state.transactions.push(tx);created.push(tx.id);
+  }
+  saveState();closeTransaction();renderAll();showToast(recurring?x(`${occurrences} recurring items created`, `تم إنشاء ${occurrences} عمليات متكررة`):x('Transaction saved','تم حفظ العملية'),()=>{state.transactions=state.transactions.filter(t=>!created.includes(t.id));saveState();renderAll()});
+}
+function openTransactionDetail(id){
+  const t=transactionById(id);if(!t)return;const source=accountById(t.sourceAccountId),destination=accountById(t.destinationAccountId),locked=t.meta?.lockedRecord;let accountText='';if(t.type==='transfer')accountText=`${nameOf(source)} → ${nameOf(destination)}`;else accountText=nameOf(source||destination);
+  openSheet(transactionLabel(t),`<div style="text-align:center;padding:4px 0 14px"><div class="row-icon" style="width:52px;height:52px;margin:0 auto 10px;background:${colorBg(transactionColor(t))};color:${transactionColor(t)}">${svg(transactionIcon(t))}</div><div style="font-size:30px;font-weight:700;color:${t.type==='income'||t.type==='refund'?'var(--teal)':'inherit'}">${money(transactionSignedAmount(t),{sign:true})}</div><div class="small muted">${t.planned?x('Scheduled — not posted','مجدولة — غير مرحلة'):x('Posted transaction','عملية مرحلة')}</div></div><div class="kv"><span>${x('Date','التاريخ')}</span><span>${formatDate(t.date)}</span></div><div class="kv"><span>${x('Account','الحساب')}</span><span>${esc(accountText)}</span></div>${t.categoryId?`<div class="kv"><span>${x('Category','الفئة')}</span><span>${esc(nameOf(categoryById(t.categoryId)))}</span></div>`:''}${t.note?`<div class="kv"><span>${x('Note','الملاحظة')}</span><span>${esc(t.note)}</span></div>`:''}${locked?`<div class="notice warn">${x('This transaction was generated from a planned-expense or loan-payment record. Edit or delete it from the linked module to preserve data integrity.','تم إنشاء هذه العملية من سجل مصروف مخطط أو دفعة قرض. عدلها أو احذفها من الوحدة المرتبطة للحفاظ على سلامة البيانات.')}</div>`:''}<div class="form-actions">${t.planned?`<button class="primary" data-action="mark-posted" data-id="${esc(t.id)}">${t.type==='income'?x('Mark received today','تسجيل الاستلام اليوم'):x('Mark paid today','تسجيل الدفع اليوم')}</button>`:''}${!locked?`<button class="secondary" data-action="edit-transaction" data-id="${esc(t.id)}">${svg('edit')}${x('Edit','تعديل')}</button>`:''}</div>${!locked?`<button class="danger-btn" style="margin-top:9px" data-action="delete-transaction" data-id="${esc(t.id)}">${x('Delete transaction','حذف العملية')}</button>`:`<button class="secondary" style="margin-top:9px" data-action="open-linked-record" data-id="${esc(t.id)}">${x('Open linked record','فتح السجل المرتبط')}</button>`}`);
+}
+function markTransactionPosted(id){const t=transactionById(id);if(!t)return;const old={planned:t.planned,date:t.date,cleared:t.cleared};t.planned=false;t.date=todayISO();t.cleared=true;t.modifiedAt=new Date().toISOString();saveState();closeSheet();renderAll();showToast(t.type==='income'?x('Income marked received','تم تسجيل الدخل كمستلم'):x('Transaction marked paid','تم تسجيل العملية كمدفوعة'),()=>{Object.assign(t,old);saveState();renderAll()})}
+function deleteTransaction(id){const t=transactionById(id);if(!t||t.meta?.lockedRecord)return;confirmSheet(x('Delete transaction','حذف العملية'),x('This removes the transaction from balances, budgets and forecasts.','سيؤدي ذلك إلى حذف العملية من الأرصدة والميزانيات والتوقعات.'),x('Delete','حذف'),()=>{const index=state.transactions.findIndex(q=>q.id===id),copy=state.transactions[index];state.transactions.splice(index,1);saveState();closeSheet();renderAll();showToast(x('Transaction deleted','تم حذف العملية'),()=>{state.transactions.splice(index,0,copy);saveState();renderAll()})})}
+
+function showTransactionSearch(){
+  openSheet(x('Transactions','العمليات'),`<div class="input-row"><div class="field"><label for="txSearchInput">${x('Search','بحث')}</label><input id="txSearchInput" type="search" placeholder="${x('Merchant, note or amount','متجر أو ملاحظة أو مبلغ')}"></div><div class="field"><label for="txSearchType">${x('Type','النوع')}</label><select id="txSearchType"><option value="all">${x('All','الكل')}</option><option value="expense">${x('Expense','مصروف')}</option><option value="income">${x('Income','دخل')}</option><option value="transfer">${x('Transfer','تحويل')}</option><option value="refund">${x('Refund','استرداد')}</option><option value="scheduled">${x('Scheduled','مجدول')}</option></select></div></div><div class="field"><label for="txSearchMonth">${x('Month','الشهر')}</label><select id="txSearchMonth"><option value="all">${x('All months','كل الأشهر')}</option>${monthOptions().reverse().map(k=>`<option value="${k}" ${k===ui.selectedMonth?'selected':''}>${formatMonth(k)}</option>`).join('')}</select></div><div class="divider"></div><div id="txSearchResults"></div><button class="primary" style="margin-top:15px" data-action="new-transaction-from-sheet">${svg('plus')}${x('Add transaction','إضافة عملية')}</button>`);
+  const redraw=()=>drawTransactionSearchResults();document.getElementById('txSearchInput').oninput=redraw;document.getElementById('txSearchType').onchange=redraw;document.getElementById('txSearchMonth').onchange=redraw;drawTransactionSearchResults();
+}
+function drawTransactionSearchResults(){
+  const root=document.getElementById('txSearchResults');if(!root)return;const query=(document.getElementById('txSearchInput')?.value||'').trim().toLowerCase(),type=document.getElementById('txSearchType')?.value||'all',month=document.getElementById('txSearchMonth')?.value||'all';
+  const rows=state.transactions.filter(t=>{if(month!=='all'&&monthKey(t.date)!==month)return false;if(type==='scheduled'&&!t.planned)return false;if(type!=='all'&&type!=='scheduled'&&t.type!==type)return false;if(!query)return true;const hay=[transactionLabel(t),t.note,nameOf(categoryById(t.categoryId)),moneyText(t.amountMinor)].join(' ').toLowerCase();return hay.includes(query)}).sort((a,b)=>dateAtNoon(b.date)-dateAtNoon(a.date));
+  root.innerHTML=rows.length?rows.slice(0,100).map(transactionRow).join(''):`<div class="notice">${x('No matching transactions.','لا توجد عمليات مطابقة.')}</div>`;
+}
+
+function showUpcomingSheet(days=90){const items=upcomingItems(days);openSheet(x(`Upcoming — ${days} days`,`القادم خلال ${days} يوماً`),items.length?items.map(upcomingRow).join(''):`<div class="notice">${x('Nothing is scheduled in this period.','لا توجد التزامات مجدولة خلال هذه الفترة.')}</div>`)}
+function showOverdueSheet(){const rows=overdueScheduledTransactions();openSheet(x('Overdue scheduled transactions','العمليات المجدولة المتأخرة'),rows.length?rows.sort((a,b)=>dateAtNoon(a.date)-dateAtNoon(b.date)).map(transactionRow).join(''):`<div class="notice">${x('No overdue scheduled transactions.','لا توجد عمليات مجدولة متأخرة.')}</div>`)}
+
+/* =========================================================
+   BACKUP, ENCRYPTION, IMPORT VALIDATION AND RESET
+   ========================================================= */
+function downloadBlob(blob,filename){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function bytesToBase64(bytes){let binary='';for(const b of bytes)binary+=String.fromCharCode(b);return btoa(binary)}
+function base64ToBytes(value){const binary=atob(value),out=new Uint8Array(binary.length);for(let i=0;i<binary.length;i++)out[i]=binary.charCodeAt(i);return out}
+async function deriveBackupKey(password,salt){const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:250000,hash:'SHA-256'},material,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+async function encryptBackupObject(obj,password){const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12)),key=await deriveBackupKey(password,salt),plain=new TextEncoder().encode(JSON.stringify(obj)),cipher=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,plain);return {format:'qfin-encrypted-v1',schemaVersion:SCHEMA_VERSION,salt:bytesToBase64(salt),iv:bytesToBase64(iv),data:bytesToBase64(new Uint8Array(cipher))}}
+async function decryptBackupObject(envelope,password){const salt=base64ToBytes(envelope.salt),iv=base64ToBytes(envelope.iv),data=base64ToBytes(envelope.data),key=await deriveBackupKey(password,salt),plain=await crypto.subtle.decrypt({name:'AES-GCM',iv},key,data);return JSON.parse(new TextDecoder().decode(plain))}
+function exportPlain(){state.settings.lastExport=new Date().toISOString();saveState();downloadBlob(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),`finance-v2-backup-${todayISO()}.json`);renderAll();showToast(x('Backup exported','تم تصدير النسخة'))}
+async function exportEncrypted(){const password=window.prompt(x('Enter a strong password with at least 8 characters for the encrypted backup. The password cannot be recovered.','أدخل كلمة مرور قوية من 8 أحرف على الأقل للنسخة المشفرة. لا يمكن استعادة كلمة المرور.'));if(password===null)return;if(password.length<8){showToast(x('Password must contain at least 8 characters','يجب أن تتكون كلمة المرور من 8 أحرف على الأقل'));return}try{state.settings.lastExport=new Date().toISOString();saveState();const envelope=await encryptBackupObject(state,password);downloadBlob(new Blob([JSON.stringify(envelope,null,2)],{type:'application/json'}),`finance-v2-encrypted-${todayISO()}.json`);renderAll();showToast(x('Encrypted backup exported','تم تصدير النسخة المشفرة'))}catch(err){console.error(err);showToast(x('Encrypted export failed','فشل التصدير المشفر'))}}
+async function handleImportFile(file){
+  if(!file)return;try{const raw=await file.text();let parsed=JSON.parse(raw);if(parsed?.format==='qfin-encrypted-v1'){const password=window.prompt(x('Enter the backup password','أدخل كلمة مرور النسخة الاحتياطية'));if(password===null)return;parsed=await decryptBackupObject(parsed,password)}const valid=validateState(parsed);if(!valid.ok)throw new Error(valid.error);ui.pendingImport=normalizeState(parsed);openSheet(x('Restore backup','استعادة النسخة الاحتياطية'),`<div class="notice warn">${x('The file passed structural validation. A local pre-restore copy of the current data will be created before replacement.','اجتاز الملف التحقق البنيوي. سيتم إنشاء نسخة محلية قبل الاستعادة من البيانات الحالية قبل الاستبدال.')}</div><div class="kv"><span>${x('Accounts','الحسابات')}</span><span>${ui.pendingImport.accounts.length}</span></div><div class="kv"><span>${x('Transactions','العمليات')}</span><span>${ui.pendingImport.transactions.length}</span></div><div class="kv"><span>${x('Planned expenses','المصروفات المخططة')}</span><span>${ui.pendingImport.plannedExpenses.length}</span></div><div class="kv"><span>${x('Loans','القروض')}</span><span>${ui.pendingImport.loans.length}</span></div><div class="kv"><span>${x('Sample mode','الوضع التجريبي')}</span><span>${ui.pendingImport.settings.sampleMode?x('Yes','نعم'):x('No','لا')}</span></div><div class="form-actions"><button class="ghost-btn" data-action="close-sheet">${x('Cancel','إلغاء')}</button><button class="primary" data-action="confirm-import">${x('Restore','استعادة')}</button></div>`)}catch(err){console.error(err);showToast(x(`Invalid backup: ${err.message}`,`نسخة غير صالحة: ${err.message}`))}finally{document.getElementById('importFile').value=''}}
+function confirmImport(){if(!ui.pendingImport)return;try{storeSet(PRE_RESTORE_KEY,JSON.stringify(state));state=ui.pendingImport;ui.pendingImport=null;saveState();closeSheet();ui.selectedMonth=monthKey(NOW);ui.view='home';renderAll();showToast(x('Backup restored and validated','تمت استعادة النسخة والتحقق منها'))}catch(err){const previous=storeGet(PRE_RESTORE_KEY);if(previous){state=normalizeState(JSON.parse(previous));saveState()}showToast(x('Restore failed; previous data retained','فشلت الاستعادة وتم الاحتفاظ بالبيانات السابقة'))}}
+function hasMeaningfulData(){return state.accounts.length||state.transactions.length||state.plannedExpenses.length||state.loans.length}
+function loadSampleData(){const apply=()=>{const lang=state.settings.language;state=sampleState();state.settings.language=lang;saveState();closeSheet();ui.view='home';ui.selectedMonth=monthKey(NOW);renderAll();showToast(x('Sample data loaded','تم تحميل البيانات التجريبية'))};if(hasMeaningfulData())confirmSheet(x('Replace current data with sample data?','استبدال البيانات الحالية ببيانات تجريبية؟'),x('A pre-replacement copy will be kept locally, but the visible app data will be replaced.','سيتم الاحتفاظ بنسخة محلية قبل الاستبدال، لكن بيانات التطبيق الظاهرة ستستبدل.'),x('Load sample','تحميل التجريبي'),()=>{storeSet(PRE_RESTORE_KEY,JSON.stringify(state));apply()});else apply()}
+function clearSampleData(){if(!state.settings.sampleMode){showToast(x('Sample mode is not active','الوضع التجريبي غير مفعل'));return}confirmSheet(x('Clear sample data?','مسح البيانات التجريبية؟'),x('This removes the fictional accounts, transactions, plans and loans.','سيحذف ذلك الحسابات والعمليات والخطط والقروض الخيالية.'),x('Clear sample','مسح التجريبي'),()=>{const lang=state.settings.language;state=emptyState();state.settings.language=lang;saveState();closeSheet();ui.view='home';renderAll();showToast(x('Sample data cleared','تم مسح البيانات التجريبية'))})}
+function clearLedger(){confirmSheet(x('Clear financial activity?','مسح النشاط المالي؟'),x('Transactions, planned-expense activity and recorded loan payments will be removed. Accounts and setup will remain.','سيتم حذف العمليات ونشاط المصروفات المخططة ودفعات القروض المسجلة، مع بقاء الحسابات والإعدادات.'),x('Clear activity','مسح النشاط'),()=>{state.transactions=[];state.plannedExpenses.forEach(p=>p.activities=[]);state.loans.forEach(l=>l.payments=[]);saveState();closeSheet();renderAll();showToast(x('Financial activity cleared','تم مسح النشاط المالي'))})}
+function resetPreferences(){confirmSheet(x('Reset preferences?','إعادة ضبط التفضيلات؟'),x('The language will return to English, the buffer to QAR 5,000 and the horizon to 30 days.','ستعود اللغة إلى الإنجليزية والاحتياطي إلى 5,000 ر.ق والأفق إلى 30 يوماً.'),x('Reset','إعادة ضبط'),()=>{state.settings.language='en';state.settings.minimumBufferMinor=500000;state.settings.horizonDays=30;saveState();closeSheet();renderAll();showToast('Preferences reset')},{danger:false})}
+function deleteAllData(){confirmSheet(x('Delete all app data?','حذف جميع بيانات التطبيق؟'),x('This permanently removes accounts, transactions, categories, planned expenses, loans, profile data and preferences from this browser.','سيؤدي ذلك إلى حذف الحسابات والعمليات والفئات والمصروفات المخططة والقروض وبيانات الملف والتفضيلات نهائياً من هذا المتصفح.'),x('Delete everything','حذف الكل'),()=>{storeRemove(STORAGE_KEY);storeRemove(PRE_RESTORE_KEY);state=emptyState();state.categories=[];saveState();closeSheet();ui.view='home';ui.selectedMonth=monthKey(NOW);renderAll();showToast(x('All app data deleted','تم حذف جميع بيانات التطبيق'))})}
+/* =========================================================
+   ARCHIVING AND CROSS-MODULE ACTIONS
+   ========================================================= */
+function archiveAccount(id){const a=accountById(id);if(!a)return;const linked=state.loans.some(l=>l.active&&l.liabilityAccountId===id);if(linked){showToast(x('Archive the linked financing first','أرشف التمويل المرتبط أولاً'));return}if(Math.abs(accountBalance(id))>1){showToast(x('Reconcile the account to zero before archiving','طابق الحساب إلى رصيد صفري قبل الأرشفة'));return}confirmSheet(x('Archive account?','أرشفة الحساب؟'),x('The account will disappear from entry lists, while its historical transactions remain available.','سيختفي الحساب من قوائم الإدخال مع بقاء عملياته التاريخية.'),x('Archive','أرشفة'),()=>{a.active=false;saveState();closeSheet();renderAll();showToast(x('Account archived','تمت أرشفة الحساب'))},{danger:false})}
+function archiveCategory(id){const c=categoryById(id);if(!c)return;confirmSheet(x('Archive category?','أرشفة الفئة؟'),x('Historical transactions keep the category, but it will no longer appear in new transaction entry.','ستحتفظ العمليات التاريخية بالفئة، لكنها لن تظهر عند إدخال عمليات جديدة.'),x('Archive','أرشفة'),()=>{c.active=false;saveState();closeSheet();renderAll();showToast(x('Category archived','تمت أرشفة الفئة'))},{danger:false})}
+function archivePlanned(id){const p=plannedById(id);if(!p)return;confirmSheet(x('Archive planned expense?','أرشفة المصروف المخطط؟'),x('Its activity history will remain in the backup but it will no longer affect Safe to Spend.','سيبقى سجل النشاط في النسخة الاحتياطية، لكنه لن يؤثر في المبلغ الآمن للإنفاق.'),x('Archive','أرشفة'),()=>{p.active=false;saveState();closeSheet();renderAll();showToast(x('Planned expense archived','تمت أرشفة المصروف المخطط'))},{danger:false})}
+function archiveLoan(id){const l=loanById(id);if(!l)return;confirmSheet(x('Archive financing?','أرشفة التمويل؟'),x('The payment history and liability account remain available, but future installments will no longer affect forecasts.','سيبقى سجل الدفعات وحساب الالتزام متاحين، لكن الأقساط المستقبلية لن تؤثر في التوقعات.'),x('Archive','أرشفة'),()=>{l.active=false;saveState();closeSheet();renderAll();showToast(x('Financing archived','تمت أرشفة التمويل'))},{danger:false})}
+function openLinkedRecord(txId){const t=transactionById(txId);if(!t)return;closeSheet();if(t.meta?.loanPaymentId){const l=state.loans.find(q=>q.payments?.some(p=>p.id===t.meta.loanPaymentId));if(l){ui.view='plan';ui.planTab='loans';renderAll();setTimeout(()=>openLoan(l.id),0);return}}if(t.meta?.plannedExpenseId){ui.view='plan';ui.planTab='planned';renderAll();setTimeout(()=>openPlanned(t.meta.plannedExpenseId),0)}}
+
+/* =========================================================
+   GLOBAL EVENT ROUTING
+   ========================================================= */
+document.addEventListener('click',e=>{
+  const nav=e.target.closest('[data-nav]');if(nav){ui.view=nav.dataset.nav;renderAll();window.scrollTo({top:0,behavior:'smooth'});return}
+  const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action,id=el.dataset.id;
+  switch(action){
+    case 'close-sheet':closeSheet();break;
+    case 'close-transaction':closeTransaction();break;
+    case 'choose-month':chooseMonthSheet();break;
+    case 'select-month':ui.selectedMonth=id;closeSheet();renderAll();break;
+    case 'toggle-language':state.settings.language=isAr()?'en':'ar';saveState();renderAll();if(document.getElementById('transactionOverlay').classList.contains('open'))renderTransactionForm(ui.editingTxId?transactionById(ui.editingTxId):null);break;
+    case 'go-settings':ui.view='settings';renderAll();window.scrollTo(0,0);break;
+    case 'go-insights':ui.view='insights';renderAll();window.scrollTo(0,0);break;
+    case 'go-plan':ui.view='plan';renderAll();window.scrollTo(0,0);break;
+    case 'safe-breakdown':safeBreakdownSheet();break;
+    case 'new-transaction':openTransaction('expense');break;
+    case 'quick-add':openTransaction('expense',{merchantId:id});break;
+    case 'tx-type':ui.txType=id;renderTransactionForm(null);break;
+    case 'tx-merchant':selectTxMerchant(id);break;
+    case 'open-transaction':openTransactionDetail(id);break;
+    case 'edit-transaction':{const t=transactionById(id);closeSheet();setTimeout(()=>openTransaction(t?.type||'expense',{id}),180);break}
+    case 'delete-transaction':deleteTransaction(id);break;
+    case 'mark-posted':markTransactionPosted(id);break;
+    case 'open-linked-record':openLinkedRecord(id);break;
+    case 'show-upcoming':showUpcomingSheet(90);break;
+    case 'show-transactions':showTransactionSearch();break;
+    case 'new-transaction-from-sheet':closeSheet();setTimeout(()=>openTransaction('expense'),170);break;
+    case 'show-overdue':showOverdueSheet();break;
+    case 'open-upcoming':if(el.dataset.kind==='transaction')openTransactionDetail(id);else if(el.dataset.kind==='loan')openLoan(id);else openPlanned(id);break;
+    case 'open-account':openAccount(id);break;
+    case 'add-account':accountForm();break;
+    case 'edit-account':closeSheet();setTimeout(()=>accountForm(id),170);break;
+    case 'reconcile-account':closeSheet();setTimeout(()=>reconcileAccount(id),170);break;
+    case 'archive-account':archiveAccount(id);break;
+    case 'plan-tab':ui.planTab=id;renderAll();break;
+    case 'open-category':if(ui.view!=='plan'){ui.view='plan';ui.planTab='budgets';renderAll()}openCategory(id);break;
+    case 'add-category':categoryForm();break;
+    case 'edit-category':closeSheet();setTimeout(()=>categoryForm(id),170);break;
+    case 'archive-category':archiveCategory(id);break;
+    case 'select-color':{const hidden=document.getElementById('catColor');if(hidden){hidden.value=el.dataset.color;document.querySelectorAll('#catColors .chip').forEach(b=>b.classList.toggle('active',b===el))}break}
+    case 'select-icon':{const hidden=document.getElementById('catIcon');if(hidden){hidden.value=el.dataset.icon;document.querySelectorAll('#catIcons .chip').forEach(b=>b.classList.toggle('active',b===el))}break}
+    case 'open-planned':if(ui.view!=='plan'){ui.view='plan';ui.planTab='planned';renderAll()}openPlanned(id);break;
+    case 'add-planned':plannedForm();break;
+    case 'edit-planned':closeSheet();setTimeout(()=>plannedForm(id),170);break;
+    case 'planned-deposit':closeSheet();setTimeout(()=>plannedDepositForm(id),170);break;
+    case 'planned-payment':closeSheet();setTimeout(()=>plannedPaymentForm(id),170);break;
+    case 'archive-planned':archivePlanned(id);break;
+    case 'next-planned-cycle':{const p=plannedById(id);if(p){advancePlannedCycle(p);saveState();closeSheet();renderAll();showToast(x('Next funding cycle started','تم بدء دورة التمويل التالية'))}break}
+    case 'open-loan':if(ui.view!=='plan'){ui.view='plan';ui.planTab='loans';renderAll()}openLoan(id);break;
+    case 'add-loan':loanForm();break;
+    case 'edit-loan':closeSheet();setTimeout(()=>loanForm(id),170);break;
+    case 'loan-payment':closeSheet();setTimeout(()=>loanPaymentForm(id),170);break;
+    case 'archive-loan':archiveLoan(id);break;
+    case 'edit-profile':profileForm();break;
+    case 'edit-planning':planningSettingsForm();break;
+    case 'export-backup':exportPlain();break;
+    case 'export-encrypted':exportEncrypted();break;
+    case 'import-backup':document.getElementById('importFile').click();break;
+    case 'confirm-import':confirmImport();break;
+    case 'load-sample':loadSampleData();break;
+    case 'clear-sample':clearSampleData();break;
+    case 'clear-ledger':clearLedger();break;
+    case 'reset-settings':resetPreferences();break;
+    case 'delete-all':deleteAllData();break;
+    case 'confirm-action':{const fn=ui.pendingConfirm;ui.pendingConfirm=null;if(fn)fn();break}
+  }
+});
+
+document.getElementById('transactionForm').addEventListener('submit',saveTransactionFromForm);
+document.getElementById('txRecurring').addEventListener('change',e=>{document.getElementById('txRecurringFields').hidden=!e.target.checked});
+document.getElementById('txDate').addEventListener('change',e=>{if(isFutureDate(e.target.value))document.getElementById('txPlanned').checked=true});
+document.getElementById('txAccount').addEventListener('change',()=>{if(ui.txType==='transfer')renderTxDynamic(ui.editingTxId?transactionById(ui.editingTxId):null)});
+document.getElementById('importFile').addEventListener('change',e=>handleImportFile(e.target.files?.[0]));
+document.getElementById('toastUndo').addEventListener('click',()=>{const fn=undoAction;closeToast();if(fn)fn()});
+document.getElementById('sheetOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('sheetOverlay'))closeSheet()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(document.getElementById('transactionOverlay').classList.contains('open'))closeTransaction();else if(document.getElementById('sheetOverlay').classList.contains('open'))closeSheet()}});
+
+/* =========================================================
+   INITIALIZATION
+   ========================================================= */
+state=loadState();
+ui.selectedMonth=monthKey(NOW);
+renderAll();
+if(!hasMeaningfulData())showToast(x('Add an account or load sample data to begin','أضف حساباً أو حمّل البيانات التجريبية للبدء'));
+</script>
+</body>
+</html>
