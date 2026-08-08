@@ -36,151 +36,201 @@ button{cursor:pointer}
 .greeting{font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .period-sub{font-size:12px;color:var(--muted);margin-top:2px}
 .header-actions{display:flex;align-items:center;gap:7px}
-.icon-btn,.period-btn,.lang-btn{border:1px solid var(--line);background:var(--surface);border-radius:13px;display:inline-flex;align-items:center;justify-content:center}
+.icon-btn,.period-btn,.lang-btn{border:1px solid var(--line);background:var(--surface);border-radius:14px;display:inline-flex;align-items:center;justify-content:center}
 .icon-btn{width:44px;padding:0}
 .period-btn{padding:0 12px;font-size:12px;font-weight:700;gap:6px;white-space:nowrap}
-.lang-btn{padding:0 10px;font-size:11.5px;font-weight:700}
-.sample-strip{display:flex;align-items:center;justify-content:center;gap:7px;background:#FFF5D9;color:#785106;border-bottom:1px solid #EFDDA9;font-size:11.5px;font-weight:700;padding:7px 14px}
+.lang-btn{padding:0 10px;font-size:12px;font-weight:700}
+.sample-strip{display:flex;align-items:center;justify-content:center;gap:7px;background:#FFF5D9;color:#785106;border-bottom:1px solid #EFDDA9;font-size:12px;font-weight:700;padding:7px 14px}
 .dot{width:7px;height:7px;border-radius:50%;background:currentColor;display:inline-block}
 main{padding:15px 16px 24px}
 .view{display:none}.view.active{display:block}
-.view-title{font-size:23px;line-height:1.2;margin:2px 0 4px;font-weight:700;letter-spacing:-.025em}
-.view-subtitle{font-size:12.5px;line-height:1.55;color:var(--muted);margin:0 0 14px}
+.view-title{font-size:24px;line-height:1.2;margin:2px 0 4px;font-weight:700;letter-spacing:-.025em}
+.view-subtitle{font-size:12px;line-height:1.55;color:var(--muted);margin:0 0 14px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-top:13px}
 .card:first-child{margin-top:0}
-.hero{background:var(--ink);color:#fff;border:none;padding:21px;border-radius:22px;position:relative;overflow:hidden}
+.hero{background:var(--ink);color:#fff;border:none;padding:21px;border-radius:18px;position:relative;overflow:hidden}
 .hero:after{content:"";position:absolute;width:210px;height:210px;border-radius:50%;right:-95px;top:-105px;background:radial-gradient(circle,rgba(255,255,255,.15),transparent 68%);pointer-events:none}
 [dir="rtl"] .hero:after{right:auto;left:-95px}
 .hero>*{position:relative;z-index:1}
-.hero-label{font-size:11px;font-weight:700;opacity:.62;letter-spacing:.08em;text-transform:uppercase}
+.hero-label{font-size:12px;font-weight:700;opacity:.62;letter-spacing:.08em;text-transform:uppercase}
 [dir="rtl"] .hero-label{text-transform:none;letter-spacing:0;font-size:12px}
-.hero-value{font-size:38px;line-height:1.08;font-weight:700;letter-spacing:-.045em;margin-top:7px;font-variant-numeric:tabular-nums}
+.hero-value{font-size:52px;line-height:1.08;font-weight:700;letter-spacing:-.045em;margin-top:7px;font-variant-numeric:tabular-nums}
 .hero-value.negative{color:#FFB9B3}
 .currency{font-size:12px;font-weight:700;opacity:.58;margin-inline-start:6px;letter-spacing:0}
-.hero-desc{font-size:11.5px;line-height:1.55;opacity:.62;margin-top:8px;max-width:330px}
+.hero-desc{font-size:12px;line-height:1.55;opacity:.62;margin-top:8px;max-width:330px}
 .hero-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 16px;border-top:1px solid rgba(255,255,255,.15);margin-top:17px;padding-top:15px}
-.hero-metric-label{font-size:10.5px;opacity:.56;margin-bottom:4px}
-.hero-metric-value{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
-.hero-link{border:0;background:transparent;color:#fff;padding:7px 0 0;min-height:auto;font-size:11.5px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.hero-metric-label{font-size:10px;opacity:.56;margin-bottom:4px}
+.hero-metric-value{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums}
+.hero-link{border:0;background:transparent;color:#fff;padding:7px 0 0;min-height:auto;font-size:12px;font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}
-.section-title{font-size:13px;font-weight:700;margin:0}
-.section-link{border:0;background:transparent;color:var(--teal);min-height:auto;padding:3px 0;font-size:11.5px;font-weight:700}
+.section-title{font-size:14px;font-weight:700;margin:0}
+.section-link{border:0;background:transparent;color:var(--teal);min-height:auto;padding:3px 0;font-size:12px;font-weight:700}
 .muted{color:var(--muted)}
-.small{font-size:11.5px;line-height:1.55}
+.small{font-size:12px;line-height:1.55}
 .metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.metric{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
-.metric-label{font-size:11px;color:var(--muted);line-height:1.35}
-.metric-value{font-size:20px;font-weight:700;margin-top:5px;font-variant-numeric:tabular-nums;letter-spacing:-.025em}
-.metric-note{font-size:10.5px;color:var(--muted);margin-top:3px}
+.metric{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px}
+.metric-label{font-size:12px;color:var(--muted);line-height:1.35}
+.metric-value{font-size:24px;font-weight:700;margin-top:5px;font-variant-numeric:tabular-nums;letter-spacing:-.025em}
+.metric-note{font-size:10px;color:var(--muted);margin-top:3px}
 .attention-list,.list{display:flex;flex-direction:column}
 .attention{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
 .attention:last-child{border-bottom:0;padding-bottom:2px}
-.status-icon{width:35px;height:35px;flex:none;border-radius:11px;display:flex;align-items:center;justify-content:center}
+.status-icon{width:35px;height:35px;flex:none;border-radius:14px;display:flex;align-items:center;justify-content:center}
 .status-icon.warn{background:var(--amber-bg);color:var(--amber)}
 .status-icon.danger{background:var(--red-bg);color:var(--red)}
 .status-icon.good{background:var(--teal-3);color:var(--teal)}
 .attention-main{flex:1;min-width:0}
-.attention-title{font-size:12.5px;font-weight:700;line-height:1.4}
-.attention-desc{font-size:11px;color:var(--muted);line-height:1.5;margin-top:2px}
-.attention-action{border:0;background:transparent;color:var(--teal);font-size:11px;font-weight:700;min-height:auto;padding:4px 0}
+.attention-title{font-size:12px;font-weight:700;line-height:1.4}
+.attention-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-top:2px}
+.attention-action{border:0;background:transparent;color:var(--teal);font-size:12px;font-weight:700;min-height:auto;padding:4px 0}
 .row{display:flex;align-items:center;gap:11px;padding:12px 0;border-bottom:1px solid var(--line);width:100%;background:transparent;border-left:0;border-right:0;border-top:0;text-align:start}
 .row:last-child{border-bottom:0}
-.row-icon{width:39px;height:39px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--soft)}
+.row-icon{width:39px;height:39px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex:none;background:var(--soft)}
 .row-main{flex:1;min-width:0}
-.row-title{display:block;font-size:13px;font-weight:700;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row-sub{display:block;font-size:10.8px;color:var(--muted);line-height:1.45;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-title{display:block;font-size:14px;font-weight:700;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-sub{display:block;font-size:10px;color:var(--muted);line-height:1.45;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row-side{text-align:end;flex:none;max-width:128px;white-space:nowrap}
-.row-amount{display:block;font-size:13.5px;font-weight:700;font-variant-numeric:tabular-nums}
+.row-amount{display:block;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
 .row-amount.positive{color:var(--teal)}
 .row-amount.negative{color:var(--red)}
-.row-tag{display:block;font-size:9.8px;color:var(--muted);margin-top:3px}
+.row-tag{display:block;font-size:10px;color:var(--muted);margin-top:3px}
 .chev{color:#9A9F99;width:18px;height:18px;flex:none}
 .quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.quick{border:1px solid var(--line);background:var(--surface);border-radius:15px;padding:10px 5px 9px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:7px;min-width:0}
-.quick-ic{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center}
-.quick-name{font-size:9.8px;font-weight:700;line-height:1.25;text-align:center;width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.progress-track{height:8px;background:var(--soft);border-radius:99px;overflow:hidden;position:relative}
-.progress-fill{height:100%;border-radius:99px;background:var(--teal);display:block}
+.quick{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:10px 5px 9px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:7px;min-width:0}
+.quick-ic{width:34px;height:34px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.quick-name{font-size:10px;font-weight:700;line-height:1.25;text-align:center;width:100%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.progress-track{height:8px;background:var(--soft);border-radius:99.0px;overflow:hidden;position:relative}
+.progress-fill{height:100%;border-radius:99.0px;background:var(--teal);display:block}
 .progress-fill.warn{background:var(--amber)}
 .progress-fill.danger{background:var(--red)}
 .progress-row{margin:13px 0}
 .progress-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:7px;align-items:baseline}
-.progress-name{font-size:12.5px;font-weight:700}
-.progress-values{font-size:10.8px;color:var(--muted);font-variant-numeric:tabular-nums}
-.progress-note{display:flex;justify-content:space-between;gap:8px;font-size:10.5px;color:var(--muted);margin-top:6px}
+.progress-name{font-size:12px;font-weight:700}
+.progress-values{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums}
+.progress-note{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:var(--muted);margin-top:6px}
 .segmented{display:flex;background:#E9EAE5;border-radius:14px;padding:4px;gap:2px;margin-bottom:13px}
-.segmented button{flex:1;border:0;background:transparent;border-radius:11px;font-size:11.5px;font-weight:700;color:var(--muted);padding:0 7px}
+.segmented button{flex:1;border:0;background:transparent;border-radius:14px;font-size:12px;font-weight:700;color:var(--muted);padding:0 7px}
 .segmented button.active{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(17,21,18,.08)}
-.primary,.secondary,.danger-btn,.ghost-btn{width:100%;border-radius:15px;border:0;padding:0 15px;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px}
+.primary,.secondary,.danger-btn,.ghost-btn{width:100%;border-radius:14px;border:0;padding:0 15px;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px}
 .primary{background:var(--teal);color:#fff}
 .secondary{background:var(--teal-2);color:var(--teal)}
 .danger-btn{background:var(--red-bg);color:var(--red)}
 .ghost-btn{background:var(--surface);border:1px solid var(--line)}
 .btn-row{display:flex;gap:9px;margin-top:14px}.btn-row>*{flex:1}
-.badge{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:5px 9px;font-size:10px;font-weight:700;background:var(--soft);color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:5px;border-radius:99.0px;padding:5px 9px;font-size:10px;font-weight:700;background:var(--soft);color:var(--muted)}
 .badge.warn{background:var(--amber-bg);color:var(--amber)}
 .badge.danger{background:var(--red-bg);color:var(--red)}
 .badge.good{background:var(--teal-3);color:var(--teal)}
 .empty{text-align:center;padding:27px 18px}
-.empty-icon{width:66px;height:66px;border-radius:22px;background:var(--teal-3);color:var(--teal);display:flex;align-items:center;justify-content:center;margin:0 auto 15px}
-.empty-title{font-size:16px;font-weight:700;margin:0}
+.empty-icon{width:66px;height:66px;border-radius:18px;background:var(--teal-3);color:var(--teal);display:flex;align-items:center;justify-content:center;margin:0 auto 15px}
+.empty-title{font-size:17px;font-weight:700;margin:0}
 .empty-desc{font-size:12px;color:var(--muted);line-height:1.6;margin:7px auto 0;max-width:280px}
 .bottom-nav{position:fixed;z-index:30;bottom:0;width:100%;max-width:430px;background:rgba(255,255,255,.95);backdrop-filter:blur(18px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);align-items:end;padding:8px 6px calc(10px + env(safe-area-inset-bottom))}
-.nav-btn{border:0;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:9.5px;font-weight:700;padding:3px 2px}
+.nav-btn{border:0;background:transparent;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:10px;font-weight:700;padding:3px 2px}
 .nav-btn svg{width:22px;height:22px}.nav-btn.active{color:var(--teal)}
 .fab-wrap{display:flex;justify-content:center;align-items:flex-end}
-.fab{width:52px;height:52px;border-radius:17px;border:0;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px rgba(17,21,18,.2);transform:translateY(-8px)}
+.fab{width:52px;height:52px;border-radius:18px;border:0;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px rgba(17,21,18,.2);transform:translateY(-8px)}
 .fab svg{width:24px;height:24px}
 .overlay{position:fixed;inset:0;z-index:80;display:none;align-items:flex-end;justify-content:center;background:rgba(17,21,18,.43);backdrop-filter:blur(3px)}
 .overlay.open{display:flex}
-.sheet{width:100%;max-width:430px;max-height:89vh;background:var(--surface);border-radius:25px 25px 0 0;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.sheet{width:100%;max-width:430px;max-height:89vh;background:var(--surface);border-radius:18px 25px 0 0;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow)}
 .sheet-head{display:flex;align-items:center;gap:10px;padding:10px 18px 11px;border-bottom:1px solid var(--line)}
-.grab{position:absolute;left:50%;transform:translateX(-50%);width:38px;height:4px;background:#D9DDD6;border-radius:99px;margin-top:-2px}
-.sheet-title{font-size:15px;font-weight:700;flex:1;margin-top:8px}
-.close-btn{border:0;background:var(--soft);width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-top:5px}
+.grab{position:absolute;left:50%;transform:translateX(-50%);width:38px;height:4px;background:#D9DDD6;border-radius:99.0px;margin-top:-2px}
+.sheet-title{font-size:17px;font-weight:700;flex:1;margin-top:8px}
+.close-btn{border:0;background:var(--soft);width:40px;height:40px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-top:5px}
 .sheet-body{overflow-y:auto;padding:17px 18px calc(24px + env(safe-area-inset-bottom))}
 .full-overlay{position:fixed;inset:0;z-index:90;background:var(--bg);display:none;max-width:430px;margin:0 auto;flex-direction:column}
 .full-overlay.open{display:flex}
 .full-head{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 16px 10px;border-bottom:1px solid var(--line);background:rgba(247,247,244,.96)}
-.full-title{font-size:15px;font-weight:700;flex:1}
+.full-title{font-size:17px;font-weight:700;flex:1}
 .full-body{flex:1;overflow-y:auto;padding:16px 16px 28px}
 .field{margin-top:13px}
 .field:first-child{margin-top:0}
-label,.field-label{display:block;font-size:11.5px;font-weight:700;margin-bottom:6px;color:#3D443E}
-input,select,textarea{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:13px;padding:12px 13px;color:var(--ink);font-size:16px;min-height:46px}
+label,.field-label{display:block;font-size:12px;font-weight:700;margin-bottom:6px;color:#3D443E}
+input,select,textarea{width:100%;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 13px;color:var(--ink);font-size:17px;min-height:46px}
 textarea{min-height:86px;resize:vertical;line-height:1.5}
 input:focus,select:focus,textarea:focus{border-color:var(--teal)}
 .input-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.amount-input{font-size:36px;font-weight:700;text-align:center;letter-spacing:-.035em;padding:17px 10px;direction:ltr}
-.help{font-size:10.8px;color:var(--muted);line-height:1.5;margin-top:6px}
+.amount-input{font-size:34px;font-weight:700;text-align:center;letter-spacing:-.035em;padding:17px 10px;direction:ltr}
+.help{font-size:10px;color:var(--muted);line-height:1.5;margin-top:6px}
 .check-row{display:flex;align-items:flex-start;gap:9px;border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:12px}
 .check-row input{width:20px;height:20px;min-height:0;flex:none;margin-top:1px}
-.check-copy{font-size:11.5px;line-height:1.45}.check-copy b{display:block;font-size:12px;margin-bottom:2px}
+.check-copy{font-size:12px;line-height:1.45}.check-copy b{display:block;font-size:12px;margin-bottom:2px}
 .chip-row{display:flex;gap:7px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}.chip-row::-webkit-scrollbar{display:none}
-.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:0 12px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:6px;min-height:39px}
+.chip{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:99.0px;padding:0 12px;font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:6px;min-height:39px}
 .chip.active{border-color:var(--teal);color:var(--teal);background:var(--teal-3)}
 .form-actions{display:flex;gap:9px;margin-top:18px}.form-actions>*{flex:1}
-.toast{position:fixed;z-index:120;bottom:calc(92px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,18px);width:calc(100% - 32px);max-width:398px;background:var(--ink);color:#fff;border-radius:15px;padding:12px 14px;display:flex;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:.25s}
+.toast{position:fixed;z-index:120;bottom:calc(92px + env(safe-area-inset-bottom));left:50%;transform:translate(-50%,18px);width:calc(100% - 32px);max-width:398px;background:var(--ink);color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;opacity:0;pointer-events:none;transition:.25s}
 .toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
 .toast-msg{font-size:12px;line-height:1.4;flex:1}.toast button{border:0;background:transparent;color:#C8F169;font-size:12px;font-weight:700;min-height:auto;padding:4px}
 .chart{height:132px;display:flex;align-items:flex-end;gap:3px;border-bottom:1px solid var(--line);padding-top:9px}
-.bar{flex:1;min-width:3px;border-radius:4px 4px 0 0;background:var(--teal);height:2px;position:relative}
+.bar{flex:1;min-width:3px;border-radius:6px 4px 0 0;background:var(--teal);height:2px;position:relative}
 .bar.weekend{background:#B9812E}.bar.zero{background:#E7E9E4;height:3px!important}
 .chart-axis{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:6px}
 .insight-card{border-inline-start:4px solid var(--teal);padding-inline-start:14px}
 .insight-card.warn{border-inline-start-color:var(--amber)}.insight-card.danger{border-inline-start-color:var(--red)}
-.insight-title{font-size:13px;font-weight:700;line-height:1.45}.insight-body{font-size:11.5px;color:var(--muted);line-height:1.6;margin-top:5px}
-.insight-rec{font-size:11.5px;line-height:1.55;margin-top:8px;background:var(--soft);border-radius:11px;padding:9px 10px}
+.insight-title{font-size:14px;font-weight:700;line-height:1.45}.insight-body{font-size:12px;color:var(--muted);line-height:1.6;margin-top:5px}
+.insight-rec{font-size:12px;line-height:1.55;margin-top:8px;background:var(--soft);border-radius:14px;padding:9px 10px}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .kv{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:12px}.kv:last-child{border-bottom:0}.kv span:last-child{font-weight:700;text-align:end;font-variant-numeric:tabular-nums}
-.notice{border-radius:14px;padding:11px 12px;background:var(--teal-3);color:#244A45;font-size:11px;line-height:1.55}.notice.warn{background:var(--amber-bg);color:#744C05}.notice.danger{background:var(--red-bg);color:#7C2721}
+.notice{border-radius:14px;padding:11px 12px;background:var(--teal-3);color:#244A45;font-size:12px;line-height:1.55}.notice.warn{background:var(--amber-bg);color:#744C05}.notice.danger{background:var(--red-bg);color:#7C2721}
 .divider{height:1px;background:var(--line);margin:15px 0}
 .settings-row{display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:1px solid var(--line);width:100%;border-top:0;border-left:0;border-right:0;background:transparent;text-align:start}.settings-row:last-child{border-bottom:0}
-.settings-copy{flex:1;min-width:0}.settings-title{display:block;font-size:12.5px;font-weight:700}.settings-sub{display:block;font-size:10.8px;color:var(--muted);line-height:1.45;margin-top:2px}
+.settings-copy{flex:1;min-width:0}.settings-title{display:block;font-size:12px;font-weight:700}.settings-sub{display:block;font-size:10px;color:var(--muted);line-height:1.45;margin-top:2px}
 .file-input{display:none}
 bdi{unicode-bidi:isolate}
-@media (max-width:350px){.hero-value{font-size:33px}.quick-grid{grid-template-columns:repeat(3,1fr)}.header-actions{gap:4px}.lang-btn{padding:0 7px}.period-btn{padding:0 8px}.metric-value{font-size:18px}}
+@media (max-width:350px){.hero-value{font-size:52px}.quick-grid{grid-template-columns:repeat(3,1fr)}.header-actions{gap:4px}.lang-btn{padding:0 7px}.period-btn{padding:0 8px}.metric-value{font-size:17px}}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* ---- fast entry ---- */
+#quickPane{display:flex;flex-direction:column;gap:0}
+.qamt{text-align:center;padding:16px 0 8px}
+.qamt-v{font-size:52px;font-weight:500;letter-spacing:-.045em;line-height:1;
+  font-variant-numeric:tabular-nums;direction:ltr;color:var(--ink)}
+.qamt-v.zero{color:#C9CCC6}
+.qamt-c{font-size:10px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted);margin-top:8px}
+[dir="rtl"] .qamt-c{letter-spacing:0;text-transform:none;font-size:12px}
+.qchips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;padding-bottom:14px}
+.qchip{background:var(--surface);border:1px solid var(--line);border-radius:99.0px;padding:7px 14px;
+  font:inherit;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer}
+.qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding-bottom:12px}
+.qm{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:11px 4px 9px;
+  cursor:pointer;font:inherit;display:flex;flex-direction:column;align-items:center;gap:6px;
+  transition:transform .12s}
+.qm:active{transform:scale(.94)}
+.qm-ic{width:34px;height:34px;border-radius:14px;display:flex;align-items:center;justify-content:center}
+.qm-n{font-size:10px;font-weight:600;line-height:1.25;text-align:center;color:var(--ink);
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.qm-a{font-size:10px;color:var(--muted);font-variant-numeric:tabular-nums;margin-top:-3px}
+.qm.more{border-style:dashed}
+.qpad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.qkey{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 0;
+  font:inherit;font-size:24px;font-weight:500;color:var(--ink);cursor:pointer;
+  font-variant-numeric:tabular-nums;transition:transform .1s}
+.qkey:active{transform:scale(.96);background:var(--soft)}
+.qkey.fn{background:transparent;border-color:transparent;color:var(--muted);font-size:17px}
+
+/* ===== motion =====
+   Everything shares one easing curve so the app moves with a single personality.
+   All of it collapses to nothing under prefers-reduced-motion. */
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+button{transition:transform .14s cubic-bezier(.3,.8,.3,1),background .16s}
+button:active{transform:scale(.972)}
+.card,.hero{animation:rise .45s cubic-bezier(.22,.85,.3,1) both}
+.card:nth-of-type(1){animation-delay:.04s}.card:nth-of-type(2){animation-delay:.10s}
+.card:nth-of-type(3){animation-delay:.16s}.card:nth-of-type(4){animation-delay:.22s}
+.card:nth-of-type(n+5){animation-delay:.26s}
+.hero-value{transition:color .2s}
+.bar-fill,[class*="progress"] > span,[class*="bar"] > i{transition:width .6s cubic-bezier(.22,.85,.3,1)}
+.row,.list-row,.tx-row{transition:background .16s}
+.row:active,.list-row:active,.tx-row:active{background:var(--soft)}
+.full-overlay{transition:transform .32s cubic-bezier(.3,.85,.3,1),opacity .2s}
+.qm,.qkey,.quick{transition:transform .12s cubic-bezier(.3,.8,.3,1),background .16s}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}
 </style>
 </head>
 <body>
@@ -225,7 +275,15 @@ bdi{unicode-bidi:isolate}
 <div class="full-overlay" id="transactionOverlay" aria-hidden="true">
   <div class="full-head"><button class="close-btn" data-action="close-transaction" aria-label="Close" id="transactionClose"></button><div class="full-title" id="transactionTitle"></div></div>
   <div class="full-body">
-    <form id="transactionForm" novalidate>
+    <div id="quickPane">
+      <div class="segmented" id="quickTypeTabs"></div>
+      <div class="qamt"><div class="qamt-v" id="quickAmount">0</div><div class="qamt-c" id="quickCur"></div></div>
+      <div class="qchips" id="quickChips"></div>
+      <div class="qgrid" id="quickMerchants"></div>
+      <div class="qpad" id="quickPad"></div>
+      <button class="ghost-btn" id="quickDetails" type="button" data-action="quick-open-full" style="margin-top:10px"></button>
+    </div>
+    <form id="transactionForm" novalidate hidden>
       <div class="segmented" id="transactionTypeTabs"></div>
       <div class="field"><label for="txAmount" id="txAmountLabel"></label><input class="amount-input" id="txAmount" name="amount" inputmode="decimal" autocomplete="off" placeholder="0.00" required></div>
       <div class="input-row">
@@ -700,6 +758,7 @@ function renderAll(){
   renderHeader();renderNav();renderHome();renderAccounts();renderPlan();renderInsights();renderSettings();
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${ui.view}`));
   document.querySelectorAll('[data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===ui.view));
+  animateHero();
 }
 function renderHeader(){
   document.getElementById('greeting').textContent=state.profile.name?x(`Hello, ${state.profile.name}`,`مرحباً، ${state.profile.name}`):x('Welcome','مرحباً بك');
@@ -735,10 +794,38 @@ function plannedRow(p){
 }
 function loanRow(l){const due=nextLoanDue(l),out=loanOutstanding(l);return `<button class="row" data-action="open-loan" data-id="${esc(l.id)}"><span class="row-icon" style="background:${colorBg(l.color)};color:${l.color}">${svg(l.icon||'loan')}</span><span class="row-main"><span class="row-title">${esc(nameOf(l))}</span><span class="row-sub">${due?x(`Next ${formatDate(due.dueDate)}`,`القادم ${formatDate(due.dueDate)}`):x('No remaining schedule','لا توجد دفعات متبقية')}</span></span><span class="row-side"><span class="row-amount negative">${money(out)}</span><span class="row-tag">${x('Outstanding','الرصيد المستحق')}</span></span>${rowChevron()}</button>`}
 
+
+/* animate the headline figure so a change registers instead of just appearing */
+let lastHeroMinor=null;
+function animateHero(){
+  const el=document.querySelector('.hero-value');if(!el)return;
+  const target=el.dataset.minor?Number(el.dataset.minor):null;
+  if(target===null||lastHeroMinor===null||lastHeroMinor===target||
+     window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    lastHeroMinor=target;return;
+  }
+  const from=lastHeroMinor,t0=performance.now(),dur=560;
+  const sign=el.classList.contains('negative');
+  (function step(t){
+    const p=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-p,3);
+    el.textContent=money(Math.round(from+(target-from)*e));
+    if(p<1)requestAnimationFrame(step);else el.textContent=money(target);
+  })(t0);
+  lastHeroMinor=target;
+}
+
 function renderHome(){
   const root=document.getElementById('view-home'),current=ui.selectedMonth===monthKey(NOW),txs=selectedMonthTransactions({actualOnly:false}).slice().sort((a,b)=>dateAtNoon(b.date)-dateAtNoon(a.date));
   if(!state.accounts.some(a=>a.active&&isAssetAccount(a))){
-    root.innerHTML=`<div class="card"><div class="empty"><div class="empty-icon">${svg('wallet')}</div><h2 class="empty-title">${x('Start with your first account','ابدأ بإضافة حسابك الأول')}</h2><p class="empty-desc">${x('Accounts are required before the app can calculate balances, transfers and Safe to Spend.','الحسابات مطلوبة قبل أن يتمكن التطبيق من حساب الأرصدة والتحويلات والمبلغ الآمن للإنفاق.')}</p><div class="btn-row"><button class="primary" data-action="add-account">${x('Add account','إضافة حساب')}</button><button class="secondary" data-action="load-sample">${x('Load sample','تحميل التجريبي')}</button></div></div></div>`;return;
+    root.innerHTML=`<div class="card"><div class="empty"><div class="empty-icon">${svg('wallet')}</div>
+      <h2 class="empty-title">${x('Log your first expense','سجّل أول مصروف')}</h2>
+      <p class="empty-desc">${x('Start typing amounts straight away. A Cash account is created for you, and you can add real accounts whenever you want balances and Safe to Spend.','ابدأ بتسجيل المبالغ مباشرة. سيتم إنشاء حساب نقدي تلقائياً، ويمكنك إضافة حساباتك الحقيقية لاحقاً للحصول على الأرصدة والمبلغ الآمن.')}</p>
+      <div class="btn-row">
+        <button class="primary" data-action="new-transaction">${x('Add an expense','إضافة مصروف')}</button>
+        <button class="secondary" data-action="add-account">${x('Add account','إضافة حساب')}</button>
+      </div>
+      <button class="ghost-btn" data-action="load-sample" style="margin-top:10px">${x('Explore with sample data','استعراض بيانات تجريبية')}</button>
+    </div></div>`;return;
   }
   const quick=topMerchants().slice(0,4);const attentions=current?buildInsights().slice(0,3):[];
   if(current){
@@ -746,7 +833,7 @@ function renderHome(){
     root.innerHTML=`
       <div class="hero">
         <div class="hero-label">${x('Safe to Spend','المبلغ الآمن للإنفاق')}</div>
-        <div class="hero-value ${safe.safe<0?'negative':''}">${money(safe.safe)}</div>
+        <div class="hero-value ${safe.safe<0?'negative':''}" data-minor="${safe.safe}">${money(safe.safe)}</div>
         <div class="hero-desc">${x(`After obligations due within ${state.settings.horizonDays} days and your selected cash buffer.`,`بعد الالتزامات المستحقة خلال ${state.settings.horizonDays} يوماً والاحتياطي النقدي المحدد.`)}</div>
         <button class="hero-link" data-action="safe-breakdown">${x('See calculation','عرض طريقة الحساب')}</button>
         <div class="hero-grid">
@@ -761,7 +848,7 @@ function renderHome(){
       <div class="card"><div class="section-head"><h2 class="section-title">${x('Recent transactions','آخر العمليات')}</h2><button class="section-link" data-action="show-transactions">${x('View all','عرض الكل')}</button></div>${txs.length?txs.slice(0,8).map(transactionRow).join(''):`<div class="empty"><p class="empty-desc">${x('No transactions in this month.','لا توجد عمليات في هذا الشهر.')}</p></div>`}</div>`;
   }else{
     const spend=monthOrdinarySpend(),income=monthIncome(),outflow=monthCashOutflow();
-    root.innerHTML=`<div class="hero"><div class="hero-label">${x('Month summary','ملخص الشهر')}</div><div class="hero-value">${money(spend)}</div><div class="hero-desc">${x('Ordinary spending recorded for the selected month.','الإنفاق الاعتيادي المسجل للشهر المحدد.')}</div><div class="hero-grid"><div><div class="hero-metric-label">${x('Income','الدخل')}</div><div class="hero-metric-value">${money(income)}</div></div><div><div class="hero-metric-label">${x('Cash outflow','التدفق النقدي الخارج')}</div><div class="hero-metric-value">${money(outflow)}</div></div><div><div class="hero-metric-label">${x('Budget','الميزانية')}</div><div class="hero-metric-value">${money(totalBudget())}</div></div><div><div class="hero-metric-label">${x('Budget variance','انحراف الميزانية')}</div><div class="hero-metric-value">${money(totalBudget()-spend)}</div></div></div></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Transactions','العمليات')}</h2></div>${txs.length?txs.map(transactionRow).join(''):`<div class="empty"><p class="empty-desc">${x('No transactions in this month.','لا توجد عمليات في هذا الشهر.')}</p></div>`}</div>`;
+    root.innerHTML=`<div class="hero"><div class="hero-label">${x('Month summary','ملخص الشهر')}</div><div class="hero-value" data-minor="${spend}">${money(spend)}</div><div class="hero-desc">${x('Ordinary spending recorded for the selected month.','الإنفاق الاعتيادي المسجل للشهر المحدد.')}</div><div class="hero-grid"><div><div class="hero-metric-label">${x('Income','الدخل')}</div><div class="hero-metric-value">${money(income)}</div></div><div><div class="hero-metric-label">${x('Cash outflow','التدفق النقدي الخارج')}</div><div class="hero-metric-value">${money(outflow)}</div></div><div><div class="hero-metric-label">${x('Budget','الميزانية')}</div><div class="hero-metric-value">${money(totalBudget())}</div></div><div><div class="hero-metric-label">${x('Budget variance','انحراف الميزانية')}</div><div class="hero-metric-value">${money(totalBudget()-spend)}</div></div></div></div><div class="card"><div class="section-head"><h2 class="section-title">${x('Transactions','العمليات')}</h2></div>${txs.length?txs.map(transactionRow).join(''):`<div class="empty"><p class="empty-desc">${x('No transactions in this month.','لا توجد عمليات في هذا الشهر.')}</p></div>`}</div>`;
   }
 }
 function insightMini(i){return `<div class="attention"><span class="status-icon ${i.severity}">${svg(i.severity==='danger'?'alert':i.severity==='warn'?'alert':'check')}</span><div class="attention-main"><div class="attention-title">${esc(i.title)}</div><div class="attention-desc">${esc(i.body)}</div><button class="attention-action" data-action="${esc(i.action||'go-insights')}" ${i.ref?`data-id="${esc(i.ref)}"`:''}>${x('Review','مراجعة')}</button></div></div>`}
@@ -885,6 +972,144 @@ function transactionAccountList(type){
   if(type==='transfer')return state.accounts.filter(a=>a.active&&isAssetAccount(a));
   return state.accounts.filter(a=>a.active&&a.type!=='loan');
 }
+
+/* =========================================================
+   FAST ENTRY — numpad first, merchant amount prediction.
+   Manual entry is the only way data gets in, so this path
+   has to cost two taps and a number.
+   ========================================================= */
+let quickAmt='';
+/* what this merchant usually costs: median of the last 12, so one odd
+   big shop does not drag the suggestion the way a mean would */
+function merchantTypicalMinor(merchantId){
+  const amts=state.transactions
+    .filter(t=>t.merchantId===merchantId&&t.type==='expense'&&!t.planned)
+    .sort((a,b)=>dateAtNoon(b.date)-dateAtNoon(a.date))
+    .slice(0,12).map(t=>t.amountMinor).sort((a,b)=>a-b);
+  if(!amts.length)return 0;
+  const mid=Math.floor(amts.length/2);
+  return amts.length%2?amts[mid]:Math.round((amts[mid-1]+amts[mid])/2);
+}
+/* only suggest when the merchant is genuinely consistent */
+function merchantIsPredictable(merchantId){
+  const amts=state.transactions
+    .filter(t=>t.merchantId===merchantId&&t.type==='expense'&&!t.planned)
+    .slice(-8).map(t=>t.amountMinor);
+  if(amts.length<3)return false;
+  const typical=merchantTypicalMinor(merchantId);if(!typical)return false;
+  const within=amts.filter(a=>Math.abs(a-typical)<=Math.max(200,typical*0.15)).length;
+  return within/amts.length>=0.6;
+}
+function quickPaint(){
+  const el=document.getElementById('quickAmount');
+  el.textContent=quickAmt===''?'0':quickAmt;
+  el.classList.toggle('zero',quickAmt==='');
+}
+function quickRender(){
+  const isExp=ui.txType==='expense';
+  document.getElementById('quickCur').textContent=state.settings.currency||'QAR';
+  document.getElementById('quickDetails').textContent=x('More options','خيارات إضافية');
+  document.getElementById('quickTypeTabs').innerHTML=
+    [['expense','expense',x('Expense','مصروف')],['income','income',x('Income','دخل')]]
+    .map(([id,ic,label])=>`<button type="button" class="${ui.txType===id?'active':''}" data-action="quick-type" data-id="${id}">${svg(ic)} ${label}</button>`).join('');
+
+  const acc=transactionAccountList(ui.txType)[0];
+  document.getElementById('quickChips').innerHTML=
+    `<button class="qchip" data-action="quick-open-full">${svg('calendar')} ${x('Today','اليوم')}</button>`
+   +(acc?`<button class="qchip" data-action="quick-open-full">${svg('wallet')} ${esc(nameOf(acc))}</button>`:'');
+
+  const grid=document.getElementById('quickMerchants');
+  if(!isExp){
+    const cats=state.categories.filter(c=>c.active&&c.type==='income');
+    grid.innerHTML=(cats.length?cats:state.categories.filter(c=>c.active)).slice(0,8)
+      .map(c=>`<button class="qm" data-action="quick-save-cat" data-id="${esc(c.id)}">
+        <span class="qm-ic" style="background:${colorBg(c.color)};color:${c.color}">${svg(c.icon||'tag')}</span>
+        <span class="qm-n">${esc(nameOf(c))}</span></button>`).join('');
+  } else {
+    /* merchants first, then categories to fill the grid — a new install has no
+       merchant history yet and must not be shown an empty pad */
+    const ms=topMerchants().slice(0,11);
+    let html=ms.map(m=>{
+      const typical=merchantIsPredictable(m.id)?merchantTypicalMinor(m.id):0;
+      return `<button class="qm" data-action="quick-save" data-id="${esc(m.id)}" data-typical="${typical}">
+        <span class="qm-ic" style="background:${colorBg(m.color)};color:${m.color}">${svg(m.icon||'tag')}</span>
+        <span class="qm-n">${esc(nameOf(m))}</span>
+        ${typical?`<span class="qm-a">${money(typical)}</span>`:''}</button>`}).join('');
+    const slots=11-ms.length;
+    if(slots>0){
+      const used=new Set(ms.map(m=>m.categoryId).filter(Boolean));
+      const cats=state.categories.filter(c=>c.active&&c.type!=='income'&&!used.has(c.id)).slice(0,slots);
+      html+=cats.map(c=>`<button class="qm" data-action="quick-save-cat" data-id="${esc(c.id)}">
+        <span class="qm-ic" style="background:${colorBg(c.color)};color:${c.color}">${svg(c.icon||'tag')}</span>
+        <span class="qm-n">${esc(nameOf(c))}</span></button>`).join('');
+    }
+    grid.innerHTML=html+`<button class="qm more" data-action="quick-open-full">
+      <span class="qm-ic" style="background:var(--soft);color:var(--muted)">${svg('plus')}</span>
+      <span class="qm-n">${x('Other','أخرى')}</span></button>`;
+  }
+  document.getElementById('quickPad').innerHTML=
+    ['1','2','3','4','5','6','7','8','9','.','0','⌫']
+    .map(k=>`<button type="button" class="qkey ${(k==='.'||k==='⌫')?'fn':''}" data-action="quick-key" data-id="${k}">${k}</button>`).join('');
+  quickPaint();
+}
+function quickKey(k){
+  if(k==='⌫')quickAmt=quickAmt.slice(0,-1);
+  else if(k==='.'){if(!quickAmt.includes('.')&&quickAmt!=='')quickAmt+='.'}
+  else{
+    if(quickAmt.includes('.')&&quickAmt.split('.')[1].length>=2)return;
+    if(quickAmt.replace('.','').length>=8)return;
+    quickAmt+=k;
+  }
+  quickPaint();
+}
+/* tapping a merchant saves immediately; with no amount typed we fall back
+   to what that merchant usually costs */
+
+/* An empty app should never refuse to record a number. If no account exists
+   when the first expense is logged, create Cash silently and carry on. */
+function ensureDefaultAccount(){
+  const existing=transactionAccountList('expense')[0];
+  if(existing)return existing;
+  const acc={id:uid(),nameEn:'Cash',nameAr:'نقداً',type:'cash',active:true,
+    openingBalanceMinor:0,includeInSafe:true,color:'#0F5C56',icon:'wallet',
+    createdAt:new Date().toISOString()};
+  state.accounts.push(acc);
+  return acc;
+}
+
+function quickSave(merchantId,typicalMinor){
+  const m=merchantById(merchantId);if(!m)return;
+  let minor=quickAmt?toMinor(quickAmt):Number(typicalMinor||0);
+  if(!minor){showToast(x('Enter an amount first','اكتب المبلغ أولاً'));return}
+  const acc=transactionAccountList('expense').find(a=>a.id===m.lastAccountId)||ensureDefaultAccount();
+  const tx={id:uid(),type:'expense',amountMinor:minor,date:todayISO(),
+    sourceAccountId:acc.id,categoryId:m.categoryId||null,merchantId:m.id,
+    note:'',planned:false,posted:true,createdAt:new Date().toISOString()};
+  state.transactions.push(tx);
+  m.lastAccountId=acc.id;
+  saveState();closeTransaction();renderAll();
+  showToast(`${x('Added','أُضيف')} ${moneyText(minor)} · ${nameOf(m)}`);
+}
+function quickSaveCategory(catId){
+  const c=categoryById(catId);if(!c)return;
+  const minor=quickAmt?toMinor(quickAmt):0;
+  if(!minor){showToast(x('Enter an amount first','اكتب المبلغ أولاً'));return}
+  const acc=transactionAccountList(ui.txType)[0]||ensureDefaultAccount();
+  const tx={id:uid(),type:ui.txType,amountMinor:minor,date:todayISO(),
+    [ui.txType==='income'?'destinationAccountId':'sourceAccountId']:acc.id,
+    categoryId:c.id,merchantId:null,note:'',planned:false,posted:true,
+    createdAt:new Date().toISOString()};
+  state.transactions.push(tx);
+  saveState();closeTransaction();renderAll();
+  showToast(`${x('Added','أُضيف')} ${moneyText(minor)} · ${nameOf(c)}`);
+}
+function quickShowFull(){
+  document.getElementById('quickPane').hidden=true;
+  const form=document.getElementById('transactionForm');form.hidden=false;
+  if(quickAmt)document.getElementById('txAmount').value=quickAmt;
+  setTimeout(()=>document.getElementById('txAmount').focus(),60);
+}
+
 function openTransaction(type='expense',{id=null,merchantId=null}={}){
   const existing=id?transactionById(id):null;if(existing?.meta?.lockedRecord){showToast(x('This entry is managed from its linked plan or loan','تدار هذه العملية من الخطة أو القرض المرتبط'));return}
   ui.editingTxId=id;ui.txType=existing?.type||type;ui.prefillMerchantId=merchantId||existing?.merchantId||null;
@@ -897,7 +1122,12 @@ function openTransaction(type='expense',{id=null,merchantId=null}={}){
   document.getElementById('txRecurring').checked=!!existing?.recurring;
   document.getElementById('txRecurringFields').hidden=!existing?.recurring;
   renderTransactionForm(existing);
-  setTimeout(()=>document.getElementById('txAmount').focus(),80);
+  const fast=!existing;
+  quickAmt='';
+  document.getElementById('quickPane').hidden=!fast;
+  document.getElementById('transactionForm').hidden=fast;
+  if(fast)quickRender();
+  else setTimeout(()=>document.getElementById('txAmount').focus(),80);
 }
 function closeTransaction(){document.getElementById('transactionOverlay').classList.remove('open');document.getElementById('transactionOverlay').setAttribute('aria-hidden','true');ui.editingTxId=null;ui.prefillMerchantId=null}
 function renderTransactionForm(existing=null){
@@ -1006,6 +1236,11 @@ document.addEventListener('click',e=>{
   const nav=e.target.closest('[data-nav]');if(nav){ui.view=nav.dataset.nav;renderAll();window.scrollTo({top:0,behavior:'smooth'});return}
   const el=e.target.closest('[data-action]');if(!el)return;const action=el.dataset.action,id=el.dataset.id;
   switch(action){
+    case 'quick-key':quickKey(id);break;
+    case 'quick-type':ui.txType=id;quickRender();break;
+    case 'quick-save':quickSave(id,el.dataset.typical);break;
+    case 'quick-save-cat':quickSaveCategory(id);break;
+    case 'quick-open-full':quickShowFull();break;
     case 'close-sheet':closeSheet();break;
     case 'close-transaction':closeTransaction();break;
     case 'choose-month':chooseMonthSheet();break;
