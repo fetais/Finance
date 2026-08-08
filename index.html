@@ -725,7 +725,7 @@ function safeToSpend(){
   const scheduledBudgetSpend=sum(billRows.filter(t=>monthKey(t.date)===monthKey(NOW)&&!t.meta?.excludeFromBudget),t=>t.amountMinor);
   const budgetLeft=rawBudgetLeft-scheduledBudgetSpend,total=totalBudget();
   const safe=total>0?Math.min(cashAfter,budgetLeft):cashAfter;
-  return {horizon,grossCash,cash,expectedIncome:expectedScheduledIncome+salary,scheduledBills,loanDue,reservedInLiquid,requiredPlans,buffer,cashAfter,rawBudgetLeft,scheduledBudgetSpend,budgetLeft,safe,daily:safe>0?Math.floor(safe/Math.max(1,daysBetween(NOW,endOfMonth(monthKey(NOW)))+1)):safe};
+  return {horizon,grossCash,cash,expectedIncome:expectedScheduledIncome+salary,scheduledBills,loanDue,reservedInLiquid,requiredPlans,buffer,cashAfter,rawBudgetLeft,scheduledBudgetSpend,budgetLeft,safe,daily:safe>0?Math.floor(safe/Math.max(1,daysBetween(NOW,endOfMonth(monthKey(NOW)))+1)):0};
 }
 function upcomingItems(days=30){
   const horizon=addDays(NOW,days),items=[];
@@ -832,15 +832,24 @@ function renderHome(){
     const safe=safeToSpend(),commitments=safe.scheduledBills+safe.loanDue+safe.requiredPlans;
     root.innerHTML=`
       <div class="hero">
-        <div class="hero-label">${x('Safe to Spend','المبلغ الآمن للإنفاق')}</div>
-        <div class="hero-value ${safe.safe<0?'negative':''}" data-minor="${safe.safe}">${money(safe.safe)}</div>
-        <div class="hero-desc">${x(`After obligations due within ${state.settings.horizonDays} days and your selected cash buffer.`,`بعد الالتزامات المستحقة خلال ${state.settings.horizonDays} يوماً والاحتياطي النقدي المحدد.`)}</div>
-        <button class="hero-link" data-action="safe-breakdown">${x('See calculation','عرض طريقة الحساب')}</button>
+        ${totalAssets()<=0?`
+          <div class="hero-label">${x('Budget remaining','المتبقي من الميزانية')}</div>
+          <div class="hero-value" data-minor="${safe.budgetLeft}">${money(safe.budgetLeft)}</div>
+          <div class="hero-desc">${x('Add what is actually in your accounts and this becomes Safe to Spend — what you can spend after everything already committed.','أضف رصيد حساباتك الفعلي ليتحول هذا إلى المبلغ الآمن للإنفاق — ما يمكنك إنفاقه بعد كل الالتزامات.')}</div>
+          <button class="hero-link" data-action="add-account">${x('Add your balance','أضف رصيدك')}</button>
+        `:`
+          <div class="hero-label">${x('Safe to Spend','المبلغ الآمن للإنفاق')}</div>
+          <div class="hero-value ${safe.safe<0?'negative':''}" data-minor="${safe.safe}">${money(safe.safe)}</div>
+          <div class="hero-desc">${safe.safe<0
+            ? x('Your commitments over the next 30 days are larger than the cash you have available.','التزاماتك خلال 30 يوماً أكبر من النقد المتاح لديك.')
+            : x(`This is yours to spend after everything due in the next ${state.settings.horizonDays} days.`,`هذا ما يمكنك إنفاقه بعد كل المستحق خلال ${state.settings.horizonDays} يوماً.`)}</div>
+          <button class="hero-link" data-action="safe-breakdown">${x('See how this is worked out','كيف تم الحساب')}</button>
+        `}
         <div class="hero-grid">
-          <div><div class="hero-metric-label">${x('Unreserved cash','النقد غير المخصص')}</div><div class="hero-metric-value">${money(safe.cash)}</div></div>
-          <div><div class="hero-metric-label">${x('Budget remaining','المتبقي من الميزانية')}</div><div class="hero-metric-value">${money(safe.budgetLeft)}</div></div>
-          <div><div class="hero-metric-label">${x('Committed next','الالتزامات القادمة')}</div><div class="hero-metric-value">${money(commitments)}</div></div>
-          <div><div class="hero-metric-label">${x('Suggested per day','المقترح يومياً')}</div><div class="hero-metric-value">${money(safe.daily)}</div></div>
+          <div><div class="hero-metric-label">${x('Cash available','النقد المتاح')}</div><div class="hero-metric-value">${money(safe.cash)}</div></div>
+          <div><div class="hero-metric-label">${x('Budget left','المتبقي من الميزانية')}</div><div class="hero-metric-value">${money(safe.budgetLeft)}</div></div>
+          <div><div class="hero-metric-label">${x('Due soon','مستحق قريباً')}</div><div class="hero-metric-value">${money(commitments)}</div></div>
+          <div><div class="hero-metric-label">${x('A day, to month end','يومياً حتى نهاية الشهر')}</div><div class="hero-metric-value">${safe.daily>0?money(safe.daily):'—'}</div></div>
         </div>
       </div>
       ${quick.length?`<div class="card"><div class="section-head"><h2 class="section-title">${x('Quick add','إضافة سريعة')}</h2><button class="section-link" data-action="new-transaction">${x('More','المزيد')}</button></div><div class="quick-grid">${quick.map(m=>`<button class="quick" data-action="quick-add" data-id="${esc(m.id)}"><span class="quick-ic" style="background:${colorBg(m.color)};color:${m.color}">${svg(m.icon||'tag')}</span><span class="quick-name">${esc(nameOf(m))}</span></button>`).join('')}</div></div>`:''}
